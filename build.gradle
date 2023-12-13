@@ -43,6 +43,10 @@ dependencies {
     runtimeOnly 'com.h2database:h2'
     runtimeOnly 'com.mysql:mysql-connector-j'
 
+    //scrape
+    implementation 'org.seleniumhq.selenium:selenium-java:4.16.1'
+    implementation 'org.jsoup:jsoup:1.15.3'
+
 }
 
 tasks.named('bootBuildImage') {

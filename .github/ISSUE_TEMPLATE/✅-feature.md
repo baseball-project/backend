@@ -8,14 +8,11 @@ assignees: ''
 ---
 
 ## Description
----
-작업 내용을 입력해주세요.
+작업 내용을 설명해주세요.
 
 ## Todo
----
-[ ] work1
-[ ] work2
+- [ ] work1
+- [ ] work2
 
 ## ETC
----
 기타사항 입력해주세요.

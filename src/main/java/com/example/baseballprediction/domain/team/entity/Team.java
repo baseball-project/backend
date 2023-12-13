@@ -15,6 +15,9 @@ public class Team extends BaseEntity {
 
     @Column(unique = true, nullable = false, length = 30)
     private String name;
+
+    @Column(unique = true, nullable = false, length = 10)
+    private String shortName;
     @Column(length = 200)
     private String logoUrl;
     @Column(length = 16)

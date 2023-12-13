@@ -3,11 +3,16 @@ package com.example.baseballprediction.domain.game.entity;
 import com.example.baseballprediction.domain.team.entity.Team;
 import com.example.baseballprediction.global.constant.Status;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Game {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

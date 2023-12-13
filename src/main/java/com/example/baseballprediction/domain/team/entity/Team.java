@@ -3,9 +3,11 @@ package com.example.baseballprediction.domain.team.entity;
 import com.example.baseballprediction.domain.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Team extends BaseEntity {
     @Id

@@ -5,10 +5,12 @@ import com.example.baseballprediction.domain.team.entity.Team;
 import com.example.baseballprediction.global.constant.SocialType;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseEntity {
     @Id

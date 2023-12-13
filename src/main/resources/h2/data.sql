@@ -1,0 +1,10 @@
+insert into team(name, short_name, logo_url, color, created_at) values ('LG 트윈스', 'LG', '', '', current_timestamp);
+insert into team(name, short_name, logo_url, color, created_at) values ('KT 위즈', 'KT', '', '', current_timestamp);
+insert into team(name, short_name, logo_url, color, created_at) values ('SSG 랜더스', 'SSG', '', '', current_timestamp);
+insert into team(name, short_name, logo_url, color, created_at) values ('NC 다이노스', 'NC', '', '', current_timestamp);
+insert into team(name, short_name, logo_url, color, created_at) values ('두산 베어스', '두산', '', '', current_timestamp);
+insert into team(name, short_name, logo_url, color, created_at) values ('KIA 타이거즈', 'KIA', '', '', current_timestamp);
+insert into team(name, short_name, logo_url, color, created_at) values ('롯데 자이언츠', '롯데', '', '', current_timestamp);
+insert into team(name, short_name, logo_url, color, created_at) values ('삼성 라이온즈', '삼성', '', '', current_timestamp);
+insert into team(name, short_name, logo_url, color, created_at) values ('한화 이글스', '한화', '', '', current_timestamp);
+insert into team(name, short_name, logo_url, color, created_at) values ('키움 히어로즈', '키움', '', '', current_timestamp);

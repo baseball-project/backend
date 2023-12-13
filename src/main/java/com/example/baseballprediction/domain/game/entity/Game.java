@@ -3,9 +3,7 @@ package com.example.baseballprediction.domain.game.entity;
 import com.example.baseballprediction.domain.team.entity.Team;
 import com.example.baseballprediction.global.constant.Status;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDateTime;
@@ -13,20 +11,19 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class Game {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "game_id")
     private Long id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "home_team_id")
-    @Column(nullable = false)
     private Team homeTeam;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "away_team_id")
-    @Column(nullable = false)
     private Team awayTeam;
 
     @Enumerated(EnumType.STRING)
@@ -36,15 +33,25 @@ public class Game {
     @Column(nullable = false)
     private LocalDateTime startedAt;
 
-    @Column(name = "home_team_score", nullable = false)
+    @Column(nullable = false)
     @ColumnDefault("0")
     private int homeTeamScore;
 
-    @Column(name = "away_team_score", nullable = false)
+    @Column(nullable = false)
     @ColumnDefault("0")
     private int awayTeamScore;
 
-    @OneToOne
-    @JoinColumn(name = "win_team_id")
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "win_team_id", unique = false)
     private Team winTeam;
+
+    @Builder
+    public Game(Team homeTeam, Team awayTeam, Status status, LocalDateTime startedAt, int homeTeamScore, int awayTeamScore) {
+        this.homeTeam = homeTeam;
+        this.awayTeam = awayTeam;
+        this.status = status;
+        this.startedAt = startedAt;
+        this.homeTeamScore = homeTeamScore;
+        this.awayTeamScore = awayTeamScore;
+    }
 }

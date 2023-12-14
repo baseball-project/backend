@@ -22,7 +22,7 @@ jobs:
         shell: bash
 
       - name: Build with Gradle
-        run: ./gradlew clean build -x test
+        run: ./gradlew clean build -Pprofile=prod -x test
         shell: bash
 
       - name: Get current time

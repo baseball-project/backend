@@ -5,6 +5,9 @@ server:
       force: true
   port: ${PORT}
 spring:
+  profiles:
+    active:
+      - prod
   datasource:
     url: jdbc:mysql://${RDS.HOSTNAME}:${RDS.PORT}/${RDS.DBNAME}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -23,4 +26,4 @@ my-env:
 
 logging:
   level:
-    com.example.miniproject: DEBUG
+    com.example.baseballprediction: DEBUG

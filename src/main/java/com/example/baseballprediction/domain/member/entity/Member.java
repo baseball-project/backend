@@ -4,16 +4,14 @@ import com.example.baseballprediction.domain.BaseEntity;
 import com.example.baseballprediction.domain.team.entity.Team;
 import com.example.baseballprediction.global.constant.SocialType;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Builder
 public class Member extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +24,7 @@ public class Member extends BaseEntity {
     @Column(length = 200, nullable = false)
     private String password;
     @Enumerated(EnumType.STRING)
-    @Column(length = 20, nullable = false)
+    @Column(length = 20, nullable = false, name = "social")
     private SocialType socialType;
     @Column(length = 20, unique = true, nullable = false)
     private String nickname;

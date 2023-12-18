@@ -58,7 +58,8 @@ public class SecurityConfig {
         httpSecurity.apply(new CustomSecurityFilterManager());
 
         httpSecurity.authorizeHttpRequests((request) -> request
-                .requestMatchers(new AntPathRequestMatcher("/login")).permitAll()
+                .requestMatchers(new AntPathRequestMatcher("/login"),
+                        new AntPathRequestMatcher("/h2-console/**")).permitAll()
                 .anyRequest().authenticated());
         return httpSecurity.build();
     }

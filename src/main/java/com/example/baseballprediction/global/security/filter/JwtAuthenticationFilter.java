@@ -37,13 +37,13 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
 
         jwt = jwt.replace(JwtTokenProvider.TOKEN_PREFIX, "");
 
-        if (!jwtTokenProvider.validateToken(jwt)) {
+        if (!JwtTokenProvider.validateToken(jwt)) {
             filterChain.doFilter(request, response);
         }
 
         Member member = Member.builder()
-                .id(jwtTokenProvider.getMemberIdFromToken(jwt))
-                .nickname(jwtTokenProvider.getNicknameFromToken(jwt))
+                .id(JwtTokenProvider.getMemberIdFromToken(jwt))
+                .nickname(JwtTokenProvider.getNicknameFromToken(jwt))
                 .build();
 
         MemberDetails memberDetails = new MemberDetails(member);

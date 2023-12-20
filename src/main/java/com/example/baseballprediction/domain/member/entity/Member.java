@@ -46,4 +46,8 @@ public class Member extends BaseEntity {
     @ColumnDefault("1")
     @Column(nullable = false)
     private int level;
+
+    public void changeTeam(Team team) {
+        this.team = team;
+    }
 }

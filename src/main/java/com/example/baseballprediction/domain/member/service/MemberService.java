@@ -13,6 +13,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.example.baseballprediction.domain.member.dto.MemberRequest.DetailsDTO;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -40,5 +42,22 @@ public class MemberService {
         Team likeTeam = teamRepository.findById(teamId).orElseThrow();
 
         member.changeTeam(likeTeam);
+    }
+
+    public void modifyDetails(String username, DetailsDTO detailsDTO) {
+        Member member = memberRepository.findByUsername(username).orElseThrow();
+
+        if (isExistNickname(member.getNickname(), detailsDTO.getNickname())) {
+            throw new RuntimeException("중복되는 닉네임이 있습니다.");
+        }
+
+        member.updateDetails(detailsDTO.getProfileImageUrl(), detailsDTO.getNickname(), detailsDTO.getComment());
+    }
+
+    public boolean isExistNickname(String originNickname, String nickname) {
+
+        if (originNickname.equals(nickname)) return false;
+
+        return memberRepository.findByNickname(nickname).isPresent();
     }
 }

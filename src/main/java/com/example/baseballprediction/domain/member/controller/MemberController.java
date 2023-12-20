@@ -14,8 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Map;
 
-import static com.example.baseballprediction.domain.member.dto.MemberRequest.LikeTeamDTO;
-import static com.example.baseballprediction.domain.member.dto.MemberRequest.LoginDTO;
+import static com.example.baseballprediction.domain.member.dto.MemberRequest.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -36,6 +35,15 @@ public class MemberController {
     public ResponseEntity<ApiResponse<?>> likeTeamModify(@RequestBody LikeTeamDTO likeTeamDTO,
                                                          @AuthenticationPrincipal MemberDetails memberDetails) {
         memberService.modifyLikeTeam(memberDetails.getUsername(), likeTeamDTO.getTeamId());
+
+        return ResponseEntity.ok(ApiResponse.createSuccess());
+    }
+
+    @PutMapping("/profile/details")
+    public ResponseEntity<ApiResponse<?>> detailsModify(@RequestBody DetailsDTO detailsDTO,
+                                                        @AuthenticationPrincipal MemberDetails memberDetails) {
+
+        memberService.modifyDetails(memberDetails.getUsername(), detailsDTO);
 
         return ResponseEntity.ok(ApiResponse.createSuccess());
     }

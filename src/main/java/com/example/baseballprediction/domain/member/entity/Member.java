@@ -50,4 +50,10 @@ public class Member extends BaseEntity {
     public void changeTeam(Team team) {
         this.team = team;
     }
+
+    public void updateDetails(String profileImageUrl, String nickname, String comment) {
+        this.profileImageUrl = profileImageUrl;
+        this.nickname = nickname;
+        this.comment = comment;
+    }
 }

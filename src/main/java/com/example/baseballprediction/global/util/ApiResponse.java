@@ -26,6 +26,10 @@ public class ApiResponse<T> {
         return new ApiResponse(HttpStatus.OK.value(), SUCCESS_MESSAGE, null);
     }
 
+    public static <T> ApiResponse<T> success(T data) {
+        return new ApiResponse<>(HttpStatus.OK.value(), SUCCESS_MESSAGE, data);
+    }
+
     public static ApiResponse<?> createValidationFail(BindingResult bindingResult) {
         Map<String, String> errors = new HashMap<>();
 

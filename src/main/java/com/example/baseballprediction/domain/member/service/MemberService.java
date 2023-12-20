@@ -16,8 +16,6 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    private final JwtTokenProvider jwtTokenProvider;
-
     public Map<String, Object> login(String username, String password) {
         Member member = memberRepository.findByUsername(username).orElseThrow();
 
@@ -26,7 +24,7 @@ public class MemberService {
         }
 
         Map<String, Object> response = new HashMap<>();
-        response.put("token", jwtTokenProvider.createToken(member));
+        response.put("token", JwtTokenProvider.createToken(member));
 
         return response;
     }

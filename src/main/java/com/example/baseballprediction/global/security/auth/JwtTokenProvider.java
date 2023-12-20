@@ -7,6 +7,7 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import java.util.Base64;
 import java.util.Date;
 
 @Component
@@ -14,11 +15,14 @@ public class JwtTokenProvider {
     public static final Long EXP = 1000L * 60 * 60 * 24;
     public static final String TOKEN_PREFIX = "Bearer ";
     public static final String HEADER = "Authorization";
+    private static String secretKey;
 
     @Value("${my-env.jwt.key}")
-    private String secretKey;
+    public void setSecretKey(String secret) {
+        secretKey = Base64.getEncoder().encodeToString(secret.getBytes());
+    }
 
-    public Long getMemberIdFromToken(String token) {
+    public static Long getMemberIdFromToken(String token) {
         return Jwts.parser()
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token)
@@ -26,7 +30,7 @@ public class JwtTokenProvider {
                 .get("id", Long.class);
     }
 
-    public String getNicknameFromToken(String token) {
+    public static String getNicknameFromToken(String token) {
         return Jwts.parser()
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token)
@@ -34,7 +38,7 @@ public class JwtTokenProvider {
                 .get("nickname", String.class);
     }
 
-    public boolean validateToken(String token) {
+    public static boolean validateToken(String token) {
         try {
             Claims claims = Jwts.parser()
                     .setSigningKey(secretKey)
@@ -47,7 +51,7 @@ public class JwtTokenProvider {
         }
     }
 
-    public String createToken(Member member) {
+    public static String createToken(Member member) {
         Claims claims = Jwts.claims();
         claims.put("id", member.getId());
         claims.put("nickname", member.getNickname());

@@ -43,7 +43,7 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
 
         Member member = Member.builder()
                 .id(JwtTokenProvider.getMemberIdFromToken(jwt))
-                .nickname(JwtTokenProvider.getNicknameFromToken(jwt))
+                .username(JwtTokenProvider.getUsernameFromToken(jwt))
                 .build();
 
         MemberDetails memberDetails = new MemberDetails(member);

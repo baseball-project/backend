@@ -30,12 +30,12 @@ public class JwtTokenProvider {
                 .get("id", Long.class);
     }
 
-    public static String getNicknameFromToken(String token) {
+    public static String getUsernameFromToken(String token) {
         return Jwts.parser()
                 .setSigningKey(secretKey)
                 .parseClaimsJws(token)
                 .getBody()
-                .get("nickname", String.class);
+                .get("username", String.class);
     }
 
     public static boolean validateToken(String token) {
@@ -54,7 +54,7 @@ public class JwtTokenProvider {
     public static String createToken(Member member) {
         Claims claims = Jwts.claims();
         claims.put("id", member.getId());
-        claims.put("nickname", member.getNickname());
+        claims.put("username", member.getUsername());
 
         String jwt = Jwts.builder()
                 .setClaims(claims)

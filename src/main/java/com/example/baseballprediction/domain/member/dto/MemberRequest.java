@@ -16,4 +16,12 @@ public class MemberRequest {
     public static class LikeTeamDTO {
         private Integer teamId;
     }
+
+    @Getter
+    @NoArgsConstructor
+    public static class DetailsDTO {
+        private String profileImageUrl;
+        private String nickname;
+        private String comment;
+    }
 }

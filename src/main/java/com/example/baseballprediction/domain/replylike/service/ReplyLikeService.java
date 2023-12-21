@@ -38,4 +38,16 @@ public class ReplyLikeService {
 
 		return replyLikeRepository.countByReply(reply);
 	}
+
+	public void deleteReplyLike(String username, Long replyId) {
+		Member member = memberRepository.findByUsername(username).orElseThrow();
+		Reply reply = replyRepository.findById(replyId).orElseThrow();
+		ReplyLike replyLike = replyLikeRepository.findByReply(reply).orElseThrow();
+
+		if (!replyLike.getMember().equals(member)) {
+			throw new RuntimeException("본인이 누른 좋아요만 취소할 수 있습니다.");
+		}
+
+		replyLikeRepository.delete(replyLike);
+	}
 }

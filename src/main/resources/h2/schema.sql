@@ -52,27 +52,6 @@ create table game_vote(
     foreign key(member_id) references member(member_id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-create table game_reply (
-	game_reply_id bigint auto_increment primary key,
-    member_id bigint not null,
-    game_id bigint not null,
-    content varchar(1000) not null,
-    created_at datetime not null default current_timestamp,
-    modified_at datetime,
-    foreign key(member_id) references member(member_id),
-    foreign key(game_id) references game(game_id)
-)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
-create table game_reply_like(
-	game_reply_like_id bigint auto_increment primary key,
-    game_reply_id bigint not null,
-    member_id bigint not null,
-    created_at datetime not null default current_timestamp,
-    modified_at datetime,
-    foreign key(game_reply_id) references game_reply(game_reply_id),
-    foreign key(member_id) references member(member_id)
-)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
 create table mini_game (
 	mini_game_id bigint auto_increment primary key,
 	question varchar(100) not null,
@@ -105,8 +84,8 @@ create table gift_token_log(
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 create table monthly_fairy(
-	monthly_fairy_id bigint auto_increment primary key,
-	statistic_month int not null,
+    monthly_fairy_id bigint auto_increment primary key,
+    statistic_month int not null,
     type varchar(10) not null,
     fairy_rank int not null,
     vote_ratio int not null,
@@ -114,23 +93,22 @@ create table monthly_fairy(
 	foreign key(member_id) references member(member_id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-create table monthly_fairy_reply (
-	monthly_fairy_reply_id bigint auto_increment primary key,
+create table reply(
+	reply_id bigint auto_increment primary key,
     member_id bigint not null,
-    monthly_fairy_id bigint not null,
     content varchar(1000) not null,
+    reply_type varchar(10) not null,
     created_at datetime not null default current_timestamp,
     modified_at datetime,
-    foreign key(member_id) references member(member_id),
-    foreign key(monthly_fairy_id) references monthly_fairy(monthly_fairy_id)
+    foreign key(member_id) references member(member_id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-create table monthly_fairy_reply_like(
-	monthly_fairy_reply_like_id bigint auto_increment primary key,
-    monthly_fairy_reply_id bigint not null,
-    member_id bigint not null,
-    created_at datetime not null default current_timestamp,
-    modified_at datetime,
-    foreign key(monthly_fairy_reply_id) references monthly_fairy_reply(monthly_fairy_reply_id),
-    foreign key(member_id) references member(member_id)
+create table reply_like(
+	reply_like_id bigint auto_increment primary key,
+	member_id bigint not null,
+	reply_id bigint not null,
+	created_at datetime not null default current_timestamp,
+	modified_at datetime,
+	foreign key(reply_id) references reply(reply_id),
+	foreign key(member_id) references member(member_id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

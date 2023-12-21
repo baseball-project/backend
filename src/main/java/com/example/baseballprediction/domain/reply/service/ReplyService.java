@@ -45,4 +45,16 @@ public class ReplyService {
 
 		replyRepository.save(reply);
 	}
+
+	public void deleteReply(Long replyId, String username) {
+		Member member = memberRepository.findByUsername(username).orElseThrow();
+
+		Reply reply = replyRepository.findById(replyId).orElseThrow();
+
+		if (!reply.getMember().equals(member)) {
+			throw new RuntimeException("본인이 작성한 댓글만 삭제가 가능합니다.");
+		}
+
+		replyRepository.delete(reply);
+	}
 }

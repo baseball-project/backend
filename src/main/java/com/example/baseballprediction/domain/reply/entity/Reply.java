@@ -15,6 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -37,4 +38,11 @@ public class Reply extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "reply_type")
 	private ReplyType type;
+
+	@Builder
+	public Reply(Member member, String content, ReplyType type) {
+		this.member = member;
+		this.content = content;
+		this.type = type;
+	}
 }

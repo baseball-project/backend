@@ -109,6 +109,7 @@ create table monthly_fairy(
 	statistic_month int not null,
     type varchar(10) not null,
     fairy_rank int not null,
+    vote_ratio int not null,
     member_id bigint not null,
 	foreign key(member_id) references member(member_id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

@@ -150,3 +150,9 @@ INSERT INTO game(away_team_id, away_team_score, home_team_id, home_team_score, w
 (10, 0, 7, 0, NULL, 128,  '2024-01-13 14:00:00', 'READY'),
 (8, 0, 2, 0, NULL, 129,  '2024-01-13 14:00:00', 'READY'),
 (4, 0, 9, 0, NULL, 130,  '2024-01-13 14:00:00', 'READY');
+
+INSERT INTO monthly_fairy(statistic_month, type, fairy_rank, vote_ratio, member_id) VALUES
+(202312, 'WIN', 1, 90, 1),
+(202312, 'LOSE', 1, 10, 5),
+(202312, 'WIN', 2, 75, 2),
+(202312, 'LOSE', 2, 20, 4);

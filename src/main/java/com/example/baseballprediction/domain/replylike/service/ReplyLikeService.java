@@ -31,4 +31,11 @@ public class ReplyLikeService {
 
 		replyLikeRepository.save(replyLike);
 	}
+
+	@Transactional(readOnly = true)
+	public Long findReplyLikeCount(Long replyId) {
+		Reply reply = replyRepository.findById(replyId).orElseThrow();
+
+		return replyLikeRepository.countByReply(reply);
+	}
 }

@@ -1,13 +1,18 @@
 package com.example.baseballprediction.domain.monthlyfairy.controller;
 
 import static com.example.baseballprediction.domain.monthlyfairy.dto.MonthlyFairyResponse.*;
+import static com.example.baseballprediction.domain.reply.dto.ReplyResponse.*;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.baseballprediction.domain.monthlyfairy.service.MonthlyFairyService;
+import com.example.baseballprediction.domain.reply.service.ReplyService;
+import com.example.baseballprediction.global.constant.ReplyType;
 import com.example.baseballprediction.global.util.ApiResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -17,12 +22,29 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/statistics")
 public class MonthlyFairyController {
 	private final MonthlyFairyService monthlyFairyService;
+	private final ReplyService replyService;
 
 	@GetMapping("")
 	public ResponseEntity<ApiResponse<StatisticsDTO>> monthlyFairyList() {
 		StatisticsDTO statistics = monthlyFairyService.findStatistics();
 
 		ApiResponse<StatisticsDTO> response = ApiResponse.success(statistics);
+
+		return ResponseEntity.ok(response);
+	}
+	
+	@GetMapping("/replies")
+	public ResponseEntity<ApiResponse<Page<ReplyDTO>>> replyList(
+		@RequestParam(required = false, defaultValue = "0") int page,
+		@RequestParam(required = false, defaultValue = "15") int item) {
+		if (page < 0)
+			throw new RuntimeException("페이지 번호를 확인해주세요.");
+
+		page = page == 0 ? page : page - 1;
+
+		Page<ReplyDTO> replies = replyService.findRepliesByType(ReplyType.FAIRY, page, item);
+
+		ApiResponse<Page<ReplyDTO>> response = ApiResponse.success(replies);
 
 		return ResponseEntity.ok(response);
 	}

@@ -23,7 +23,7 @@ import lombok.NoArgsConstructor;
 public class ReplyLike extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "reply_like")
+	@Column(name = "reply_like_id")
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)

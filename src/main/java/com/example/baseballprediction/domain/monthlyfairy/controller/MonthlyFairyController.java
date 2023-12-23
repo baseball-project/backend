@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.baseballprediction.domain.monthlyfairy.service.MonthlyFairyService;
 import com.example.baseballprediction.domain.reply.dto.ReplyRequest;
 import com.example.baseballprediction.domain.reply.service.ReplyService;
+import com.example.baseballprediction.domain.replylike.service.ReplyLikeService;
 import com.example.baseballprediction.global.constant.ReplyType;
 import com.example.baseballprediction.global.security.auth.MemberDetails;
 import com.example.baseballprediction.global.util.ApiResponse;
@@ -31,6 +32,7 @@ import lombok.RequiredArgsConstructor;
 public class MonthlyFairyController {
 	private final MonthlyFairyService monthlyFairyService;
 	private final ReplyService replyService;
+	private final ReplyLikeService replyLikeService;
 
 	@GetMapping("")
 	public ResponseEntity<ApiResponse<StatisticsDTO>> monthlyFairyList() {
@@ -69,6 +71,15 @@ public class MonthlyFairyController {
 	public ResponseEntity<ApiResponse> replyRemove(@AuthenticationPrincipal MemberDetails memberDetails,
 		@PathVariable Long replyId) {
 		replyService.deleteReply(replyId, memberDetails.getUsername());
+
+		return ResponseEntity.ok(ApiResponse.successWithNoData());
+	}
+
+	@PostMapping("/replies/{replyId}/like")
+	public ResponseEntity<ApiResponse> replyLikeAdd(@AuthenticationPrincipal MemberDetails memberDetails,
+		@PathVariable Long replyId) {
+
+		replyLikeService.saveReplyLike(memberDetails.getUsername(), replyId);
 
 		return ResponseEntity.ok(ApiResponse.successWithNoData());
 	}

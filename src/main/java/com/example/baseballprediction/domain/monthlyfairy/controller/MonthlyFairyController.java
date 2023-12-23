@@ -4,15 +4,21 @@ import static com.example.baseballprediction.domain.monthlyfairy.dto.MonthlyFair
 import static com.example.baseballprediction.domain.reply.dto.ReplyResponse.*;
 
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.baseballprediction.domain.monthlyfairy.service.MonthlyFairyService;
+import com.example.baseballprediction.domain.reply.dto.ReplyRequest;
 import com.example.baseballprediction.domain.reply.service.ReplyService;
 import com.example.baseballprediction.global.constant.ReplyType;
+import com.example.baseballprediction.global.security.auth.MemberDetails;
 import com.example.baseballprediction.global.util.ApiResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -32,7 +38,7 @@ public class MonthlyFairyController {
 
 		return ResponseEntity.ok(response);
 	}
-	
+
 	@GetMapping("/replies")
 	public ResponseEntity<ApiResponse<Page<ReplyDTO>>> replyList(
 		@RequestParam(required = false, defaultValue = "0") int page,
@@ -47,5 +53,13 @@ public class MonthlyFairyController {
 		ApiResponse<Page<ReplyDTO>> response = ApiResponse.success(replies);
 
 		return ResponseEntity.ok(response);
+	}
+
+	@PostMapping("/reply")
+	public ResponseEntity<ApiResponse> replyAdd(@AuthenticationPrincipal MemberDetails memberDetails, @RequestBody
+	ReplyRequest.ReplyDTO replyDTO) {
+		replyService.addReply(ReplyType.FAIRY, memberDetails.getUsername(), replyDTO.getContent());
+
+		return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.createSuccess());
 	}
 }

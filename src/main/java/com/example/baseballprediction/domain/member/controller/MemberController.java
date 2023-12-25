@@ -3,6 +3,7 @@ package com.example.baseballprediction.domain.member.controller;
 import static com.example.baseballprediction.domain.member.dto.MemberRequest.*;
 import static com.example.baseballprediction.domain.member.dto.MemberResponse.*;
 
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.baseballprediction.domain.member.dto.FairyProjection;
 import com.example.baseballprediction.domain.member.dto.ProfileProjection;
 import com.example.baseballprediction.domain.member.service.MemberService;
 import com.example.baseballprediction.global.security.auth.JwtTokenProvider;
@@ -70,4 +72,15 @@ public class MemberController {
 
 		return ResponseEntity.ok(response);
 	}
+
+	@GetMapping("/profile/history/fairy-statistics")
+	public ResponseEntity<ApiResponse<List<FairyProjection>>> fairyStatisticList(
+		@AuthenticationPrincipal MemberDetails memberDetails) {
+		List<FairyProjection> fairyProjections = memberService.findFairyStatistics(memberDetails.getMember().getId());
+
+		ApiResponse<List<FairyProjection>> response = ApiResponse.success(fairyProjections);
+
+		return ResponseEntity.ok(response);
+	}
+
 }

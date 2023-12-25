@@ -4,12 +4,14 @@ import static com.example.baseballprediction.domain.member.dto.MemberRequest.*;
 import static com.example.baseballprediction.domain.member.dto.MemberResponse.*;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.baseballprediction.domain.member.dto.FairyProjection;
 import com.example.baseballprediction.domain.member.dto.ProfileProjection;
 import com.example.baseballprediction.domain.member.entity.Member;
 import com.example.baseballprediction.domain.member.repository.MemberRepository;
@@ -78,5 +80,11 @@ public class MemberService {
 		ProfileDTO details = new ProfileDTO(member);
 
 		return details;
+	}
+
+	public List<FairyProjection> findFairyStatistics(Long memberId) {
+		List<FairyProjection> fairyProjections = memberRepository.findFairyStatistics(memberId);
+
+		return fairyProjections;
 	}
 }

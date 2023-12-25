@@ -1,6 +1,7 @@
 package com.example.baseballprediction.domain.member.controller;
 
 import static com.example.baseballprediction.domain.member.dto.MemberRequest.*;
+import static com.example.baseballprediction.domain.member.dto.MemberResponse.*;
 
 import java.util.Map;
 
@@ -58,5 +59,15 @@ public class MemberController {
 		ProfileProjection profile = memberService.findProfile(memberId);
 
 		return ResponseEntity.ok(ApiResponse.success(profile));
+	}
+
+	@GetMapping("/profile/details")
+	public ResponseEntity<ApiResponse<ProfileDTO>> detailsList(@AuthenticationPrincipal MemberDetails memberDetails) {
+
+		ProfileDTO profile = memberService.findDetails(memberDetails.getUsername());
+
+		ApiResponse<ProfileDTO> response = ApiResponse.success(profile);
+
+		return ResponseEntity.ok(response);
 	}
 }

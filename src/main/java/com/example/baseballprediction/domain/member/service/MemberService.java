@@ -1,6 +1,7 @@
 package com.example.baseballprediction.domain.member.service;
 
 import static com.example.baseballprediction.domain.member.dto.MemberRequest.*;
+import static com.example.baseballprediction.domain.member.dto.MemberResponse.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -69,5 +70,13 @@ public class MemberService {
 		ProfileProjection profile = memberRepository.findProfile(memberId).orElseThrow();
 
 		return profile;
+	}
+
+	public ProfileDTO findDetails(String username) {
+		Member member = memberRepository.findByUsername(username).orElseThrow();
+
+		ProfileDTO details = new ProfileDTO(member);
+
+		return details;
 	}
 }

@@ -1,50 +1,86 @@
 package com.example.baseballprediction.domain.member.controller;
 
-import com.example.baseballprediction.domain.member.service.MemberService;
-import com.example.baseballprediction.global.security.auth.JwtTokenProvider;
-import com.example.baseballprediction.global.security.auth.MemberDetails;
-import com.example.baseballprediction.global.util.ApiResponse;
-import lombok.RequiredArgsConstructor;
+import static com.example.baseballprediction.domain.member.dto.MemberRequest.*;
+import static com.example.baseballprediction.domain.member.dto.MemberResponse.*;
+
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
+import com.example.baseballprediction.domain.member.dto.FairyProjection;
+import com.example.baseballprediction.domain.member.dto.ProfileProjection;
+import com.example.baseballprediction.domain.member.service.MemberService;
+import com.example.baseballprediction.global.security.auth.JwtTokenProvider;
+import com.example.baseballprediction.global.security.auth.MemberDetails;
+import com.example.baseballprediction.global.util.ApiResponse;
 
-import static com.example.baseballprediction.domain.member.dto.MemberRequest.*;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
 public class MemberController {
-    private final MemberService memberService;
+	private final MemberService memberService;
 
-    @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody LoginDTO loginDTO) {
-        Map<String, Object> response = memberService.login(loginDTO.getUsername(), loginDTO.getPassword());
+	@PostMapping("/login")
+	public ResponseEntity<String> login(@RequestBody LoginDTO loginDTO) {
+		Map<String, Object> response = memberService.login(loginDTO.getUsername(), loginDTO.getPassword());
 
-        return ResponseEntity
-                .ok()
-                .header(JwtTokenProvider.HEADER, (String) response.get("token"))
-                .body("정상적으로 처리되었습니다.");
-    }
+		return ResponseEntity
+			.ok()
+			.header(JwtTokenProvider.HEADER, (String)response.get("token"))
+			.body("정상적으로 처리되었습니다.");
+	}
 
-    @PutMapping("/profile/team")
-    public ResponseEntity<ApiResponse<?>> likeTeamModify(@RequestBody LikeTeamDTO likeTeamDTO,
-                                                         @AuthenticationPrincipal MemberDetails memberDetails) {
-        memberService.modifyLikeTeam(memberDetails.getUsername(), likeTeamDTO.getTeamId());
+	@PutMapping("/profile/team")
+	public ResponseEntity<ApiResponse<?>> likeTeamModify(@RequestBody LikeTeamDTO likeTeamDTO,
+		@AuthenticationPrincipal MemberDetails memberDetails) {
+		memberService.modifyLikeTeam(memberDetails.getUsername(), likeTeamDTO.getTeamId());
 
-        return ResponseEntity.ok(ApiResponse.createSuccess());
-    }
+		return ResponseEntity.ok(ApiResponse.createSuccess());
+	}
 
-    @PutMapping("/profile/details")
-    public ResponseEntity<ApiResponse<?>> detailsModify(@RequestBody DetailsDTO detailsDTO,
-                                                        @AuthenticationPrincipal MemberDetails memberDetails) {
+	@PutMapping("/profile/details")
+	public ResponseEntity<ApiResponse<?>> detailsModify(@RequestBody DetailsDTO detailsDTO,
+		@AuthenticationPrincipal MemberDetails memberDetails) {
 
-        memberService.modifyDetails(memberDetails.getUsername(), detailsDTO);
+		memberService.modifyDetails(memberDetails.getUsername(), detailsDTO);
 
-        return ResponseEntity.ok(ApiResponse.createSuccess());
-    }
+		return ResponseEntity.ok(ApiResponse.createSuccess());
+	}
+
+	@GetMapping("/profiles/{memberId}")
+	public ResponseEntity<ApiResponse<ProfileProjection>> profileList(@PathVariable Long memberId) {
+		ProfileProjection profile = memberService.findProfile(memberId);
+
+		return ResponseEntity.ok(ApiResponse.success(profile));
+	}
+
+	@GetMapping("/profile/details")
+	public ResponseEntity<ApiResponse<ProfileDTO>> detailsList(@AuthenticationPrincipal MemberDetails memberDetails) {
+
+		ProfileDTO profile = memberService.findDetails(memberDetails.getUsername());
+
+		ApiResponse<ProfileDTO> response = ApiResponse.success(profile);
+
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/profile/history/fairy-statistics")
+	public ResponseEntity<ApiResponse<List<FairyProjection>>> fairyStatisticList(
+		@AuthenticationPrincipal MemberDetails memberDetails) {
+		List<FairyProjection> fairyProjections = memberService.findFairyStatistics(memberDetails.getMember().getId());
+
+		ApiResponse<List<FairyProjection>> response = ApiResponse.success(fairyProjections);
+
+		return ResponseEntity.ok(response);
+	}
+
 }

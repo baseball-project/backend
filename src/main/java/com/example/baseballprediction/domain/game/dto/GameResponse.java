@@ -1,4 +1,4 @@
-package com.example.baseballprediction.kbo.dto;
+package com.example.baseballprediction.domain.game.dto;
 
 import java.time.LocalDateTime;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -10,12 +10,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 
-public class KboResponse {
+public class GameResponse {
 
 	@Getter
 	@NoArgsConstructor
 	@AllArgsConstructor
-	public static class KboDtoDaily{
+	public static class GameDtoDaily{
 		
 		private Long gameId;
 		
@@ -29,7 +29,7 @@ public class KboResponse {
 		
 		private String status;
 		
-		public KboDtoDaily(Game game, Team homeTeam, Team awayTeam) {
+		public GameDtoDaily(Game game, Team homeTeam, Team awayTeam) {
 			this.gameId = game.getId();
 			this.homeTeam = new TeamDailyDTO(homeTeam);
 			this.awayTeam = new TeamDailyDTO(awayTeam);

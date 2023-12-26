@@ -1,42 +1,42 @@
-package com.example.baseballprediction.kbo.service;
+package com.example.baseballprediction.domain.game.service;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Service;
+import com.example.baseballprediction.domain.game.dto.GameResponse.GameDtoDaily;
 import com.example.baseballprediction.domain.game.entity.Game;
-import com.example.baseballprediction.kbo.dto.KboResponse.KboDtoDaily;
-import com.example.baseballprediction.kbo.repository.KboRepository;
+import com.example.baseballprediction.domain.game.repository.GameRepository;
 
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-public class KboService {
+public class GameService {
 
-	private final KboRepository kboRepository;
+	private final GameRepository gameRepository;
 	
 
-	public List<KboDtoDaily> findDailyKbo(){
-		List<Game> games = kboRepository.findAll();
+	public List<GameDtoDaily> findDailyGame(){
+		List<Game> games = gameRepository.findAll();
 		
-		List<KboDtoDaily> kboDTOList = new ArrayList<>();
+		List<GameDtoDaily> gameDTOList = new ArrayList<>();
 		
 		for(Game game : games) {
 			String formatDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 			String gameFormatDate = game.getStartedAt().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 			
 			  if(gameFormatDate.equals(formatDate)) {
-				KboDtoDaily dailyDto = new KboDtoDaily(game,game.getAwayTeam() ,game.getHomeTeam());
+				  GameDtoDaily dailygame = new GameDtoDaily(game,game.getAwayTeam() ,game.getHomeTeam());
 					
-				kboDTOList.add(dailyDto);
+				  gameDTOList.add(dailygame);
 			  
 			  }
 			
 		}
 		
-		return kboDTOList;
+		return gameDTOList;
 		
 		
 	}

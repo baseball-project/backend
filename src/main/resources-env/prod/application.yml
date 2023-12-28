@@ -20,9 +20,23 @@ spring:
       hibernate:
         default_batch_fetch_size: 100
 
+cloud:
+  aws:
+    s3:
+      bucket: ${S3.BUCKET}
+    credentials:
+      access-key: ${S3.ACCESSKEY}
+      secret-key: ${S3.SECRETKEY}
+    region:
+      static: ${S3.REGION}
+      auto: false
+    stack:
+      auto: false
+
 my-env:
   jwt:
     key: ${JWT.KEY}
+
 
 logging:
   level:

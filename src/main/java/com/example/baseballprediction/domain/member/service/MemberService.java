@@ -60,7 +60,8 @@ public class MemberService {
 		member.updateDetails(detailsDTO.getProfileImageUrl(), detailsDTO.getNickname(), detailsDTO.getComment());
 	}
 
-	public boolean isExistNickname(String originNickname, String nickname) {
+	@Transactional(readOnly = true)
+	private boolean isExistNickname(String originNickname, String nickname) {
 
 		if (originNickname.equals(nickname))
 			return false;
@@ -68,12 +69,14 @@ public class MemberService {
 		return memberRepository.findByNickname(nickname).isPresent();
 	}
 
+	@Transactional(readOnly = true)
 	public ProfileProjection findProfile(Long memberId) {
 		ProfileProjection profile = memberRepository.findProfile(memberId).orElseThrow();
 
 		return profile;
 	}
 
+	@Transactional(readOnly = true)
 	public ProfileDTO findDetails(String username) {
 		Member member = memberRepository.findByUsername(username).orElseThrow();
 
@@ -82,6 +85,7 @@ public class MemberService {
 		return details;
 	}
 
+	@Transactional(readOnly = true)
 	public List<FairyProjection> findFairyStatistics(Long memberId) {
 		List<FairyProjection> fairyProjections = memberRepository.findFairyStatistics(memberId);
 

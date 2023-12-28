@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.baseballprediction.domain.member.entity.Member;
 import com.example.baseballprediction.domain.member.repository.MemberRepository;
@@ -19,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class MonthlyFairyService {
 	private final MonthlyFairyRepository monthlyFairyRepository;
 	private final MemberRepository memberRepository;

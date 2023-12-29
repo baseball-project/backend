@@ -10,6 +10,7 @@ import java.util.Map;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.baseballprediction.domain.member.dto.FairyProjection;
 import com.example.baseballprediction.domain.member.dto.ProfileProjection;
@@ -17,7 +18,9 @@ import com.example.baseballprediction.domain.member.entity.Member;
 import com.example.baseballprediction.domain.member.repository.MemberRepository;
 import com.example.baseballprediction.domain.team.entity.Team;
 import com.example.baseballprediction.domain.team.repository.TeamRepository;
+import com.example.baseballprediction.global.constant.ImageType;
 import com.example.baseballprediction.global.security.auth.JwtTokenProvider;
+import com.example.baseballprediction.global.util.S3UploadService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,6 +31,7 @@ public class MemberService {
 	private final MemberRepository memberRepository;
 	private final TeamRepository teamRepository;
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
+	private final S3UploadService s3UploadService;
 
 	@Transactional(readOnly = true)
 	public Map<String, Object> login(String username, String password) {
@@ -50,14 +54,17 @@ public class MemberService {
 		member.changeTeam(likeTeam);
 	}
 
-	public void modifyDetails(String username, DetailsDTO detailsDTO) {
+	public void modifyDetails(String username, DetailsDTO detailsDTO, MultipartFile profileImage) {
 		Member member = memberRepository.findByUsername(username).orElseThrow();
 
 		if (isExistNickname(member.getNickname(), detailsDTO.getNickname())) {
 			throw new RuntimeException("중복되는 닉네임이 있습니다.");
 		}
 
-		member.updateDetails(detailsDTO.getProfileImageUrl(), detailsDTO.getNickname(), detailsDTO.getComment());
+		String uploadFileName = s3UploadService.updateFile(profileImage, member.getProfileImageUrl(),
+			ImageType.PROFILE);
+
+		member.updateDetails(uploadFileName, detailsDTO.getNickname(), detailsDTO.getComment());
 	}
 
 	@Transactional(readOnly = true)

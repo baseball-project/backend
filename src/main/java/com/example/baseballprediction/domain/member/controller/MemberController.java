@@ -13,7 +13,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.baseballprediction.domain.member.dto.FairyProjection;
 import com.example.baseballprediction.domain.member.dto.ProfileProjection;
@@ -48,12 +50,13 @@ public class MemberController {
 	}
 
 	@PutMapping("/profile/details")
-	public ResponseEntity<ApiResponse<?>> detailsModify(@RequestBody DetailsDTO detailsDTO,
+	public ResponseEntity<ApiResponse<?>> detailsModify(@RequestPart("data") DetailsDTO detailsDTO,
+		@RequestPart(name = "profileImage", required = false) MultipartFile profileImage,
 		@AuthenticationPrincipal MemberDetails memberDetails) {
 
-		memberService.modifyDetails(memberDetails.getUsername(), detailsDTO);
+		memberService.modifyDetails(memberDetails.getUsername(), detailsDTO, profileImage);
 
-		return ResponseEntity.ok(ApiResponse.createSuccess());
+		return ResponseEntity.ok(ApiResponse.successWithNoData());
 	}
 
 	@GetMapping("/profiles/{memberId}")

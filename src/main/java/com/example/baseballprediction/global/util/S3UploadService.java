@@ -22,6 +22,17 @@ public class S3UploadService {
 	@Value("${cloud.aws.s3.bucket}")
 	private String bucket;
 
+	@Value("${cloud.aws.s3.domain}")
+	private String domain;
+
+	public String updateFile(MultipartFile multipartFile, String originFileName, ImageType imageType) {
+		deleteFile(originFileName);
+
+		String updateFileName = saveFile(multipartFile, imageType);
+
+		return updateFileName;
+	}
+
 	public String saveFile(MultipartFile multipartFile, ImageType imageType) {
 		String originFileName = multipartFile.getOriginalFilename();
 		String saveFileName = imageType.getFolderName() + "/" + generateFileName(originFileName);
@@ -36,11 +47,18 @@ public class S3UploadService {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-		
-		return amazonS3.getUrl(bucket, saveFileName).toString();
+
+		return amazonS3.getUrl(bucket, saveFileName).toString().replace(domain, "");
 	}
 
 	private String generateFileName(String originFileName) {
-		return UUID.randomUUID() + originFileName;
+		return UUID.randomUUID() + originFileName.substring(originFileName.indexOf("."));
+	}
+
+	private void deleteFile(String fileName) {
+		if (fileName == null)
+			return;
+
+		amazonS3.deleteObject(bucket, fileName);
 	}
 }

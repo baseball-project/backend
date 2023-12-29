@@ -24,6 +24,7 @@ cloud:
   aws:
     s3:
       bucket: ${S3.BUCKET}
+      domain: ${S3.DOMAIN}
     credentials:
       access-key: ${S3.ACCESSKEY}
       secret-key: ${S3.SECRETKEY}

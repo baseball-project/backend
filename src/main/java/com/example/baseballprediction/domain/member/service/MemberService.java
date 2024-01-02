@@ -15,8 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.baseballprediction.domain.gifttoken.entity.GiftToken;
+import com.example.baseballprediction.domain.gifttoken.repository.GiftTokenRepository;
 import com.example.baseballprediction.domain.member.dto.FairyProjection;
-import com.example.baseballprediction.domain.member.dto.MemberResponse;
 import com.example.baseballprediction.domain.member.dto.ProfileProjection;
 import com.example.baseballprediction.domain.member.entity.Member;
 import com.example.baseballprediction.domain.member.repository.MemberRepository;
@@ -37,6 +38,7 @@ public class MemberService {
 	private final MemberRepository memberRepository;
 	private final TeamRepository teamRepository;
 	private final MonthlyFairyRepository monthlyFairyRepository;
+	private final GiftTokenRepository giftTokenRepository;
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 	private final S3UploadService s3UploadService;
 
@@ -107,14 +109,27 @@ public class MemberService {
 	}
 
 	@Transactional(readOnly = true)
-	public Page<MemberResponse.FairyHistoryDTO> findFairyHistories(Long memberId, int page, int list) {
+	public Page<FairyHistoryDTO> findFairyHistories(Long memberId, int page, int list) {
 		Pageable pageable = PageRequest.of(page, list);
 		Member member = memberRepository.findById(memberId).orElseThrow();
 
 		Page<MonthlyFairy> monthlyFairies = monthlyFairyRepository.findByMemberToPage(member, pageable);
 
-		Page<MemberResponse.FairyHistoryDTO> fairyHistories = monthlyFairies.map(m -> new FairyHistoryDTO(member, m));
+		Page<FairyHistoryDTO> fairyHistories = monthlyFairies.map(m -> new FairyHistoryDTO(member, m));
 
 		return fairyHistories;
+	}
+
+	@Transactional(readOnly = true)
+	public Page<GiftHistoryDTO> findGiftHistories(Long memberId, int page, int list) {
+		Member giveMember = memberRepository.findById(memberId).orElseThrow();
+
+		Pageable pageable = PageRequest.of(page, list);
+
+		Page<GiftToken> giftTokens = giftTokenRepository.findByGiveMember(giveMember, pageable);
+
+		Page<GiftHistoryDTO> giftHistories = giftTokens.map(m -> new GiftHistoryDTO(m));
+
+		return giftHistories;
 	}
 }

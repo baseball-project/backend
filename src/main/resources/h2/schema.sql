@@ -89,6 +89,8 @@ create table monthly_fairy(
     fairy_rank int not null,
     vote_ratio int not null,
     member_id bigint not null,
+    created_at datetime not null default current_timestamp,
+    modified_at datetime,
 	foreign key(member_id) references member(member_id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

@@ -2,7 +2,6 @@ create table team (
     team_id int auto_increment primary key,
     name varchar(30) unique not null,
     short_name varchar(10) unique not null,
-    logo_url varchar(200),
     color varchar(16),
     created_at datetime not null default current_timestamp,
     modified_at datetime

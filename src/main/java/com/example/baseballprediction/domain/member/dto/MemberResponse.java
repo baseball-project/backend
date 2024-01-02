@@ -1,5 +1,6 @@
 package com.example.baseballprediction.domain.member.dto;
 
+import com.example.baseballprediction.domain.gifttoken.entity.GiftToken;
 import com.example.baseballprediction.domain.member.entity.Member;
 import com.example.baseballprediction.domain.monthlyfairy.entity.MonthlyFairy;
 import com.example.baseballprediction.global.util.CustomDateUtil;
@@ -42,6 +43,23 @@ public class MemberResponse {
 			this.rank = monthlyFairy.getRank();
 			this.comment = member.getComment();
 			this.historyDate = CustomDateUtil.dateToString(monthlyFairy.getCreatedAt());
+		}
+	}
+
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class GiftHistoryDTO {
+		private String nickname;
+		private String profileImageUrl;
+		private int token;
+		private String takeDate;
+
+		public GiftHistoryDTO(GiftToken giftToken) {
+			this.nickname = giftToken.getTakeMember().getNickname();
+			this.profileImageUrl = giftToken.getTakeMember().getProfileImageUrl();
+			this.token = giftToken.getTokenAmount();
+			this.takeDate = CustomDateUtil.dateToString(giftToken.getCreatedAt());
 		}
 	}
 }

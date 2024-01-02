@@ -101,4 +101,16 @@ public class MemberController {
 
 		return ResponseEntity.ok(response);
 	}
+
+	@GetMapping("/profile/history/gifts")
+	public ResponseEntity<ApiResponse<?>> giftHistoryList(@AuthenticationPrincipal MemberDetails memberDetails,
+		@RequestParam(required = false, defaultValue = "0") int page,
+		@RequestParam(required = false, defaultValue = "10") int list) {
+		Page<GiftHistoryDTO> giftHistories = memberService.findGiftHistories(memberDetails.getMember()
+			.getId(), page, list);
+
+		ApiResponse<Page<GiftHistoryDTO>> response = ApiResponse.success(giftHistories);
+
+		return ResponseEntity.ok(response);
+	}
 }

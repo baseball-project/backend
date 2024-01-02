@@ -7,15 +7,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.baseballprediction.domain.member.dto.FairyProjection;
+import com.example.baseballprediction.domain.member.dto.MemberResponse;
 import com.example.baseballprediction.domain.member.dto.ProfileProjection;
 import com.example.baseballprediction.domain.member.entity.Member;
 import com.example.baseballprediction.domain.member.repository.MemberRepository;
+import com.example.baseballprediction.domain.monthlyfairy.entity.MonthlyFairy;
+import com.example.baseballprediction.domain.monthlyfairy.repository.MonthlyFairyRepository;
 import com.example.baseballprediction.domain.team.entity.Team;
 import com.example.baseballprediction.domain.team.repository.TeamRepository;
 import com.example.baseballprediction.global.constant.ImageType;
@@ -30,6 +36,7 @@ import lombok.RequiredArgsConstructor;
 public class MemberService {
 	private final MemberRepository memberRepository;
 	private final TeamRepository teamRepository;
+	private final MonthlyFairyRepository monthlyFairyRepository;
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 	private final S3UploadService s3UploadService;
 
@@ -97,5 +104,17 @@ public class MemberService {
 		List<FairyProjection> fairyProjections = memberRepository.findFairyStatistics(memberId);
 
 		return fairyProjections;
+	}
+
+	@Transactional(readOnly = true)
+	public Page<MemberResponse.FairyHistoryDTO> findFairyHistories(Long memberId, int page, int list) {
+		Pageable pageable = PageRequest.of(page, list);
+		Member member = memberRepository.findById(memberId).orElseThrow();
+
+		Page<MonthlyFairy> monthlyFairies = monthlyFairyRepository.findByMemberToPage(member, pageable);
+
+		Page<MemberResponse.FairyHistoryDTO> fairyHistories = monthlyFairies.map(m -> new FairyHistoryDTO(member, m));
+
+		return fairyHistories;
 	}
 }

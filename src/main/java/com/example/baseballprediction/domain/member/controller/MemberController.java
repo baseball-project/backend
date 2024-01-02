@@ -6,6 +6,7 @@ import static com.example.baseballprediction.domain.member.dto.MemberResponse.*;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -86,4 +88,17 @@ public class MemberController {
 		return ResponseEntity.ok(response);
 	}
 
+	@GetMapping("/profile/history/votes")
+	public ResponseEntity<ApiResponse<Page<FairyHistoryDTO>>> fairyHistoryList(
+		@AuthenticationPrincipal MemberDetails memberDetails,
+		@RequestParam(required = false, defaultValue = "0") int page,
+		@RequestParam(required = false, defaultValue = "10") int list) {
+
+		Page<FairyHistoryDTO> fairyHistories = memberService.findFairyHistories(memberDetails.getMember().getId(), page,
+			list);
+
+		ApiResponse<Page<FairyHistoryDTO>> response = ApiResponse.success(fairyHistories);
+
+		return ResponseEntity.ok(response);
+	}
 }

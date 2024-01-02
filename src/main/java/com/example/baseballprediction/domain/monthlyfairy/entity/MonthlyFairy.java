@@ -1,5 +1,6 @@
 package com.example.baseballprediction.domain.monthlyfairy.entity;
 
+import com.example.baseballprediction.domain.BaseEntity;
 import com.example.baseballprediction.domain.member.entity.Member;
 import com.example.baseballprediction.global.constant.FairyType;
 
@@ -20,7 +21,7 @@ import lombok.NoArgsConstructor;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class MonthlyFairy {
+public class MonthlyFairy extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "monthly_fairy_id")

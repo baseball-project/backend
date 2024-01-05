@@ -26,6 +26,7 @@ import com.example.baseballprediction.global.security.auth.JwtTokenProvider;
 import com.example.baseballprediction.global.security.auth.MemberDetails;
 import com.example.baseballprediction.global.util.ApiResponse;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -52,7 +53,7 @@ public class MemberController {
 	}
 
 	@PutMapping("/profile/details")
-	public ResponseEntity<ApiResponse<?>> detailsModify(@RequestPart("data") DetailsDTO detailsDTO,
+	public ResponseEntity<ApiResponse<?>> detailsModify(@RequestPart("data") @Valid DetailsDTO detailsDTO,
 		@RequestPart(name = "profileImage", required = false) MultipartFile profileImage,
 		@AuthenticationPrincipal MemberDetails memberDetails) {
 

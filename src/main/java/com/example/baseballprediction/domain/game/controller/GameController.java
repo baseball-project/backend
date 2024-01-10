@@ -32,6 +32,7 @@ public class GameController {
 	
 	private final GameService gameService;
 	private final ReplyService replyService;
+	private final ReplyLikeService replyLikeService;
 	
 	//오늘의 승부예측 경기 list 조회
 	@GetMapping("")
@@ -52,6 +53,16 @@ public class GameController {
 		replyService.addReply(ReplyType.GAME, memberDetails.getUsername(), replyDTO.getContent());
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.createSuccess());
+	}
+	
+	//승부예측 댓글 좋아요
+	@PostMapping("/daily-reply/{replyId}/like")
+	public ResponseEntity<ApiResponse> gameReplyLikeAdd(@AuthenticationPrincipal MemberDetails memberDetails,
+		@PathVariable Long replyId) {
+
+		replyLikeService.saveReplyLike(memberDetails.getUsername(), replyId);
+
+		return ResponseEntity.ok(ApiResponse.successWithNoData());
 	}
 	
 

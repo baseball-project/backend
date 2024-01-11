@@ -24,6 +24,7 @@ import com.example.baseballprediction.global.constant.ReplyType;
 import com.example.baseballprediction.global.security.auth.MemberDetails;
 import com.example.baseballprediction.global.util.ApiResponse;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -61,7 +62,7 @@ public class MonthlyFairyController {
 
 	@PostMapping("/reply")
 	public ResponseEntity<ApiResponse> replyAdd(@AuthenticationPrincipal MemberDetails memberDetails, @RequestBody
-	ReplyRequest.ReplyDTO replyDTO) {
+	@Valid ReplyRequest.ReplyDTO replyDTO) {
 		replyService.addReply(ReplyType.FAIRY, memberDetails.getUsername(), replyDTO.getContent());
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.createSuccess());

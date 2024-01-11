@@ -59,7 +59,6 @@ public class GameController {
 		return ResponseEntity.ok(response);
 	}
 	
-	
 	//승부예측 댓글 작성
 	@PostMapping("/daily-reply")
 	public ResponseEntity<ApiResponse> gameReplyAdd(@AuthenticationPrincipal MemberDetails memberDetails, @RequestBody
@@ -68,8 +67,8 @@ public class GameController {
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.createSuccess());
 	}
-	
-	//승부예측 댓글 좋아요
+
+  //승부예측 댓글 좋아요
 	@PostMapping("/daily-reply/{replyId}/like")
 	public ResponseEntity<ApiResponse> gameReplyLikeAdd(@AuthenticationPrincipal MemberDetails memberDetails,
 		@PathVariable Long replyId) {
@@ -78,6 +77,5 @@ public class GameController {
 
 		return ResponseEntity.ok(ApiResponse.successWithNoData());
 	}
-	
 
 }

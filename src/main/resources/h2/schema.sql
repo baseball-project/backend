@@ -2,7 +2,6 @@ create table team (
     team_id int auto_increment primary key,
     name varchar(30) unique not null,
     short_name varchar(10) unique not null,
-    logo_url varchar(200),
     color varchar(16),
     created_at datetime not null default current_timestamp,
     modified_at datetime
@@ -90,6 +89,8 @@ create table monthly_fairy(
     fairy_rank int not null,
     vote_ratio int not null,
     member_id bigint not null,
+    created_at datetime not null default current_timestamp,
+    modified_at datetime,
 	foreign key(member_id) references member(member_id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 

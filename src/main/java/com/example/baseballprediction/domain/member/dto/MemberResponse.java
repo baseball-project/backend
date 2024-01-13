@@ -62,4 +62,11 @@ public class MemberResponse {
 			this.takeDate = CustomDateUtil.dateToString(giftToken.getCreatedAt());
 		}
 	}
+
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class NicknameDTO {
+		private boolean exist;
+	}
 }

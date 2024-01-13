@@ -25,7 +25,10 @@ import com.example.baseballprediction.domain.monthlyfairy.entity.MonthlyFairy;
 import com.example.baseballprediction.domain.monthlyfairy.repository.MonthlyFairyRepository;
 import com.example.baseballprediction.domain.team.entity.Team;
 import com.example.baseballprediction.domain.team.repository.TeamRepository;
+import com.example.baseballprediction.global.constant.ErrorCode;
 import com.example.baseballprediction.global.constant.ImageType;
+import com.example.baseballprediction.global.error.exception.BusinessException;
+import com.example.baseballprediction.global.error.exception.NotFoundException;
 import com.example.baseballprediction.global.security.auth.JwtTokenProvider;
 import com.example.baseballprediction.global.util.S3UploadService;
 
@@ -44,10 +47,11 @@ public class MemberService {
 
 	@Transactional(readOnly = true)
 	public Map<String, Object> login(String username, String password) {
-		Member member = memberRepository.findByUsername(username).orElseThrow();
+		Member member = memberRepository.findByUsername(username).orElseThrow(() -> new NotFoundException(
+			ErrorCode.MEMBER_NOT_FOUND));
 
 		if (!bCryptPasswordEncoder.matches(password, member.getPassword())) {
-			throw new RuntimeException("패스워드가 일치하지 않습니다.");
+			throw new BusinessException(ErrorCode.LOGIN_PASSWORD_INVALID);
 		}
 
 		Map<String, Object> response = new HashMap<>();
@@ -57,17 +61,20 @@ public class MemberService {
 	}
 
 	public void modifyLikeTeam(String username, int teamId) {
-		Member member = memberRepository.findByUsername(username).orElseThrow();
-		Team likeTeam = teamRepository.findById(teamId).orElseThrow();
+		Member member = memberRepository.findByUsername(username)
+			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+		Team likeTeam = teamRepository.findById(teamId)
+			.orElseThrow(() -> new NotFoundException(ErrorCode.TEAM_NOT_FOUND));
 
 		member.changeTeam(likeTeam);
 	}
 
 	public void modifyDetails(String username, DetailsDTO detailsDTO, MultipartFile profileImage) {
-		Member member = memberRepository.findByUsername(username).orElseThrow();
+		Member member = memberRepository.findByUsername(username)
+			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
 		if (isExistNickname(member.getNickname(), detailsDTO.getNickname())) {
-			throw new RuntimeException("중복되는 닉네임이 있습니다.");
+			throw new BusinessException(ErrorCode.MEMBER_NICKNAME_EXIST);
 		}
 
 		String uploadFileName = s3UploadService.updateFile(profileImage, member.getProfileImageUrl(),
@@ -87,14 +94,16 @@ public class MemberService {
 
 	@Transactional(readOnly = true)
 	public ProfileProjection findProfile(Long memberId) {
-		ProfileProjection profile = memberRepository.findProfile(memberId).orElseThrow();
+		ProfileProjection profile = memberRepository.findProfile(memberId)
+			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
 		return profile;
 	}
 
 	@Transactional(readOnly = true)
 	public ProfileDTO findDetails(String username) {
-		Member member = memberRepository.findByUsername(username).orElseThrow();
+		Member member = memberRepository.findByUsername(username)
+			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
 		ProfileDTO details = new ProfileDTO(member);
 
@@ -111,7 +120,8 @@ public class MemberService {
 	@Transactional(readOnly = true)
 	public Page<FairyHistoryDTO> findFairyHistories(Long memberId, int page, int list) {
 		Pageable pageable = PageRequest.of(page, list);
-		Member member = memberRepository.findById(memberId).orElseThrow();
+		Member member = memberRepository.findById(memberId)
+			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
 		Page<MonthlyFairy> monthlyFairies = monthlyFairyRepository.findByMemberToPage(member, pageable);
 
@@ -122,7 +132,8 @@ public class MemberService {
 
 	@Transactional(readOnly = true)
 	public Page<GiftHistoryDTO> findGiftHistories(Long memberId, int page, int list) {
-		Member giveMember = memberRepository.findById(memberId).orElseThrow();
+		Member giveMember = memberRepository.findById(memberId)
+			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
 		Pageable pageable = PageRequest.of(page, list);
 

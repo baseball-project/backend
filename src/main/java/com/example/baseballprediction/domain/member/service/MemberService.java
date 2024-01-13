@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import com.example.baseballprediction.domain.gifttoken.entity.GiftToken;
 import com.example.baseballprediction.domain.gifttoken.repository.GiftTokenRepository;
 import com.example.baseballprediction.domain.member.dto.FairyProjection;
+import com.example.baseballprediction.domain.member.dto.MemberResponse;
 import com.example.baseballprediction.domain.member.dto.ProfileProjection;
 import com.example.baseballprediction.domain.member.entity.Member;
 import com.example.baseballprediction.domain.member.repository.MemberRepository;
@@ -81,6 +82,16 @@ public class MemberService {
 			ImageType.PROFILE);
 
 		member.updateDetails(uploadFileName, detailsDTO.getNickname(), detailsDTO.getComment());
+	}
+
+	@Transactional(readOnly = true)
+	public MemberResponse.NicknameDTO findExistNickname(Long memberId, String nickname) {
+		Member member = memberRepository.findById(memberId)
+			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+
+		boolean isExist = isExistNickname(member.getNickname(), nickname);
+
+		return new MemberResponse.NicknameDTO(isExist);
 	}
 
 	@Transactional(readOnly = true)

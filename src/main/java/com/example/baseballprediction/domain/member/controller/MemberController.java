@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.example.baseballprediction.domain.member.dto.FairyProjection;
+import com.example.baseballprediction.domain.member.dto.MemberRequest;
+import com.example.baseballprediction.domain.member.dto.MemberResponse;
 import com.example.baseballprediction.domain.member.dto.ProfileProjection;
 import com.example.baseballprediction.domain.member.service.MemberService;
 import com.example.baseballprediction.global.security.auth.JwtTokenProvider;
@@ -111,6 +113,18 @@ public class MemberController {
 			.getId(), page, list);
 
 		ApiResponse<Page<GiftHistoryDTO>> response = ApiResponse.success(giftHistories);
+
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/profile/nickname-check")
+	public ResponseEntity<ApiResponse<MemberResponse.NicknameDTO>> nicknameExistList(
+		@AuthenticationPrincipal MemberDetails memberDetails,
+		@Valid @RequestBody MemberRequest.NicknameDTO nicknameDTO) {
+		MemberResponse.NicknameDTO responseDTO = memberService.findExistNickname(memberDetails.getMember().getId(),
+			nicknameDTO.getNickname());
+
+		ApiResponse<MemberResponse.NicknameDTO> response = ApiResponse.success(responseDTO);
 
 		return ResponseEntity.ok(response);
 	}

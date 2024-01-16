@@ -17,7 +17,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Entity
+@Entity(name="reply_like")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ReplyLike extends BaseEntity {

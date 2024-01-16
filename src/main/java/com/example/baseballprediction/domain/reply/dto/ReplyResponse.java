@@ -30,13 +30,11 @@ public class ReplyResponse {
 		private String profileImageUrl;
 		private String nickname;
 		private String teamName;
-		private String teamLogoUrl;
 
 		public ProfileDTO(Member member) {
 			this.profileImageUrl = member.getProfileImageUrl();
 			this.nickname = member.getNickname();
 			this.teamName = member.getTeam().getName();
-			this.teamLogoUrl = member.getTeam().getLogoUrl();
 		}
 	}
 }

@@ -6,6 +6,7 @@ import static com.example.baseballprediction.domain.member.dto.MemberResponse.*;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,15 +14,21 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.example.baseballprediction.domain.member.dto.FairyProjection;
+import com.example.baseballprediction.domain.member.dto.MemberRequest;
+import com.example.baseballprediction.domain.member.dto.MemberResponse;
 import com.example.baseballprediction.domain.member.dto.ProfileProjection;
 import com.example.baseballprediction.domain.member.service.MemberService;
 import com.example.baseballprediction.global.security.auth.JwtTokenProvider;
 import com.example.baseballprediction.global.security.auth.MemberDetails;
 import com.example.baseballprediction.global.util.ApiResponse;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -48,12 +55,13 @@ public class MemberController {
 	}
 
 	@PutMapping("/profile/details")
-	public ResponseEntity<ApiResponse<?>> detailsModify(@RequestBody DetailsDTO detailsDTO,
+	public ResponseEntity<ApiResponse<?>> detailsModify(@RequestPart("data") @Valid DetailsDTO detailsDTO,
+		@RequestPart(name = "profileImage", required = false) MultipartFile profileImage,
 		@AuthenticationPrincipal MemberDetails memberDetails) {
 
-		memberService.modifyDetails(memberDetails.getUsername(), detailsDTO);
+		memberService.modifyDetails(memberDetails.getUsername(), detailsDTO, profileImage);
 
-		return ResponseEntity.ok(ApiResponse.createSuccess());
+		return ResponseEntity.ok(ApiResponse.successWithNoData());
 	}
 
 	@GetMapping("/profiles/{memberId}")
@@ -83,4 +91,41 @@ public class MemberController {
 		return ResponseEntity.ok(response);
 	}
 
+	@GetMapping("/profile/history/votes")
+	public ResponseEntity<ApiResponse<Page<FairyHistoryDTO>>> fairyHistoryList(
+		@AuthenticationPrincipal MemberDetails memberDetails,
+		@RequestParam(required = false, defaultValue = "0") int page,
+		@RequestParam(required = false, defaultValue = "10") int list) {
+
+		Page<FairyHistoryDTO> fairyHistories = memberService.findFairyHistories(memberDetails.getMember().getId(), page,
+			list);
+
+		ApiResponse<Page<FairyHistoryDTO>> response = ApiResponse.success(fairyHistories);
+
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/profile/history/gifts")
+	public ResponseEntity<ApiResponse<?>> giftHistoryList(@AuthenticationPrincipal MemberDetails memberDetails,
+		@RequestParam(required = false, defaultValue = "0") int page,
+		@RequestParam(required = false, defaultValue = "10") int list) {
+		Page<GiftHistoryDTO> giftHistories = memberService.findGiftHistories(memberDetails.getMember()
+			.getId(), page, list);
+
+		ApiResponse<Page<GiftHistoryDTO>> response = ApiResponse.success(giftHistories);
+
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/profile/nickname-check")
+	public ResponseEntity<ApiResponse<MemberResponse.NicknameDTO>> nicknameExistList(
+		@AuthenticationPrincipal MemberDetails memberDetails,
+		@Valid @RequestBody MemberRequest.NicknameDTO nicknameDTO) {
+		MemberResponse.NicknameDTO responseDTO = memberService.findExistNickname(memberDetails.getMember().getId(),
+			nicknameDTO.getNickname());
+
+		ApiResponse<MemberResponse.NicknameDTO> response = ApiResponse.success(responseDTO);
+
+		return ResponseEntity.ok(response);
+	}
 }

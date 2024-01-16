@@ -51,41 +51,6 @@ public class GameController {
 		
 	}
 	
-	//승부예측 투표
-		@PostMapping("/{gameId}/vote")
-		public ResponseEntity<ApiResponse> gameVoteAdd(@AuthenticationPrincipal MemberDetails memberDetails,
-				@RequestBody GameVoteRequestDTO gameVoteRequestDTO,
-				@PathVariable Long gameId) {
-			
-			gameVoteService.addGameVote(memberDetails.getUsername(),gameId,gameVoteRequestDTO);
-			
-			return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.createSuccess());
-		}
-		
-		
-		//승부예측 투표 변경 
-		@PutMapping("/voteUpdate/{gameId}")
-		public ResponseEntity<ApiResponse> gameVoteModify(@AuthenticationPrincipal MemberDetails memberDetails,
-			@RequestBody GameVoteRequestDTO gameVoteRequestDTO,
-			@PathVariable Long gameId) {
-			gameVoteService.modifyGameVote(memberDetails.getUsername(),gameId,gameVoteRequestDTO);
-
-			return ResponseEntity.ok(ApiResponse.successWithNoData());
-		}
-				
-		
-		//승부예측 투표 취소 
-		@DeleteMapping("/voteDelete/{gameId}")
-		public ResponseEntity<ApiResponse> gameVoteRemove(@AuthenticationPrincipal MemberDetails memberDetails,
-			@PathVariable Long gameId) {
-			gameVoteService.removeGameVote(gameId, memberDetails.getUsername());
-
-			return ResponseEntity.ok(ApiResponse.successWithNoData());
-		}
-	
-	
-	
-	
 	//승부 예측 댓글 조회 
 	@GetMapping("/daily-replies")
 	public ResponseEntity<ApiResponse<Page<GameListDTO>>> replyGameList(
@@ -99,7 +64,6 @@ public class GameController {
 		return ResponseEntity.ok(response);
 	}
 	
-	
 	//승부예측 댓글 작성
 	@PostMapping("/daily-reply")
 	public ResponseEntity<ApiResponse> gameReplyAdd(@AuthenticationPrincipal MemberDetails memberDetails, @RequestBody
@@ -108,8 +72,7 @@ public class GameController {
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.createSuccess());
 	}
-	
-	//승부예측 댓글 좋아요
+
 	@PostMapping("/daily-reply/{replyId}/like")
 	public ResponseEntity<ApiResponse> gameReplyLikeAdd(@AuthenticationPrincipal MemberDetails memberDetails,
 		@PathVariable Long replyId) {
@@ -119,5 +82,39 @@ public class GameController {
 		return ResponseEntity.ok(ApiResponse.successWithNoData());
 	}
 	
+	//승부예측 투표
+	@PostMapping("/{gameId}/vote")
+	public ResponseEntity<ApiResponse> gameVoteAdd(@AuthenticationPrincipal MemberDetails memberDetails,
+			@RequestBody GameVoteRequestDTO gameVoteRequestDTO,
+			@PathVariable Long gameId) {
+		
+		gameVoteService.addGameVote(memberDetails.getUsername(),gameId,gameVoteRequestDTO);
+		
+		return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.createSuccess());
+	}
+	
+	
+	//승부예측 투표 변경 
+	@PutMapping("/voteUpdate/{gameId}")
+	public ResponseEntity<ApiResponse> gameVoteModify(@AuthenticationPrincipal MemberDetails memberDetails,
+		@RequestBody GameVoteRequestDTO gameVoteRequestDTO,
+		@PathVariable Long gameId) {
+		gameVoteService.modifyGameVote(memberDetails.getUsername(),gameId,gameVoteRequestDTO);
+
+		return ResponseEntity.ok(ApiResponse.successWithNoData());
+	}
+			
+	
+	//승부예측 투표 취소 
+	@DeleteMapping("/voteDelete/{gameId}")
+	public ResponseEntity<ApiResponse> gameVoteRemove(@AuthenticationPrincipal MemberDetails memberDetails,
+		@PathVariable Long gameId) {
+		gameVoteService.removeGameVote(gameId, memberDetails.getUsername());
+
+		return ResponseEntity.ok(ApiResponse.successWithNoData());
+	}
+		
+		
+		
 
 }

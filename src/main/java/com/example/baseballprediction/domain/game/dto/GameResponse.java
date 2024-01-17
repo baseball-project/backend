@@ -46,13 +46,15 @@ public class GameResponse {
 	public static class TeamDailyDTO {
 
 		private String teamName;
+		private String teamShortName;
 		private int score;
 		private int voteRatio;
 		private int id;
 		
 
 		public TeamDailyDTO(Team team,int score, int voteRatio, int id) {
-			this.teamName = team.getShortName();
+			this.teamName = team.getName();
+			this.teamShortName = team.getShortName();
 			this.score = score;
 			this.voteRatio = voteRatio;
 			this.id = id;

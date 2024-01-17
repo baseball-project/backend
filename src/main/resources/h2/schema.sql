@@ -96,12 +96,14 @@ create table monthly_fairy(
 
 create table reply(
 	reply_id bigint auto_increment primary key,
+	parent_reply_id bigint,
     member_id bigint not null,
     content varchar(1000) not null,
     reply_type varchar(10) not null,
     created_at datetime not null default current_timestamp,
     modified_at datetime,
-    foreign key(member_id) references member(member_id)
+    foreign key(member_id) references member(member_id),
+    foreign key(parent_reply_id) references reply(reply_id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 create table reply_like(

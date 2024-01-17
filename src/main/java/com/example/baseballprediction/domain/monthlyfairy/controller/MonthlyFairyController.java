@@ -3,6 +3,8 @@ package com.example.baseballprediction.domain.monthlyfairy.controller;
 import static com.example.baseballprediction.domain.monthlyfairy.dto.MonthlyFairyResponse.*;
 import static com.example.baseballprediction.domain.reply.dto.ReplyResponse.*;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -83,5 +85,14 @@ public class MonthlyFairyController {
 		replyLikeService.saveReplyLike(memberDetails.getUsername(), replyId);
 
 		return ResponseEntity.ok(ApiResponse.successWithNoData());
+	}
+
+	@GetMapping("/replies/{replyId}/sub")
+	public ResponseEntity<ApiResponse<List<ReplyDTO>>> replySubList(@PathVariable Long replyId) {
+		List<ReplyDTO> replies = replyService.findSubReplies(replyId);
+
+		ApiResponse<List<ReplyDTO>> response = ApiResponse.success(replies);
+
+		return ResponseEntity.ok(response);
 	}
 }

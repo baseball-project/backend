@@ -2,6 +2,8 @@ package com.example.baseballprediction.domain.reply.service;
 
 import static com.example.baseballprediction.domain.reply.dto.ReplyResponse.*;
 
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -63,5 +65,16 @@ public class ReplyService {
 		}
 
 		replyRepository.delete(reply);
+	}
+
+	public List<ReplyDTO> findSubReplies(Long parentReplyId) {
+		Reply parentReply = replyRepository.findById(parentReplyId)
+			.orElseThrow(() -> new NotFoundException(ErrorCode.REPLY_NOT_FOUND));
+
+		List<ReplyLikeProjection> replies = replyRepository.findBySubReplies(parentReply);
+
+		List<ReplyDTO> replyDTOList = replies.stream().map(m -> new ReplyDTO(m)).toList();
+
+		return replyDTOList;
 	}
 }

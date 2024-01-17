@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import com.example.baseballprediction.domain.game.entity.Game;
+import com.example.baseballprediction.domain.gamevote.dto.GameVoteRatioDTO;
 import com.example.baseballprediction.domain.team.entity.Team;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
@@ -31,10 +32,10 @@ public class GameResponse {
 
 		private String status;
 
-		public GameDtoDaily(Game game, Team homeTeam, Team awayTeam) {
+		public GameDtoDaily(Game game, Team homeTeam, Team awayTeam,GameVoteRatioDTO gameVoteRatioDTO) {
 			this.gameId = game.getId();
-			this.homeTeam = new TeamDailyDTO(homeTeam);
-			this.awayTeam = new TeamDailyDTO(awayTeam);
+			this.homeTeam = new TeamDailyDTO(homeTeam, game.getHomeTeamScore(),gameVoteRatioDTO.getHomeTeamVoteRatio(),homeTeam.getId());
+			this.awayTeam = new TeamDailyDTO(awayTeam, game.getAwayTeamScore(),gameVoteRatioDTO.getAwayTeamVoteRatio(),awayTeam.getId());
 			this.gameTime = game.getStartedAt();
 			this.status = game.getStatus().toString();
 		}
@@ -45,9 +46,16 @@ public class GameResponse {
 	public static class TeamDailyDTO {
 
 		private String teamName;
+		private int score;
+		private int voteRatio;
+		private int id;
+		
 
-		public TeamDailyDTO(Team team) {
+		public TeamDailyDTO(Team team,int score, int voteRatio, int id) {
 			this.teamName = team.getShortName();
+			this.score = score;
+			this.voteRatio = voteRatio;
+			this.id = id;
 		}
 
 	}

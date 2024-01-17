@@ -1,7 +1,10 @@
 package com.example.baseballprediction.domain.reply.dto;
 
-import com.example.baseballprediction.domain.member.entity.Member;
-import com.example.baseballprediction.domain.reply.entity.Reply;
+import java.time.LocalDateTime;
+
+import org.springframework.data.annotation.LastModifiedDate;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,28 +16,33 @@ public class ReplyResponse {
 	@AllArgsConstructor
 	public static class ReplyDTO {
 		private ProfileDTO profile;
-		private Long replyId;
-		private String content;
-		private int likeCount;
+		private ReplyDetailsDTO reply;
 
-		public ReplyDTO(Reply reply) {
-			this.profile = new ProfileDTO(reply.getMember());
-			this.replyId = reply.getId();
-			this.content = reply.getContent();
-			this.likeCount = 0;
+		public ReplyDTO(ReplyLikeProjection replyLikeProjection) {
+			this.profile = new ProfileDTO(replyLikeProjection.getProfileImageUrl(), replyLikeProjection.getNickname(),
+				replyLikeProjection.getTeamName());
+			this.reply = new ReplyDetailsDTO(replyLikeProjection.getId(), replyLikeProjection.getContent(),
+				replyLikeProjection.getCount(), replyLikeProjection.getCreatedAt());
 		}
 	}
 
 	@Getter
+	@AllArgsConstructor
 	public static class ProfileDTO {
 		private String profileImageUrl;
 		private String nickname;
 		private String teamName;
+	}
 
-		public ProfileDTO(Member member) {
-			this.profileImageUrl = member.getProfileImageUrl();
-			this.nickname = member.getNickname();
-			this.teamName = member.getTeam().getName();
-		}
+	@Getter
+	@AllArgsConstructor
+	public static class ReplyDetailsDTO {
+		private Long replyId;
+		private String content;
+		private Long count;
+
+		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+		@LastModifiedDate
+		private LocalDateTime createdAt;
 	}
 }

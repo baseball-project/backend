@@ -33,6 +33,7 @@ public interface ReplyRepository extends JpaRepository<Reply, Long> {
 			+ "	ON t.id = m.team.id"
 			+ "	WHERE r.type =:replyType"
 			+ "	AND date(r.createdAt) = date(now())"
+			+ " AND r.parentReply IS NULL"
 			+ " group by r.id"
 			+ "	order by  r.createdAt desc")
 	Page<ReplyLikeProjection> findReplyGame(@Param("replyType") ReplyType replyType, Pageable pageable);

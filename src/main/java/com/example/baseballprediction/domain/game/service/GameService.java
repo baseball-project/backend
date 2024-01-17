@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 import com.example.baseballprediction.domain.game.dto.GameResponse.GameDtoDaily;
 import com.example.baseballprediction.domain.game.entity.Game;
 import com.example.baseballprediction.domain.game.repository.GameRepository;
+import com.example.baseballprediction.domain.gamevote.dto.GameVoteRatioDTO;
+import com.example.baseballprediction.domain.gamevote.repository.GameVoteRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -16,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 public class GameService {
 
 	private final GameRepository gameRepository;
+	private final GameVoteRepository gameVoteRepository;
 	
 
 	public List<GameDtoDaily> findDailyGame(){
@@ -28,7 +31,9 @@ public class GameService {
 			String gameFormatDate = game.getStartedAt().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 			
 			  if(gameFormatDate.equals(formatDate)) {
-				  GameDtoDaily dailygame = new GameDtoDaily(game,game.getAwayTeam() ,game.getHomeTeam());
+				  GameVoteRatioDTO gameVoteRatioDTO = gameVoteRepository.findVoteRatio(game.getHomeTeam().getId(), game.getAwayTeam().getId(), games.get(0).getId()).orElseThrow();
+				  
+				  GameDtoDaily dailygame = new GameDtoDaily(game,game.getHomeTeam(),game.getAwayTeam(),gameVoteRatioDTO);
 					
 				  gameDTOList.add(dailygame);
 			  

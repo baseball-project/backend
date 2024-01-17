@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class GameReplyDTO {
+public class ReplyLikeProjection {
 
 	private Long id;
 
@@ -31,7 +31,7 @@ public class GameReplyDTO {
 
 	private String teamName;
 
-	public GameReplyDTO(Long id, Long count, String content, LocalDateTime createdAt, String profileImageUrl,
+	public ReplyLikeProjection(Long id, Long count, String content, LocalDateTime createdAt, String profileImageUrl,
 		String nickname, String teamName) {
 		this.id = id;
 		this.count = count;

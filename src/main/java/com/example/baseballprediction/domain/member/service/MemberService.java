@@ -30,7 +30,7 @@ import com.example.baseballprediction.global.constant.ErrorCode;
 import com.example.baseballprediction.global.constant.ImageType;
 import com.example.baseballprediction.global.error.exception.BusinessException;
 import com.example.baseballprediction.global.error.exception.NotFoundException;
-import com.example.baseballprediction.global.security.auth.JwtTokenProvider;
+import com.example.baseballprediction.global.security.jwt.JwtTokenProvider;
 import com.example.baseballprediction.global.util.S3UploadService;
 
 import lombok.RequiredArgsConstructor;

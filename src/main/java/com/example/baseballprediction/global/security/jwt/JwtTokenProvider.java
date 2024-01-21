@@ -1,4 +1,4 @@
-package com.example.baseballprediction.global.security.auth;
+package com.example.baseballprediction.global.security.jwt;
 
 import java.util.Base64;
 import java.util.Date;

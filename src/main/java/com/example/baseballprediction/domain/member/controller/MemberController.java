@@ -24,8 +24,7 @@ import com.example.baseballprediction.domain.member.dto.MemberRequest;
 import com.example.baseballprediction.domain.member.dto.MemberResponse;
 import com.example.baseballprediction.domain.member.dto.ProfileProjection;
 import com.example.baseballprediction.domain.member.service.MemberService;
-import com.example.baseballprediction.global.security.auth.JwtTokenProvider;
-import com.example.baseballprediction.global.security.auth.MemberDetails;
+import com.example.baseballprediction.global.security.MemberDetails;
 import com.example.baseballprediction.global.util.ApiResponse;
 
 import jakarta.validation.Valid;
@@ -37,13 +36,12 @@ public class MemberController {
 	private final MemberService memberService;
 
 	@PostMapping("/login")
-	public ResponseEntity<String> login(@RequestBody LoginDTO loginDTO) {
+	public ResponseEntity<ApiResponse<Map<String, Object>>> login(@RequestBody LoginDTO loginDTO) {
 		Map<String, Object> response = memberService.login(loginDTO.getUsername(), loginDTO.getPassword());
 
-		return ResponseEntity
-			.ok()
-			.header(JwtTokenProvider.HEADER, (String)response.get("token"))
-			.body("정상적으로 처리되었습니다.");
+		ApiResponse<Map<String, Object>> apiResponse = ApiResponse.success(response);
+
+		return ResponseEntity.ok(apiResponse);
 	}
 
 	@PutMapping("/profile/team")

@@ -68,4 +68,18 @@ public class JwtTokenProvider {
 
 		return TOKEN_PREFIX + jwt;
 	}
+
+	public static String createToken(String username) {
+		Claims claims = Jwts.claims();
+		claims.put("username", username);
+
+		String jwt = Jwts.builder()
+			.setClaims(claims)
+			.setIssuedAt(new Date(System.currentTimeMillis()))
+			.setExpiration(new Date(System.currentTimeMillis() + EXP))
+			.signWith(SignatureAlgorithm.HS256, secretKey)
+			.compact();
+
+		return TOKEN_PREFIX + jwt;
+	}
 }

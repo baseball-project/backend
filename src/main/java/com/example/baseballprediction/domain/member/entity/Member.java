@@ -1,6 +1,8 @@
 package com.example.baseballprediction.domain.member.entity;
 
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import com.example.baseballprediction.domain.BaseEntity;
 import com.example.baseballprediction.domain.team.entity.Team;
@@ -25,16 +27,17 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@DynamicInsert
+@DynamicUpdate
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Builder
 public class Member extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "member_id")
 	private Long id;
 
-	@Column(length = 100, unique = true)
+	@Column(length = 50, unique = true)
 	private String username;
 
 	@Column(length = 200, nullable = false)
@@ -42,7 +45,7 @@ public class Member extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(length = 20, nullable = false, name = "social")
 	private SocialType socialType;
-	@Column(length = 20, unique = true, nullable = false)
+	@Column(length = 200, unique = true, nullable = false)
 	private String nickname;
 
 	@Column(length = 200)
@@ -57,16 +60,30 @@ public class Member extends BaseEntity {
 
 	@ColumnDefault("0")
 	@Column(nullable = false)
-	private int token;
+	private Integer token;
 
 	@ColumnDefault("1")
 	@Column(nullable = false)
-	private int level;
+	private Integer level;
 
 	@Transient
 	private int winFairyCount;
 	@Transient
 	private int loseFairyCount;
+
+	@Transient
+	private boolean isNewMember;
+
+	@Builder
+	public Member(Long id, String username, String password, String nickname, SocialType socialType,
+		boolean isNewMember) {
+		this.id = id;
+		this.username = username;
+		this.password = password;
+		this.nickname = nickname;
+		this.socialType = socialType;
+		this.isNewMember = isNewMember;
+	}
 
 	public void changeTeam(Team team) {
 		this.team = team;
@@ -81,5 +98,9 @@ public class Member extends BaseEntity {
 	public void setFairyCount(int winFairyCount, int loseFairyCount) {
 		this.winFairyCount = winFairyCount;
 		this.loseFairyCount = loseFairyCount;
+	}
+
+	public void setIsNewMember(boolean isNewMember) {
+		this.isNewMember = isNewMember;
 	}
 }

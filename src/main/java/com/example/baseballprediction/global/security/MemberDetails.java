@@ -1,4 +1,4 @@
-package com.example.baseballprediction.global.security.oauth;
+package com.example.baseballprediction.global.security;
 
 import java.util.Collection;
 import java.util.Map;

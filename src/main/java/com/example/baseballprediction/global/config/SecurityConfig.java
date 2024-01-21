@@ -15,11 +15,19 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import com.example.baseballprediction.global.security.filter.JwtAuthenticationFilter;
+import com.example.baseballprediction.global.security.jwt.filter.JwtAuthenticationFilter;
+import com.example.baseballprediction.global.security.oauth.handler.OAuth2AuthenticationSuccessHandler;
+import com.example.baseballprediction.global.security.oauth.service.OAuth2MemberService;
+
+import lombok.RequiredArgsConstructor;
 
 @EnableWebSecurity
 @Configuration
+@RequiredArgsConstructor
 public class SecurityConfig {
+
+	private final OAuth2MemberService oAuth2MemberService;
+	private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 
 	@Bean
 	public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -63,6 +71,13 @@ public class SecurityConfig {
 				new AntPathRequestMatcher("/h2-console/**"),
 				new AntPathRequestMatcher("/health")).permitAll()
 			.anyRequest().authenticated());
+
+		httpSecurity.oauth2Login(oauth2configurer -> {
+				oauth2configurer.userInfoEndpoint(user -> user.userService(oAuth2MemberService));
+				oauth2configurer.successHandler(oAuth2AuthenticationSuccessHandler);
+			}
+		);
+
 		return httpSecurity.build();
 	}
 

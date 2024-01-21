@@ -26,7 +26,7 @@ import com.example.baseballprediction.domain.reply.dto.ReplyRequest;
 import com.example.baseballprediction.domain.reply.service.ReplyService;
 import com.example.baseballprediction.domain.replylike.service.ReplyLikeService;
 import com.example.baseballprediction.global.constant.ReplyType;
-import com.example.baseballprediction.global.security.auth.MemberDetails;
+import com.example.baseballprediction.global.security.MemberDetails;
 import com.example.baseballprediction.global.util.ApiResponse;
 
 import lombok.RequiredArgsConstructor;

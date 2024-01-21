@@ -9,10 +9,10 @@ create table team (
 
 create table member (
     member_id bigint auto_increment primary key,
-    username varchar(100) unique not null,
+    username varchar(50) unique not null,
     social varchar(20) not null,
     password varchar(200) not null,
-    nickname varchar(20) unique not null,
+    nickname varchar(200) unique,
     profile_image_url varchar(200),
     team_id int,
     member_comment varchar(100),

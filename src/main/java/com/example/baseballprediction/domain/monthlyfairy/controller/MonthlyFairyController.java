@@ -95,4 +95,13 @@ public class MonthlyFairyController {
 
 		return ResponseEntity.ok(response);
 	}
+
+	@PostMapping("/replies/{replyId}/sub")
+	public ResponseEntity<ApiResponse> replySubAdd(@PathVariable Long replyId,
+		@AuthenticationPrincipal MemberDetails memberDetails, @RequestBody
+	@Valid ReplyRequest.ReplyDTO replyDTO) {
+		replyService.addSubReply(replyId, ReplyType.FAIRY, memberDetails.getUsername(), replyDTO.getContent());
+
+		return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.createSuccess());
+	}
 }

@@ -23,6 +23,7 @@ import com.example.baseballprediction.domain.game.service.GameService;
 import com.example.baseballprediction.domain.gamevote.dto.GameVoteRequest.GameVoteRequestDTO;
 import com.example.baseballprediction.domain.gamevote.service.GameVoteService;
 import com.example.baseballprediction.domain.reply.dto.ReplyRequest;
+import com.example.baseballprediction.domain.reply.dto.ReplyResponse;
 import com.example.baseballprediction.domain.reply.service.ReplyService;
 import com.example.baseballprediction.domain.replylike.service.ReplyLikeService;
 import com.example.baseballprediction.global.constant.ReplyType;
@@ -112,6 +113,23 @@ public class GameController {
 		gameVoteService.removeGameVote(gameId, memberDetails.getUsername());
 
 		return ResponseEntity.ok(ApiResponse.successWithNoData());
+	}
+
+	@GetMapping("/daily-replies/{replyId}/sub")
+	public ResponseEntity<ApiResponse<List<ReplyResponse.ReplyDTO>>> replySubList(@PathVariable Long replyId) {
+		List<ReplyResponse.ReplyDTO> replies = replyService.findSubReplies(replyId);
+
+		ApiResponse<List<ReplyResponse.ReplyDTO>> response = ApiResponse.success(replies);
+
+		return ResponseEntity.ok(response);
+	}
+
+	@PostMapping("/daily-replies/{replyId}/sub")
+	public ResponseEntity<ApiResponse> replySubAdd(@PathVariable Long replyId,
+		@AuthenticationPrincipal MemberDetails memberDetails, @RequestBody ReplyRequest.ReplyDTO replyDTO) {
+		replyService.addSubReply(replyId, ReplyType.GAME, memberDetails.getUsername(), replyDTO.getContent());
+
+		return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.createSuccess());
 	}
 
 }

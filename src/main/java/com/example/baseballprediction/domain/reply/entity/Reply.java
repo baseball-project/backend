@@ -44,9 +44,10 @@ public class Reply extends BaseEntity {
 	private ReplyType type;
 
 	@Builder
-	public Reply(Member member, String content, ReplyType type) {
+	public Reply(Member member, String content, ReplyType type, Reply parentReply) {
 		this.member = member;
 		this.content = content;
 		this.type = type;
+		this.parentReply = parentReply;
 	}
 }

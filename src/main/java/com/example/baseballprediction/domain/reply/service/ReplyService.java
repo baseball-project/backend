@@ -53,6 +53,23 @@ public class ReplyService {
 		replyRepository.save(reply);
 	}
 
+	public void addSubReply(Long replyId, ReplyType replyType, String username, String content) {
+		Reply parentReply = replyRepository.findById(replyId)
+			.orElseThrow(() -> new NotFoundException(ErrorCode.REPLY_NOT_FOUND));
+
+		Member member = memberRepository.findByUsername(username)
+			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+
+		Reply reply = Reply.builder()
+			.member(member)
+			.content(content)
+			.type(replyType)
+			.parentReply(parentReply)
+			.build();
+
+		replyRepository.save(reply);
+	}
+
 	public void deleteReply(Long replyId, String username) {
 		Member member = memberRepository.findByUsername(username)
 			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));

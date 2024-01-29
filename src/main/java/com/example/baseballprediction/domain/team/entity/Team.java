@@ -1,5 +1,7 @@
 package com.example.baseballprediction.domain.team.entity;
 
+import java.util.Objects;
+
 import com.example.baseballprediction.domain.BaseEntity;
 
 import jakarta.persistence.Column;
@@ -29,4 +31,20 @@ public class Team extends BaseEntity {
 	private String shortName;
 	@Column(length = 16)
 	private String color;
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (!(o instanceof Team)) {
+			return false;
+		}
+		Team team = (Team)o;
+		return id == team.getId();
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
+	}
 }

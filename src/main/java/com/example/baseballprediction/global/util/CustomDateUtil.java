@@ -17,4 +17,12 @@ public class CustomDateUtil {
 	public static String dateToString(LocalDate date) {
 		return date.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 	}
+
+	public static LocalDate parseLocalDate(LocalDateTime dateTime) {
+		return dateTime.toLocalDate();
+	}
+
+	public static String dateToYearMonth(LocalDateTime dateTime) {
+		return dateTime.format(DateTimeFormatter.ofPattern("yyyyMM")).toString();
+	}
 }

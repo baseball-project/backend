@@ -15,6 +15,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -43,4 +44,13 @@ public class MonthlyFairy extends BaseEntity {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
 	private Member member;
+
+	@Builder
+	public MonthlyFairy(int month, FairyType type, int rank, int voteRatio, Member member) {
+		this.month = month;
+		this.type = type;
+		this.rank = rank;
+		this.voteRatio = voteRatio;
+		this.member = member;
+	}
 }

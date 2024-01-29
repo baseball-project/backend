@@ -74,6 +74,12 @@ public class Member extends BaseEntity {
 	@Transient
 	private boolean isNewMember;
 
+	@Transient
+	private int voteScore;
+
+	@Transient
+	private int voteRatio;
+
 	@Builder
 	public Member(Long id, String username, String password, String nickname, SocialType socialType,
 		boolean isNewMember) {
@@ -102,5 +108,13 @@ public class Member extends BaseEntity {
 
 	public void setIsNewMember(boolean isNewMember) {
 		this.isNewMember = isNewMember;
+	}
+
+	public void sumVoteScore(int voteScore) {
+		this.voteScore += voteScore;
+	}
+
+	public void setVoteRatio(int voteRatio) {
+		this.voteRatio = voteRatio;
 	}
 }

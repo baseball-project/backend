@@ -36,6 +36,7 @@ jobs:
         run: |
           mkdir -p deploy
           cp build/libs/*.jar deploy/application.jar
+          cp -r .ebextensions deploy/.ebextensions
           cd deploy && zip -r application.zip .
 
       - name: Beanstalk Deploy

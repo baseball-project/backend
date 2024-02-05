@@ -69,7 +69,9 @@ public class SecurityConfig {
 		httpSecurity.authorizeHttpRequests((request) -> request
 			.requestMatchers(new AntPathRequestMatcher("/login"),
 				new AntPathRequestMatcher("/h2-console/**"),
-				new AntPathRequestMatcher("/health")).permitAll()
+				new AntPathRequestMatcher("/health"),
+				new AntPathRequestMatcher("/games")
+					).permitAll()
 			.anyRequest().authenticated());
 
 		httpSecurity.oauth2Login(oauth2configurer -> {

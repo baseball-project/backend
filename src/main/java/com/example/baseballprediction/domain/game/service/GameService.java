@@ -31,7 +31,7 @@ public class GameService {
 			String gameFormatDate = game.getStartedAt().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 			
 			  if(gameFormatDate.equals(formatDate)) {
-				  GameVoteRatioDTO gameVoteRatioDTO = gameVoteRepository.findVoteRatio(game.getHomeTeam().getId(), game.getAwayTeam().getId(), games.get(0).getId()).orElseThrow();
+				  GameVoteRatioDTO gameVoteRatioDTO = gameVoteRepository.findVoteRatio(game.getHomeTeam().getId(), game.getAwayTeam().getId(), game.getId()).orElseThrow();
 				  
 				  GameDtoDaily dailygame = new GameDtoDaily(game,game.getHomeTeam(),game.getAwayTeam(),gameVoteRatioDTO);
 					

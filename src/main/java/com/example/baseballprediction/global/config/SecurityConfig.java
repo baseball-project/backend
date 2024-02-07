@@ -70,10 +70,11 @@ public class SecurityConfig {
 			.requestMatchers(new AntPathRequestMatcher("/login"),
 				new AntPathRequestMatcher("/h2-console/**"),
 				new AntPathRequestMatcher("/health"),
-				new AntPathRequestMatcher("/games")
+				new AntPathRequestMatcher("/games"),
+				new AntPathRequestMatcher("/games/daily-replies")
 					).permitAll()
 			.anyRequest().authenticated());
-
+		
 		httpSecurity.oauth2Login(oauth2configurer -> {
 				oauth2configurer.userInfoEndpoint(user -> user.userService(oAuth2MemberService));
 				oauth2configurer.successHandler(oAuth2AuthenticationSuccessHandler);

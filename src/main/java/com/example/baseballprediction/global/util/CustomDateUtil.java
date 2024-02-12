@@ -25,4 +25,8 @@ public class CustomDateUtil {
 	public static String dateToYearMonth(LocalDateTime dateTime) {
 		return dateTime.format(DateTimeFormatter.ofPattern("yyyyMM")).toString();
 	}
+
+	public static LocalDate stringToDate(String date) {
+		return LocalDate.parse(date);
+	}
 }

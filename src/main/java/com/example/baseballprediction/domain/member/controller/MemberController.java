@@ -25,6 +25,7 @@ import com.example.baseballprediction.domain.member.dto.MemberResponse;
 import com.example.baseballprediction.domain.member.dto.ProfileProjection;
 import com.example.baseballprediction.domain.member.service.MemberService;
 import com.example.baseballprediction.global.security.MemberDetails;
+import com.example.baseballprediction.global.security.jwt.JwtTokenProvider;
 import com.example.baseballprediction.global.util.ApiResponse;
 
 import jakarta.validation.Valid;
@@ -41,7 +42,7 @@ public class MemberController {
 
 		ApiResponse<Map<String, Object>> apiResponse = ApiResponse.success(response);
 
-		return ResponseEntity.ok(apiResponse);
+		return ResponseEntity.ok().header(JwtTokenProvider.HEADER, (String)response.get("token")).body(apiResponse);
 	}
 
 	@PutMapping("/profile/team")

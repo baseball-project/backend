@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.baseballprediction.domain.game.dto.GameResponse;
 import com.example.baseballprediction.domain.game.dto.GameResponse.GameDtoDaily;
 import com.example.baseballprediction.domain.game.service.GameService;
 import com.example.baseballprediction.domain.gamevote.dto.GameVoteRequest.GameVoteRequestDTO;
@@ -130,6 +131,18 @@ public class GameController {
 		replyService.addSubReply(replyId, ReplyType.GAME, memberDetails.getUsername(), replyDTO.getContent());
 
 		return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.createSuccess());
+	}
+
+	@GetMapping("/past")
+	public ResponseEntity<ApiResponse<List<GameResponse.PastGameDTO>>> gameWeekList(@RequestParam String startDate,
+		@RequestParam String endDate,
+		@AuthenticationPrincipal MemberDetails memberDetails) {
+		List<GameResponse.PastGameDTO> gameResults = gameService.findGameResult(memberDetails.getUsername(), startDate,
+			endDate);
+
+		ApiResponse<List<GameResponse.PastGameDTO>> response = ApiResponse.success(gameResults);
+
+		return ResponseEntity.ok(response);
 	}
 
 }

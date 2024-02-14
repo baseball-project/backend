@@ -10,7 +10,7 @@ import lombok.Getter;
 public enum ErrorCode {
 	ACCESS_DENIED(HttpStatus.FORBIDDEN, "로그인 후 이용해주세요."),
 	INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "오류가 발생했습니다. 잠시 후 다시 시도해주세요."),
-
+	LOGIN_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "로그인에 실패했습니다. 다시 시도해주세요."),
 	MEMBER_NICKNAME_EXIST(HttpStatus.BAD_REQUEST, "중복되는 닉네임입니다."),
 	MEMBER_NOT_FOUND(HttpStatus.BAD_REQUEST, "사용자 정보를 찾을 수 없습니다."),
 	TEAM_NOT_FOUND(HttpStatus.BAD_REQUEST, "팀 정보를 찾을 수 없습니다."),

@@ -16,6 +16,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.example.baseballprediction.global.security.jwt.filter.JwtAuthenticationFilter;
+import com.example.baseballprediction.global.security.oauth.handler.OAuth2AuthenticationFailureHandler;
 import com.example.baseballprediction.global.security.oauth.handler.OAuth2AuthenticationSuccessHandler;
 import com.example.baseballprediction.global.security.oauth.service.OAuth2MemberService;
 
@@ -28,6 +29,7 @@ public class SecurityConfig {
 
 	private final OAuth2MemberService oAuth2MemberService;
 	private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+	private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 
 	@Bean
 	public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -72,12 +74,13 @@ public class SecurityConfig {
 				new AntPathRequestMatcher("/health"),
 				new AntPathRequestMatcher("/games"),
 				new AntPathRequestMatcher("/games/daily-replies")
-					).permitAll()
+			).permitAll()
 			.anyRequest().authenticated());
-		
+
 		httpSecurity.oauth2Login(oauth2configurer -> {
 				oauth2configurer.userInfoEndpoint(user -> user.userService(oAuth2MemberService));
 				oauth2configurer.successHandler(oAuth2AuthenticationSuccessHandler);
+				oauth2configurer.failureHandler(oAuth2AuthenticationFailureHandler);
 			}
 		);
 

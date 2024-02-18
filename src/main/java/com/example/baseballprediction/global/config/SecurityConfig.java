@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -30,6 +31,7 @@ public class SecurityConfig {
 	private final OAuth2MemberService oAuth2MemberService;
 	private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 	private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
+	private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
 	@Bean
 	public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -44,19 +46,6 @@ public class SecurityConfig {
 		return authenticationConfiguration.getAuthenticationManager();
 	}
 
-	public class CustomSecurityFilterManager extends
-		AbstractHttpConfigurer<CustomSecurityFilterManager, HttpSecurity> {
-
-		@Override
-		public void configure(HttpSecurity builder) throws Exception {
-
-			AuthenticationManager authenticationManager = builder.getSharedObject(
-				AuthenticationManager.class);
-			builder.addFilter(new JwtAuthenticationFilter(authenticationManager));
-			super.configure(builder);
-		}
-	}
-
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
 		httpSecurity.csrf(AbstractHttpConfigurer::disable);
@@ -66,7 +55,7 @@ public class SecurityConfig {
 		httpSecurity.sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 		httpSecurity.formLogin(AbstractHttpConfigurer::disable);
 
-		httpSecurity.apply(new CustomSecurityFilterManager());
+		// httpSecurity.apply(new CustomSecurityFilterManager());
 
 		httpSecurity.authorizeHttpRequests((request) -> request
 			.requestMatchers(new AntPathRequestMatcher("/login"),
@@ -83,6 +72,8 @@ public class SecurityConfig {
 				oauth2configurer.failureHandler(oAuth2AuthenticationFailureHandler);
 			}
 		);
+
+		httpSecurity.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
 		return httpSecurity.build();
 	}

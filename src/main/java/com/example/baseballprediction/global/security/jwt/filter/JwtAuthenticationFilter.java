@@ -2,27 +2,30 @@ package com.example.baseballprediction.global.security.jwt.filter;
 
 import java.io.IOException;
 
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.example.baseballprediction.domain.member.entity.Member;
+import com.example.baseballprediction.global.error.exception.BusinessException;
+import com.example.baseballprediction.global.error.exception.JwtException;
 import com.example.baseballprediction.global.security.MemberDetails;
 import com.example.baseballprediction.global.security.jwt.JwtTokenProvider;
+import com.example.baseballprediction.global.util.ApiResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
-public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
+@Component
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
 	private JwtTokenProvider jwtTokenProvider;
 
-	public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
-		super(authenticationManager);
-
+	public JwtAuthenticationFilter() {
 		if (jwtTokenProvider == null) {
 			this.jwtTokenProvider = new JwtTokenProvider();
 		}
@@ -40,8 +43,13 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
 
 		jwt = jwt.replace(JwtTokenProvider.TOKEN_PREFIX, "");
 
-		if (!JwtTokenProvider.validateToken(jwt)) {
-			filterChain.doFilter(request, response);
+		try {
+			if (!JwtTokenProvider.validateToken(jwt)) {
+				filterChain.doFilter(request, response);
+			}
+		} catch (JwtException e) {
+			setErrorResponse(response, e);
+			return;
 		}
 
 		Member member = Member.builder()
@@ -58,5 +66,16 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
 		SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
 		filterChain.doFilter(request, response);
+	}
+
+	private void setErrorResponse(HttpServletResponse servletResponse, BusinessException e) throws
+		IOException {
+		ObjectMapper mapper = new ObjectMapper();
+		ApiResponse<String> response = ApiResponse.createException(e.getCode(), e.getMessage());
+
+		servletResponse.setStatus(e.getCode());
+		servletResponse.setContentType("application/json; charset=utf-8");
+		String body = mapper.writeValueAsString(response);
+		servletResponse.getOutputStream().write(body.getBytes());
 	}
 }

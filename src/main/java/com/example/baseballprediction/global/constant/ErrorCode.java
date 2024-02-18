@@ -19,7 +19,10 @@ public enum ErrorCode {
 	REPLY_MEMBER_INVALID(HttpStatus.FORBIDDEN, "본인이 작성한 댓글만 수정/삭제가 가능합니다."),
 	LOGIN_PASSWORD_INVALID(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
 	REPLY_LIKE_MEMBER_INVALID(HttpStatus.FORBIDDEN, "본인이 누른 좋아요만 취소할 수 있습니다."),
-	REPLY_LIKE_DUPLICATED(HttpStatus.BAD_REQUEST, "좋아요는 한 번만 누를 수 있습니다.");
+	REPLY_LIKE_DUPLICATED(HttpStatus.BAD_REQUEST, "좋아요는 한 번만 누를 수 있습니다."),
+	JWT_INVALID(HttpStatus.BAD_REQUEST, "인증 정보가 올바르지 않습니다."),
+	JWT_EXPIRED(HttpStatus.FORBIDDEN, "인증 정보가 만료되었습니다."),
+	JWT_NOT_MATCHED(HttpStatus.BAD_REQUEST, "인증 정보가 일치하지 않습니다.");
 
 	private final HttpStatus httpStatus;
 	private final String message;

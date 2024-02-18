@@ -4,13 +4,21 @@ import java.util.Base64;
 import java.util.Date;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Component;
 
 import com.example.baseballprediction.domain.member.entity.Member;
+import com.example.baseballprediction.global.constant.ErrorCode;
+import com.example.baseballprediction.global.error.exception.JwtException;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.SignatureException;
+import io.jsonwebtoken.UnsupportedJwtException;
 
 @Component
 public class JwtTokenProvider {
@@ -49,8 +57,13 @@ public class JwtTokenProvider {
 				.getBody();
 
 			return true;
+		} catch (ExpiredJwtException e) {
+			throw new JwtException(ErrorCode.JWT_EXPIRED);
+		} catch (MalformedJwtException | IllegalArgumentException | UnsupportedJwtException | SignatureException |
+				 BadCredentialsException | AuthenticationCredentialsNotFoundException e) {
+			throw new JwtException(ErrorCode.JWT_INVALID);
 		} catch (Exception e) {
-			return false;
+			throw new JwtException(ErrorCode.INTERNAL_SERVER_ERROR);
 		}
 	}
 
@@ -81,5 +94,14 @@ public class JwtTokenProvider {
 			.compact();
 
 		return TOKEN_PREFIX + jwt;
+	}
+
+	public static void expireToken(String token) {
+		Claims claims = Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody();
+		claims.setExpiration(new Date(0));
+		Jwts.builder()
+			.setClaims(claims)
+			.signWith(SignatureAlgorithm.HS256, secretKey)
+			.compact();
 	}
 }

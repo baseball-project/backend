@@ -37,13 +37,24 @@ public class MemberController {
 	private final MemberService memberService;
 
 	@PostMapping("/login")
-	public ResponseEntity<ApiResponse<Map<String, Object>>> login(@RequestBody LoginDTO loginDTO) {
+	public ResponseEntity<ApiResponse<Object>> login(@RequestBody MemberRequest.LoginDTO loginDTO) {
 		Map<String, Object> response = memberService.login(loginDTO.getUsername(), loginDTO.getPassword());
 
-		ApiResponse<Map<String, Object>> apiResponse = ApiResponse.success(response);
+		ApiResponse<Object> apiResponse = ApiResponse.success(response.get("body"));
 
 		return ResponseEntity.ok().header(JwtTokenProvider.HEADER, (String)response.get("token")).body(apiResponse);
 	}
+
+	// @GetMapping("/logout")
+	// public ResponseEntity<ApiResponse> logout(@RequestHeader(JwtTokenProvider.HEADER) String authorization) {
+	// 	String token = authorization.split(" ")[1];
+	//
+	// 	OAuth2AccessToken oAuth2AccessToken =
+	// 		memberService.logout(authorization.split(" ")[1]);
+	//
+	// 	ApiResponse response = ApiResponse.successWithNoData();
+	// 	return ResponseEntity.ok(response);
+	// }
 
 	@PutMapping("/profile/team")
 	public ResponseEntity<ApiResponse<?>> likeTeamModify(@RequestBody LikeTeamDTO likeTeamDTO,

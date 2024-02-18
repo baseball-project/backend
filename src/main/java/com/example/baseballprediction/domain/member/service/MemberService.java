@@ -58,7 +58,15 @@ public class MemberService {
 		Map<String, Object> response = new HashMap<>();
 		response.put("token", JwtTokenProvider.createToken(member));
 
+		MemberResponse.LoginDTO body = new MemberResponse.LoginDTO(member);
+
+		response.put("body", body);
+
 		return response;
+	}
+
+	public void logout(String token) {
+		JwtTokenProvider.expireToken(token);
 	}
 
 	public void modifyLikeTeam(String username, int teamId) {

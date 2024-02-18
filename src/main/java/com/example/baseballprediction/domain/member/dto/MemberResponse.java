@@ -69,4 +69,17 @@ public class MemberResponse {
 	public static class NicknameDTO {
 		private boolean exist;
 	}
+
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class LoginDTO {
+		private String profileImageUrl;
+		private String nickname;
+
+		public LoginDTO(Member member) {
+			this.profileImageUrl = member.getProfileImageUrl();
+			this.nickname = member.getNickname();
+		}
+	}
 }

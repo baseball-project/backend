@@ -36,7 +36,7 @@ public class MemberDetails implements UserDetails, OAuth2User {
 
 	@Override
 	public String getName() {
-		return null;
+		return member.getNickname();
 	}
 
 	@Override
@@ -66,5 +66,9 @@ public class MemberDetails implements UserDetails, OAuth2User {
 
 	public boolean isNewMember() {
 		return member.isNewMember();
+	}
+
+	public String getProfileImageUrl() {
+		return member.getProfileImageUrl();
 	}
 }

@@ -37,7 +37,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 		response.addHeader(JwtTokenProvider.HEADER, token);
 
 		boolean isNewMember = memberDetails.isNewMember();
-		LoginDTO loginDTO = new LoginDTO(isNewMember);
+		LoginDTO loginDTO = new LoginDTO(isNewMember, memberDetails.getProfileImageUrl(), memberDetails.getName());
 
 		ApiResponse<LoginDTO> apiResponse = ApiResponse.success(loginDTO);
 

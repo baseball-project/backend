@@ -8,5 +8,7 @@ public class OAuthResponse {
 	@AllArgsConstructor
 	public static class LoginDTO {
 		private boolean isNewMember;
+		private String profileImageUrl;
+		private String nickname;
 	}
 }

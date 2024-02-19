@@ -15,6 +15,7 @@ import com.example.baseballprediction.domain.member.repository.MemberRepository;
 import com.example.baseballprediction.domain.reply.dto.ReplyLikeProjection;
 import com.example.baseballprediction.domain.reply.entity.Reply;
 import com.example.baseballprediction.domain.reply.repository.ReplyRepository;
+import com.example.baseballprediction.domain.reply.repository.ReplyRepositoryCustomImpl;
 import com.example.baseballprediction.global.constant.ErrorCode;
 import com.example.baseballprediction.global.constant.ReplyType;
 import com.example.baseballprediction.global.error.exception.NotFoundException;
@@ -29,13 +30,14 @@ public class ReplyService {
 	private final ReplyRepository replyRepository;
 	private final MemberRepository memberRepository;
 
+	private final ReplyRepositoryCustomImpl replyRepositoryCustom;
+
 	@Transactional(readOnly = true)
 	public Page<ReplyDTO> findRepliesByType(ReplyType replyType, int page, int size) {
 		Pageable pageable = PageRequest.of(page, size);
-
-		Page<ReplyLikeProjection> findGameAllReplyList = replyRepository.findReplyGame(replyType, pageable);
-
-		Page<ReplyDTO> replies = findGameAllReplyList.map(m -> new ReplyDTO(m));
+		
+		Page<ReplyLikeProjection> replyProjections = replyRepositoryCustom.findAllRepliesByType(replyType, pageable);
+		Page<ReplyDTO> replies = replyProjections.map(m -> new ReplyDTO(m));
 
 		return replies;
 	}

@@ -10,5 +10,6 @@ public class OAuthResponse {
 		private boolean isNewMember;
 		private String profileImageUrl;
 		private String nickname;
+		private String teamName;
 	}
 }

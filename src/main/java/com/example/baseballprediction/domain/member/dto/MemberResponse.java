@@ -76,10 +76,12 @@ public class MemberResponse {
 	public static class LoginDTO {
 		private String profileImageUrl;
 		private String nickname;
+		private String teamName;
 
 		public LoginDTO(Member member) {
 			this.profileImageUrl = member.getProfileImageUrl();
 			this.nickname = member.getNickname();
+			this.teamName = member.getTeam().getName();
 		}
 	}
 }

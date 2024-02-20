@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.example.baseballprediction.domain.chat.dto.ChatProfileDTO;
 import com.example.baseballprediction.domain.member.dto.FairyProjection;
 import com.example.baseballprediction.domain.member.dto.ProfileProjection;
 import com.example.baseballprediction.domain.member.entity.Member;
@@ -37,4 +38,12 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 		nativeQuery = true
 	)
 	List<FairyProjection> findFairyStatistics(Long memberId);
+	
+	@Query(
+			"SELECT new com.example.baseballprediction.domain.chat.dto.ChatProfileDTO("
+			+ " nickname, profileImageUrl, team.name)"
+			+ " FROM Member m"
+			+ " WHERE id = :memberId"
+			)
+	Optional<ChatProfileDTO> findByChatProfile(@Param("memberId")Long id);
 }

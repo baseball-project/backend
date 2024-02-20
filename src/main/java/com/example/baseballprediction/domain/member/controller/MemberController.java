@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -45,16 +46,15 @@ public class MemberController {
 		return ResponseEntity.ok().header(JwtTokenProvider.HEADER, (String)response.get("token")).body(apiResponse);
 	}
 
-	// @GetMapping("/logout")
-	// public ResponseEntity<ApiResponse> logout(@RequestHeader(JwtTokenProvider.HEADER) String authorization) {
-	// 	String token = authorization.split(" ")[1];
-	//
-	// 	OAuth2AccessToken oAuth2AccessToken =
-	// 		memberService.logout(authorization.split(" ")[1]);
-	//
-	// 	ApiResponse response = ApiResponse.successWithNoData();
-	// 	return ResponseEntity.ok(response);
-	// }
+	@GetMapping("/logout")
+	public ResponseEntity<ApiResponse> logout(@RequestHeader(JwtTokenProvider.HEADER) String authorization) {
+		String token = authorization.split(" ")[1];
+
+		memberService.logout(authorization.split(" ")[1]);
+
+		ApiResponse response = ApiResponse.successWithNoData();
+		return ResponseEntity.ok(response);
+	}
 
 	@PutMapping("/profile/team")
 	public ResponseEntity<ApiResponse<?>> likeTeamModify(@RequestBody LikeTeamDTO likeTeamDTO,

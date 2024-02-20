@@ -17,6 +17,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import com.example.baseballprediction.global.security.jwt.filter.JwtAuthenticationFilter;
+import com.example.baseballprediction.global.security.jwt.handler.JwtLogoutHandler;
 import com.example.baseballprediction.global.security.oauth.handler.OAuth2AuthenticationFailureHandler;
 import com.example.baseballprediction.global.security.oauth.handler.OAuth2AuthenticationSuccessHandler;
 import com.example.baseballprediction.global.security.oauth.service.OAuth2MemberService;
@@ -32,6 +33,7 @@ public class SecurityConfig {
 	private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
 	private final OAuth2AuthenticationFailureHandler oAuth2AuthenticationFailureHandler;
 	private final JwtAuthenticationFilter jwtAuthenticationFilter;
+	private final JwtLogoutHandler jwtLogoutHandler;
 
 	@Bean
 	public BCryptPasswordEncoder bCryptPasswordEncoder() {
@@ -73,6 +75,12 @@ public class SecurityConfig {
 			}
 		);
 
+		httpSecurity.logout(logoutConfigurer -> {
+			logoutConfigurer.addLogoutHandler(jwtLogoutHandler);
+			logoutConfigurer.logoutUrl("/logout");
+			logoutConfigurer.logoutSuccessUrl("/");
+		});
+
 		httpSecurity.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
 		return httpSecurity.build();
@@ -86,7 +94,7 @@ public class SecurityConfig {
 		configuration.addAllowedMethod("*"); // GET, POST, PUT, DELETE (Javascript 요청 허용)
 		configuration.addAllowedOriginPattern("*"); // 모든 IP 주소 허용 (프론트 앤드 IP만 허용 react)
 		configuration.setAllowCredentials(true); // 클라이언트에서 쿠키 요청 허용
-		configuration.addExposedHeader("Authorization"); // 옛날에는 디폴트 였다. 지금은 아닙니다.
+		configuration.addExposedHeader("Authorization");// 옛날에는 디폴트 였다. 지금은 아닙니다.
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", configuration);
 

@@ -29,12 +29,4 @@ public class MemberRequest {
 		@Size(max = 100, message = "한마디는 100자 이하로 설정할 수 있습니다.")
 		private String comment;
 	}
-
-	@Getter
-	@NoArgsConstructor
-	public static class NicknameDTO {
-		@NotBlank(message = "닉네임을 입력해주세요.")
-		@Size(max = 20, message = "닉네임은 20자 이하로 설정할 수 있습니다.")
-		private String nickname;
-	}
 }

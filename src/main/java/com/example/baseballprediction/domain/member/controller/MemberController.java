@@ -25,6 +25,8 @@ import com.example.baseballprediction.domain.member.dto.MemberRequest;
 import com.example.baseballprediction.domain.member.dto.MemberResponse;
 import com.example.baseballprediction.domain.member.dto.ProfileProjection;
 import com.example.baseballprediction.domain.member.service.MemberService;
+import com.example.baseballprediction.global.constant.ErrorCode;
+import com.example.baseballprediction.global.error.exception.BusinessException;
 import com.example.baseballprediction.global.security.MemberDetails;
 import com.example.baseballprediction.global.security.jwt.JwtTokenProvider;
 import com.example.baseballprediction.global.util.ApiResponse;
@@ -130,9 +132,16 @@ public class MemberController {
 	@GetMapping("/profile/nickname-check")
 	public ResponseEntity<ApiResponse<MemberResponse.NicknameDTO>> nicknameExistList(
 		@AuthenticationPrincipal MemberDetails memberDetails,
-		@Valid @RequestBody MemberRequest.NicknameDTO nicknameDTO) {
+		@RequestParam String nickname) {
+		if (nickname.length() > 20) {
+			throw new BusinessException(ErrorCode.MEMBER_NICKNAME_LENGTH);
+		}
+
+		if (nickname.isEmpty()) {
+			throw new BusinessException(ErrorCode.MEMBER_NICKNAME_NULL);
+		}
 		MemberResponse.NicknameDTO responseDTO = memberService.findExistNickname(memberDetails.getMember().getId(),
-			nicknameDTO.getNickname());
+			nickname);
 
 		ApiResponse<MemberResponse.NicknameDTO> response = ApiResponse.success(responseDTO);
 

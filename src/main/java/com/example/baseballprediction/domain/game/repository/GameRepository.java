@@ -2,12 +2,14 @@ package com.example.baseballprediction.domain.game.repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import com.example.baseballprediction.domain.game.dto.GameVoteProjection;
 import com.example.baseballprediction.domain.game.entity.Game;
+import com.example.baseballprediction.domain.team.entity.Team;
 
 public interface GameRepository extends JpaRepository<Game, Long> {
 	List<Game> findAllByStartedAtBetween(LocalDateTime startedAtStart, LocalDateTime startedAtEnd);
@@ -31,4 +33,6 @@ public interface GameRepository extends JpaRepository<Game, Long> {
 			+ " WHERE g.started_at >= :startedAtStart and g.started_at <= :startedAtEnd", nativeQuery = true)
 	List<GameVoteProjection> findPastGameByStartedAtBetween(Long memberId, LocalDateTime startedAtStart,
 		LocalDateTime startedAtEnd);
+
+	Optional<Game> findByHomeTeamAndAwayTeamAndStartedAt(Team homeTeam, Team awayTeam, LocalDateTime startedAt);
 }

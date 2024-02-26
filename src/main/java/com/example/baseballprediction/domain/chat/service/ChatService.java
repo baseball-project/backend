@@ -1,50 +1,81 @@
 package com.example.baseballprediction.domain.chat.service;
 
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import com.example.baseballprediction.domain.chat.dto.ChatProfileDTO;
-import com.example.baseballprediction.domain.chat.dto.ChatRoom;
-import com.example.baseballprediction.domain.game.entity.Game;
-import com.example.baseballprediction.domain.game.repository.GameRepository;
+import com.example.baseballprediction.domain.member.entity.Member;
 import com.example.baseballprediction.domain.member.repository.MemberRepository;
+import com.example.baseballprediction.global.constant.ErrorCode;
+import com.example.baseballprediction.global.error.exception.InsufficientTokenException;
+import com.example.baseballprediction.global.error.exception.NotFoundException;
+
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
-
-
-@Slf4j
 @RequiredArgsConstructor
 @Service
 public class ChatService {
-	
-	private final GameRepository gameRepository;
+
 	private final MemberRepository memberRepository;
-	private Map<String, ChatRoom> chatRoomMap = new HashMap<>();
+	// 채팅방 ID와 그 채팅방에 참여중인 사용자 세션 ID의 맵핑
+    private Map<String, Set<String>> chatRooms = new ConcurrentHashMap<>();
+    //클라이언트가 예기치 못하게게 끊겼을 경우 
+    private ConcurrentHashMap<String, String> sessions = new ConcurrentHashMap<>();
 	
-	public ChatRoom addChatRoom(Long gameId){
-		Optional<Game> games =  gameRepository.findById(gameId);
-		String home = games.get().getAwayTeam().getName();
-		String away = games.get().getHomeTeam().getName();
-		ChatRoom chatRoom = new ChatRoom().create (gameId,home, away);
-		chatRoomMap.put(chatRoom.getGameId().toString(), chatRoom);
-		return chatRoom;
-	}
+    
+    public void saveGiftToken(Long senderId, Long recipientId, int token) {
+        Member sender = memberRepository.findById(senderId)
+        		.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+        
+        Member recipient = memberRepository.findById(recipientId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+
+        if(sender != recipient) {
+	        // 토큰 선물 로직 추가
+	        int senderCurrentToken = sender.getToken();
+	        int recipientCurrentToken = recipient.getToken();
+	        
+	        if (senderCurrentToken >= token) {
+	            sender.setToken(senderCurrentToken - token);
+	            recipient.setToken(recipientCurrentToken + token);
 	
-	@Transactional(readOnly = true)
-	public List<ChatRoom> findAllRoom(){
-		List<ChatRoom> chatRooms = new ArrayList<>(chatRoomMap.values());
-		return chatRooms;
-	}
+	            memberRepository.save(sender);
+	            memberRepository.save(recipient);
+	        } else {
+	        	int shortage = token - senderCurrentToken;
+        	    throw new InsufficientTokenException(shortage,ErrorCode.INSUFFICIENT_TOKENS);
+	        }
+        }else {
+        	throw new InsufficientTokenException(ErrorCode.GIFTING_TO_SELF_NOT_ALLOWED);
+        }
+    }
+
+    // 사용자가 채팅방에 입장할 때 호출됨
+    public void addChatRoom(String sessionId, String gameId) {
+        // 채팅방이 존재하지 않으면 새로 생성
+        chatRooms.putIfAbsent(gameId, new HashSet<>());
+        // 해당 채팅방에 클라이언트 세션 추가
+        chatRooms.get(gameId).add(sessionId);
+    }
+
+    // 사용자가 채팅방에서 퇴장할 때 호출됨
+    public void removeChatRoom(String sessionId, String gameId) {
+        // 해당 채팅방에서 클라이언트 세션 제거
+        chatRooms.computeIfPresent(gameId, (key, sessions) -> {
+        sessions.remove(sessionId);
+            return sessions;
+        });
+    }
+
+    // 채팅방의 모든 사용자 세션을 종료하는 메서드
+    public void closeChatRoom(String gameId) {
+    	chatRooms.remove(gameId);
+    }
+    
+    public void removeSession(String sessionId) {
+        sessions.remove(sessionId);
+    }
+    
 	
-	@Transactional(readOnly = true)
-	public Optional<ChatProfileDTO> findByUsername(Long id) {
-		Optional<ChatProfileDTO> test= memberRepository.findByChatProfile(id);
-		return test;
-	}
 }

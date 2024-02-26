@@ -17,12 +17,12 @@ public class GameScheduleService {
 		scrapeService.addSchedules();
 	}
 
-	@Scheduled(cron = "0 0 18 * * 1-5", zone = "Asia/Seoul")
+	@Scheduled(cron = "0 0/10 18-23 * * 1-5", zone = "Asia/Seoul")
 	public void updateGameScoreByWeekDay() {
 		scrapeService.updateGameScore();
 	}
 
-	@Scheduled(cron = "0 0 13 * * 0,6", zone = "Asia/Seoul")
+	@Scheduled(cron = "0 0/10 13-23 * * 0,6", zone = "Asia/Seoul")
 	public void updateGameScoreByWeekend() {
 		scrapeService.updateGameScore();
 	}

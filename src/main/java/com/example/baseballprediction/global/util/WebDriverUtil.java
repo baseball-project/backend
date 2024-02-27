@@ -3,23 +3,30 @@ package com.example.baseballprediction.global.util;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 
 @Component
 public class WebDriverUtil {
-    private static final String WEB_DRIVER_PATH = "src/main/resources/chromedriver";
 
-    public static WebDriver getChromeDriver() {
-        if (ObjectUtils.isEmpty(System.getProperty("webdriver.chrome.driver"))) {
-            System.setProperty("webdriver.chrome.driver", WEB_DRIVER_PATH);
-        }
+	private static String webDriverPath;
 
-        ChromeOptions chromeOptions = new ChromeOptions();
-        chromeOptions.addArguments("headless");
+	@Value("${my-env.chrome-driver.path}")
+	public void setWebDriverPath(String path) {
+		webDriverPath = path;
+	}
 
-        WebDriver driver = new ChromeDriver(chromeOptions);
+	public static WebDriver getChromeDriver() {
+		if (ObjectUtils.isEmpty(System.getProperty("webdriver.chrome.driver"))) {
+			System.setProperty("webdriver.chrome.driver", webDriverPath);
+		}
 
-        return driver;
-    }
+		ChromeOptions chromeOptions = new ChromeOptions();
+		chromeOptions.addArguments("headless");
+
+		WebDriver driver = new ChromeDriver(chromeOptions);
+
+		return driver;
+	}
 }

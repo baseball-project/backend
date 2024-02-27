@@ -76,7 +76,8 @@ cloud:
 my-env:
   jwt:
     key: ${JWT.KEY}
-
+  chrome-driver:
+    path: src/main/resources-env/prod/chromedriver
 
 logging:
   level:

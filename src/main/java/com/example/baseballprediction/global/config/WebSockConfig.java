@@ -7,7 +7,9 @@ import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
-import com.example.baseballprediction.global.error.handler.StompHandler;
+
+import com.example.baseballprediction.global.stomp.handler.StompHandler;
+
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -19,9 +21,10 @@ public class WebSockConfig implements WebSocketMessageBrokerConfigurer {
 	
 	@Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-		registry.addEndpoint("/chat").setAllowedOrigins("*")
-        .withSockJS(); // sock.js를 통하여 낮은 버전의 브라우저에서도 websocket이 동작할수 있게 설정
-		registry.addEndpoint("/chat").setAllowedOrigins("*"); // api 통신 시, withSockJS() 설정을 빼야됨
+		// sock.js를 통하여 낮은 버전의 브라우저에서도 websocket이 동작할수 있게 설정 
+		//registry.addEndpoint("/chat").setAllowedOrigins("*").withSockJS(); 
+		// 서버 로컬에서 테스트 할 경우 주석 풀기 
+		registry.addEndpoint("/chat").setAllowedOrigins("*"); 
     }
 
     @Override

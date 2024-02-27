@@ -38,12 +38,4 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 		nativeQuery = true
 	)
 	List<FairyProjection> findFairyStatistics(Long memberId);
-	
-	@Query(
-			"SELECT new com.example.baseballprediction.domain.chat.dto.ChatProfileDTO("
-			+ " nickname, profileImageUrl, team.name)"
-			+ " FROM Member m"
-			+ " WHERE id = :memberId"
-			)
-	Optional<ChatProfileDTO> findByChatProfile(@Param("memberId")Long id);
 }

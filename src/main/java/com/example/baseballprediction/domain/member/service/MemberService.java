@@ -29,6 +29,7 @@ import com.example.baseballprediction.domain.team.repository.TeamRepository;
 import com.example.baseballprediction.global.constant.ErrorCode;
 import com.example.baseballprediction.global.constant.ImageType;
 import com.example.baseballprediction.global.error.exception.BusinessException;
+import com.example.baseballprediction.global.error.exception.InsufficientTokenException;
 import com.example.baseballprediction.global.error.exception.NotFoundException;
 import com.example.baseballprediction.global.security.jwt.JwtTokenProvider;
 import com.example.baseballprediction.global.util.S3UploadService;
@@ -162,4 +163,29 @@ public class MemberService {
 
 		return giftHistories;
 	}
+	
+	public void saveGiftToken(Long senderId, Long recipientId, int token) {
+        Member sender = memberRepository.findById(senderId)
+        		.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+        
+        Member recipient = memberRepository.findById(recipientId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+
+        if(sender != recipient) {
+	        // 토큰 선물 로직 추가
+	        int senderCurrentToken = sender.getToken();
+	        
+	        if (senderCurrentToken >= token) {
+	        	sender.addToken(-token);
+	        	recipient.addToken(token);
+	
+	            memberRepository.save(sender);
+	            memberRepository.save(recipient);
+	        } else {
+        	    throw new InsufficientTokenException(ErrorCode.INSUFFICIENT_TOKENS);
+	        }
+        }else {
+        	throw new InsufficientTokenException(ErrorCode.GIFTING_TO_SELF_NOT_ALLOWED);
+        }
+    }
 }

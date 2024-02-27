@@ -71,4 +71,8 @@ public class MemberDetails implements UserDetails, OAuth2User {
 	public String getProfileImageUrl() {
 		return member.getProfileImageUrl();
 	}
+	
+	public Integer getTeamId() {
+		return member.getTeam().getId();
+	}
 }

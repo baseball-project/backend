@@ -117,4 +117,8 @@ public class Member extends BaseEntity {
 	public void setVoteRatio(int voteRatio) {
 		this.voteRatio = voteRatio;
 	}
+	
+	public void addToken(int token) {
+        this.token += token;
+	}
 }

@@ -24,7 +24,9 @@ public enum ErrorCode {
 	REPLY_LIKE_DUPLICATED(HttpStatus.BAD_REQUEST, "좋아요는 한 번만 누를 수 있습니다."),
 	JWT_INVALID(HttpStatus.BAD_REQUEST, "인증 정보가 올바르지 않습니다."),
 	JWT_EXPIRED(HttpStatus.FORBIDDEN, "인증 정보가 만료되었습니다."),
-	JWT_NOT_MATCHED(HttpStatus.BAD_REQUEST, "인증 정보가 일치하지 않습니다.");
+	JWT_NOT_MATCHED(HttpStatus.BAD_REQUEST, "인증 정보가 일치하지 않습니다."),
+	GIFTING_TO_SELF_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "자기 자신에게 선물할 수 없습니다."),
+	INSUFFICIENT_TOKENS(HttpStatus.UNPROCESSABLE_ENTITY, "선물할 토큰이 부족합니다.");
 
 	private final HttpStatus httpStatus;
 	private final String message;

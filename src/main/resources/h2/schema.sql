@@ -3,8 +3,8 @@ create table team (
     name varchar(30) unique not null,
     short_name varchar(10) unique not null,
     color varchar(16),
-    created_at datetime not null default current_timestamp,
-    modified_at datetime
+    created_at timestamp not null default current_timestamp,
+    modified_at timestamp
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 create table member (
@@ -100,6 +100,7 @@ create table reply(
     member_id bigint not null,
     content varchar(1000) not null,
     reply_type varchar(10) not null,
+    reply_status varchar(10) not null,
     created_at datetime not null default current_timestamp,
     modified_at datetime,
     foreign key(member_id) references member(member_id),
@@ -110,6 +111,17 @@ create table reply_like(
 	reply_like_id bigint auto_increment primary key,
 	member_id bigint not null,
 	reply_id bigint not null,
+	created_at datetime not null default current_timestamp,
+	modified_at datetime,
+	foreign key(reply_id) references reply(reply_id),
+	foreign key(member_id) references member(member_id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+create table reply_report(
+	reply_report_id bigint auto_increment primary key,
+	member_id bigint not null,
+	reply_id bigint not null,
+	report_type varchar(10) not null,
 	created_at datetime not null default current_timestamp,
 	modified_at datetime,
 	foreign key(reply_id) references reply(reply_id),

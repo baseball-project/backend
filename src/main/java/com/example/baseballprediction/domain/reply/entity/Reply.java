@@ -2,6 +2,7 @@ package com.example.baseballprediction.domain.reply.entity;
 
 import com.example.baseballprediction.domain.BaseEntity;
 import com.example.baseballprediction.domain.member.entity.Member;
+import com.example.baseballprediction.global.constant.ReplyStatus;
 import com.example.baseballprediction.global.constant.ReplyType;
 
 import jakarta.persistence.Column;
@@ -43,11 +44,20 @@ public class Reply extends BaseEntity {
 	@Column(name = "reply_type")
 	private ReplyType type;
 
+	@Enumerated(EnumType.STRING)
+	@Column(name = "reply_status")
+	private ReplyStatus status;
+
 	@Builder
 	public Reply(Member member, String content, ReplyType type, Reply parentReply) {
 		this.member = member;
 		this.content = content;
 		this.type = type;
 		this.parentReply = parentReply;
+		this.status = ReplyStatus.NORMAL;
+	}
+
+	public void updateBlind() {
+		this.status = ReplyStatus.BLIND;
 	}
 }

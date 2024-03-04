@@ -2,8 +2,7 @@ package com.example.baseballprediction.domain.reply.entity;
 
 import com.example.baseballprediction.domain.BaseEntity;
 import com.example.baseballprediction.domain.member.entity.Member;
-import com.example.baseballprediction.global.constant.ReplyStatus;
-import com.example.baseballprediction.global.constant.ReplyType;
+import com.example.baseballprediction.global.constant.ReportType;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,47 +16,31 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Reply extends BaseEntity {
+public class ReplyReport extends BaseEntity {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name = "reply_id")
+	@Column(name = "reply_report_id")
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "parent_reply_id")
-	private Reply parentReply;
+	@JoinColumn(name = "reply_id")
+	private Reply reply;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id")
 	private Member member;
 
-	@Column(nullable = false, length = 1000)
-	private String content;
-
 	@Enumerated(EnumType.STRING)
-	@Column(name = "reply_type")
-	private ReplyType type;
-
-	@Enumerated(EnumType.STRING)
-	@Column(name = "reply_status")
-	private ReplyStatus status;
+	private ReportType reportType;
 
 	@Builder
-	public Reply(Member member, String content, ReplyType type, Reply parentReply) {
+	public ReplyReport(Reply reply, Member member, ReportType reportType) {
+		this.reply = reply;
 		this.member = member;
-		this.content = content;
-		this.type = type;
-		this.parentReply = parentReply;
-		this.status = ReplyStatus.NORMAL;
-	}
-
-	public void updateBlind() {
-		this.status = ReplyStatus.BLIND;
+		this.reportType = reportType;
 	}
 }

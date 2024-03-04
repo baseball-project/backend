@@ -36,10 +36,7 @@ public class ReplyRepositoryCustomImpl {
 		QMember member = QMember.member;
 		QTeam team = QTeam.team;
 
-		// StringExpression dateCondition = Expressions.stringTemplate("FUNCTION('DATE_FORMAT', {0}, '%Y-%m-%d')",
-		// 	reply.createdAt);
-
-		StringExpression dateCondition = Expressions.stringTemplate("FUNCTION('FORMATDATETIME', {0}, 'yyyy-MM-dd')",
+		StringExpression dateCondition = Expressions.stringTemplate("FUNCTION('DATE_FORMAT', {0}, '%Y-%m-%d')",
 			reply.createdAt);
 
 		BooleanExpression whereCondition;

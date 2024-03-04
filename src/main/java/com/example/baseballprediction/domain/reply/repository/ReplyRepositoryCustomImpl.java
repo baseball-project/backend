@@ -13,6 +13,7 @@ import com.example.baseballprediction.domain.reply.dto.ReplyLikeProjection;
 import com.example.baseballprediction.domain.reply.entity.QReply;
 import com.example.baseballprediction.domain.replylike.entity.QReplyLike;
 import com.example.baseballprediction.domain.team.entity.QTeam;
+import com.example.baseballprediction.global.constant.ReplyStatus;
 import com.example.baseballprediction.global.constant.ReplyType;
 import com.example.baseballprediction.global.util.CustomDateUtil;
 import com.querydsl.core.types.Projections;
@@ -35,7 +36,10 @@ public class ReplyRepositoryCustomImpl {
 		QMember member = QMember.member;
 		QTeam team = QTeam.team;
 
-		StringExpression dateCondition = Expressions.stringTemplate("FUNCTION('DATE_FORMAT', {0}, '%Y-%m-%d')",
+		// StringExpression dateCondition = Expressions.stringTemplate("FUNCTION('DATE_FORMAT', {0}, '%Y-%m-%d')",
+		// 	reply.createdAt);
+
+		StringExpression dateCondition = Expressions.stringTemplate("FUNCTION('FORMATDATETIME', {0}, 'yyyy-MM-dd')",
 			reply.createdAt);
 
 		BooleanExpression whereCondition;
@@ -59,7 +63,8 @@ public class ReplyRepositoryCustomImpl {
 			.leftJoin(member).on(reply.member.id.eq(member.id))
 			.leftJoin(team).on(reply.member.team.id.eq(team.id))
 			.leftJoin(replyLike).on(replyLike.reply.id.eq(reply.id))
-			.where(reply.type.eq(replyType), whereCondition, reply.parentReply.isNull())
+			.where(reply.type.eq(replyType), whereCondition, reply.parentReply.isNull(),
+				reply.status.eq(ReplyStatus.NORMAL))
 			.groupBy(reply.id)
 			.orderBy(reply.createdAt.desc());
 

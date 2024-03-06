@@ -1,0 +1,87 @@
+package com.example.baseballprediction.domain.chat.minigame.dto;
+
+
+import com.example.baseballprediction.domain.chat.dto.ChatProfileDTO;
+import lombok.Getter;
+
+
+public class MiniGameVoteDTO {
+
+	@Getter
+	public static class Options {
+		 private String question;
+		 private String option1;
+         private String option2;
+         
+         public Options(String question,String option1,String option2) {
+        	 this.question = question;
+        	 this.option1 = option1;
+        	 this.option2 = option2;
+         }
+	}
+	
+	@Getter
+    public static class VoteMessage{
+		private int id;
+		private String message;
+		private ChatProfileDTO profile;
+		private Options miniGames;
+        
+        public VoteMessage(int id,String message,ChatProfileDTO profile,Options options) {
+        	this.id = id;
+            this.message = message;
+        	this.profile = new ChatProfileDTO(profile.getNickname(),profile.getProfileImageUrl(),profile.getTeamName());
+            this.miniGames = new Options(options.getQuestion(),options.getOption1(), options.getOption2());
+            
+        }
+
+    }
+
+	@Getter
+    public static class VoteResult {
+        private String message;
+        
+        public VoteResult(String message) {
+        	this.message = message;
+        }
+    }
+
+	@Getter
+	public static class VoteResultDTO {
+	    private VoteCreator voteCreator;
+	    private ChatProfileDTO myProfile;
+	    private VoteRatio voteRatio;
+	    
+	    public VoteResultDTO(VoteCreator voteCreator,ChatProfileDTO myProfile,VoteRatio voteRatio) {
+	        this.voteCreator = voteCreator;
+	        this.myProfile = new ChatProfileDTO(myProfile.getNickname(),myProfile.getProfileImageUrl(),myProfile.getTeamName());
+	        this.voteRatio = new VoteRatio(voteRatio.option1VoteRatio, voteRatio.option2VoteRatio);
+	    }
+
+	}
+	
+	@Getter
+	public static class VoteCreator {
+		private String creatorNickname;
+		private Options creatorOptions;
+		
+		public VoteCreator(String creatorNickname,Options creatorOptions) {
+			this.creatorNickname = creatorNickname;
+			this.creatorOptions = new Options(creatorOptions.getQuestion(),creatorOptions.getOption1(), creatorOptions.getOption2());
+		}
+	}
+	
+	
+	@Getter
+	public static class VoteRatio{
+		private  int option1VoteRatio;
+	    private  int option2VoteRatio;
+		
+	    public VoteRatio(int option1VoteRatio,int option2VoteRatio) {
+	    	this.option1VoteRatio = option1VoteRatio;
+	    	this.option2VoteRatio = option2VoteRatio;
+	    }
+	}
+	
+
+}

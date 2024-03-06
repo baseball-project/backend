@@ -27,7 +27,10 @@ public enum ErrorCode {
 	JWT_NOT_MATCHED(HttpStatus.BAD_REQUEST, "인증 정보가 일치하지 않습니다."),
 	GIFTING_TO_SELF_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "자기 자신에게 선물할 수 없습니다."),
 	INSUFFICIENT_TOKENS(HttpStatus.UNPROCESSABLE_ENTITY, "선물할 토큰이 부족합니다."),
-	REPLY_REPORT_EXIST(HttpStatus.BAD_REQUEST, "이미 신고한 댓글입니다.");
+	REPLY_REPORT_EXIST(HttpStatus.BAD_REQUEST, "이미 신고한 댓글입니다."),
+	MINI_GAME_TOKENS_INSUFFICIENT(HttpStatus.UNPROCESSABLE_ENTITY, "미니게임을 만들 토큰이 부족합니다."),
+    MINI_GAME_NOT_FOUND(HttpStatus.BAD_REQUEST, "미니게임이 존재하지 않습니다."),
+    MINI_GAME_NOT_PARTICIPATED(HttpStatus.BAD_REQUEST, "투표에 참여하지 않았습니다.");
 
 	private final HttpStatus httpStatus;
 	private final String message;

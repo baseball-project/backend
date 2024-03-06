@@ -3,10 +3,14 @@ package com.example.baseballprediction.domain.reply.service;
 import static com.example.baseballprediction.domain.reply.dto.ReplyReportResponse.*;
 import static com.example.baseballprediction.domain.reply.dto.ReplyResponse.*;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -45,9 +49,30 @@ public class ReplyService {
 		Pageable pageable = PageRequest.of(page, size);
 
 		Page<ReplyLikeProjection> replyProjections = replyRepositoryCustom.findAllRepliesByType(replyType, pageable);
-		Page<ReplyDTO> replies = replyProjections.map(m -> new ReplyDTO(m));
 
-		return replies;
+		List<ReplyLikeProjection> bestReplyLikeProjections = findBestReplies(replyProjections.getContent());
+
+		List<ReplyLikeProjection> remainingReplies = remainReplies(replyProjections.getContent(), bestReplyLikeProjections);
+
+		List<ReplyLikeProjection> replies = new ArrayList<>(bestReplyLikeProjections);
+		replies.addAll(remainingReplies);
+
+		Page<ReplyDTO> response = new PageImpl<>(replies.stream().map(ReplyDTO::new).collect(Collectors.toList()), pageable, replyProjections.getTotalElements());
+
+		return response;
+	}
+
+	private List<ReplyLikeProjection> findBestReplies(List<ReplyLikeProjection> replyLikeProjections) {
+		return replyLikeProjections.stream()
+			.sorted(Comparator.comparingLong(ReplyLikeProjection::getCount).reversed())
+			.limit(3)
+			.collect(Collectors.toList());
+	}
+
+	private List<ReplyLikeProjection> remainReplies(List<ReplyLikeProjection> replyLikeProjections, List<ReplyLikeProjection> bestReplyLikeProjections) {
+		return replyLikeProjections.stream()
+			.filter(reply -> !bestReplyLikeProjections.contains(reply))
+			.collect(Collectors.toList());
 	}
 
 	public void addReply(ReplyType replyType, String username, String content) {

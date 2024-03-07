@@ -37,11 +37,11 @@ public class MiniGameService {
 		 Member member = memberRepository.findByNickname(nickname)
 			        .orElseThrow(() ->  new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
-		 if (member.getToken() <= 0) {
+		 if (member.getToken() < 5) {
 		        throw new BusinessException(ErrorCode.MINI_GAME_TOKENS_INSUFFICIENT);
 	    }
 		 
-		 member.addToken(-1);
+		 member.addToken(-5);
 		 memberRepository.save(member);
 		 
         // 여기서는 옵션을 단순히 저장하지 않고, gameId로 새로운 투표 세션만 생성함.
@@ -62,26 +62,26 @@ public class MiniGameService {
         Map<String, Integer> gameVotes = voteRecords.getOrDefault(miniGameId, new ConcurrentHashMap<>());
 
         Optional<MiniGameVote> existingVote = miniGameVoteRepository.findByMiniGameIdAndMemberNickname(miniGameId, nickname);
-        if (!gameVotes.containsKey(nickname) && !existingVote.isPresent()) {
-            // 세션을 저장한다. 
-            gameVotes.put(nickname, option);
-            voteRecords.put(miniGameId, gameVotes);
-            // db저장
-            MiniGame miniGame = miniGameRepository.findById((long) miniGameId)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.MINI_GAME_NOT_FOUND));
-            Member member = memberRepository.findByNickname(nickname)
-                .orElseThrow(() ->  new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
-
-            MiniGameVote vote = MiniGameVote.builder()
-                .miniGame(miniGame)
-                .member(member)
-                .voteOption(option)
-                .build();
-            miniGameVoteRepository.save(vote);
-
-            return true; // 투표 성공
+        if (gameVotes.containsKey(nickname) && existingVote.isPresent()) {
+        	 return false; // 이미 투표함
         }
-        return false; // 이미 투표함
+        // 세션을 저장한다. 
+        gameVotes.put(nickname, option);
+        voteRecords.put(miniGameId, gameVotes);
+        // db저장
+        MiniGame miniGame = miniGameRepository.findById((long) miniGameId)
+            .orElseThrow(() -> new NotFoundException(ErrorCode.MINI_GAME_NOT_FOUND));
+        Member member = memberRepository.findByNickname(nickname)
+            .orElseThrow(() ->  new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+
+        MiniGameVote vote = MiniGameVote.builder()
+            .miniGame(miniGame)
+            .member(member)
+            .voteOption(option)
+            .build();
+        miniGameVoteRepository.save(vote);
+
+        return true; // 투표 성공
     }
 	
     @Transactional(readOnly = true) 
@@ -95,12 +95,9 @@ public class MiniGameService {
        Member member = memberRepository.findByNickname(nickname)
            .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
         
-       Optional<MiniGameVote> vote = miniGameVoteRepository.findByMiniGameIdAndMemberNickname(miniGameId, nickname);
+       MiniGameVote vote = miniGameVoteRepository.findByMiniGameIdAndMemberNickname(miniGameId, nickname)
+		   .orElseThrow(() -> new BusinessException(ErrorCode.MINI_GAME_NOT_PARTICIPATED));
        
-       if (vote.isEmpty()) {
-    	   // 미니게임에 참가하지 않았을 경우
-           throw new BusinessException(ErrorCode.MINI_GAME_NOT_PARTICIPATED);
-       }
        
         // 투표율과, 투표 만들 사람을 조회
         MiniGameVoteResultDTO voteResults = miniGameVoteRepository.findVoteRatiosAndCreatorMemberId(miniGameId);

@@ -22,13 +22,13 @@ public class MiniGameVoteDTO {
 	
 	@Getter
     public static class VoteMessage{
-		private int id;
+		private Long miniGameId;
 		private String message;
 		private ChatProfileDTO profile;
 		private Options miniGames;
         
-        public VoteMessage(int id,String message,ChatProfileDTO profile,Options options) {
-        	this.id = id;
+        public VoteMessage(Long miniGameId,String message,ChatProfileDTO profile,Options options) {
+        	this.miniGameId = miniGameId;
             this.message = message;
         	this.profile = new ChatProfileDTO(profile.getNickname(),profile.getProfileImageUrl(),profile.getTeamName());
             this.miniGames = new Options(options.getQuestion(),options.getOption1(), options.getOption2());

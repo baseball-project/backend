@@ -24,21 +24,21 @@ import lombok.NoArgsConstructor;
 public class MiniGameVote {
 
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "mini_game_vote_id")
-    private Long id;
+	private Long id;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "mini_game_id", nullable = false)
-    private MiniGame miniGame;
-
+	@JoinColumn(name = "mini_game_id", nullable = false)
+	private MiniGame miniGame;
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "member_id", nullable = false)
 	private Member member;
 	 
 	@Column(name = "vote_option", nullable = false)
 	private int voteOption;
-
+	
 	@Builder
 	public MiniGameVote(MiniGame miniGame,Member member,int voteOption) {
 		this.miniGame = miniGame;

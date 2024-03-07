@@ -86,6 +86,14 @@ public class GameController {
 		return ResponseEntity.ok(ApiResponse.successWithNoData());
 	}
 
+	@DeleteMapping("/daily-reply/{replyId}/like")
+	public ResponseEntity<ApiResponse> gameReplyLikeCancel(@AuthenticationPrincipal MemberDetails memberDetails,
+		@PathVariable Long replyId) {
+		replyLikeService.deleteReplyLike(memberDetails.getUsername(), replyId);
+
+		return ResponseEntity.ok(ApiResponse.successWithNoData());
+	}
+
 	//승부예측 투표
 	@PostMapping("/{gameId}/vote")
 	public ResponseEntity<ApiResponse> gameVoteAdd(@AuthenticationPrincipal MemberDetails memberDetails,

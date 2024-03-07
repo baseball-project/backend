@@ -87,6 +87,14 @@ public class MonthlyFairyController {
 		return ResponseEntity.ok(ApiResponse.successWithNoData());
 	}
 
+	@DeleteMapping("/replies/{replyId}/like")
+	public ResponseEntity<ApiResponse> replyLikeCancel(@AuthenticationPrincipal MemberDetails memberDetails,
+		@PathVariable Long replyId) {
+		replyLikeService.deleteReplyLike(memberDetails.getUsername(), replyId);
+
+		return ResponseEntity.ok(ApiResponse.successWithNoData());
+	}
+
 	@GetMapping("/replies/{replyId}/sub")
 	public ResponseEntity<ApiResponse<List<ReplyDTO>>> replySubList(@PathVariable Long replyId) {
 		List<ReplyDTO> replies = replyService.findSubReplies(replyId);

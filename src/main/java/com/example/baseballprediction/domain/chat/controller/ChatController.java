@@ -78,7 +78,7 @@ public class ChatController {
     // 선물하기 기능
     @PutMapping("/gift/token")
 	 public ResponseEntity<ApiResponse> giftTokenAdd(@RequestBody ChatGiftRequestDTO chatGiftRequestDTO) {
-		memberService.saveGiftToken(chatGiftRequestDTO.getSenderId(), chatGiftRequestDTO.getRecipientId(), chatGiftRequestDTO.getToken());
+		memberService.saveGiftToken(chatGiftRequestDTO.getSenderName(), chatGiftRequestDTO.getRecipientName(), chatGiftRequestDTO.getToken());
 
 	   	return ResponseEntity.ok(ApiResponse.successWithNoData());
 	}

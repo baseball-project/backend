@@ -1,7 +1,10 @@
 package com.example.baseballprediction.domain.gifttoken.entity;
 
 import com.example.baseballprediction.domain.BaseEntity;
+import com.example.baseballprediction.domain.game.entity.Game;
+import com.example.baseballprediction.domain.gamevote.entity.GameVote;
 import com.example.baseballprediction.domain.member.entity.Member;
+import com.example.baseballprediction.domain.team.entity.Team;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -14,6 +17,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -38,4 +42,13 @@ public class GiftToken extends BaseEntity {
 
 	@Column(nullable = false)
 	private int tokenAmount;
+	
+	@Builder
+	public GiftToken(Member takeMember, Member giveMember, int tokenAmount) {
+        this.takeMember = takeMember;
+        this.giveMember = giveMember;
+        this.tokenAmount = tokenAmount;
+    }
+	
+	
 }

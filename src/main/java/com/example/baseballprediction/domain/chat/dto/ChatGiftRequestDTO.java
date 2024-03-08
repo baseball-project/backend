@@ -7,7 +7,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class ChatGiftRequestDTO {
 
-	private Long senderId;
-	private Long recipientId;
+	private String senderName;
+	private String recipientName;
 	private int token;
 }

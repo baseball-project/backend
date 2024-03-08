@@ -164,28 +164,35 @@ public class MemberService {
 		return giftHistories;
 	}
 	
-	public void saveGiftToken(Long senderId, Long recipientId, int token) {
-        Member sender = memberRepository.findById(senderId)
+	public void saveGiftToken(String senderName, String recipientName, int token) {
+        Member sender = memberRepository.findByNickname(senderName)
         		.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
         
-        Member recipient = memberRepository.findById(recipientId)
+        Member recipient = memberRepository.findByNickname(recipientName)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
-
-        if(sender != recipient) {
-	        // 토큰 선물 로직 추가
-	        int senderCurrentToken = sender.getToken();
-	        
-	        if (senderCurrentToken >= token) {
-	        	sender.addToken(-token);
-	        	recipient.addToken(token);
-	
-	            memberRepository.save(sender);
-	            memberRepository.save(recipient);
-	        } else {
-        	    throw new InsufficientTokenException(ErrorCode.INSUFFICIENT_TOKENS);
-	        }
-        }else {
-        	throw new InsufficientTokenException(ErrorCode.GIFTING_TO_SELF_NOT_ALLOWED);
+        
+        if(sender.equals(recipient)) {
+        	throw new BusinessException(ErrorCode.GIFTING_TO_SELF_NOT_ALLOWED);
         }
+        int senderCurrentToken = sender.getToken();
+        
+        if(senderCurrentToken < token) {
+        	throw new BusinessException(ErrorCode.INSUFFICIENT_TOKENS);
+        }
+    	sender.addToken(-token);
+    	recipient.addToken(token);
+
+        memberRepository.save(sender);
+        memberRepository.save(recipient);
+        
+        
+        GiftToken giftToken = GiftToken.builder()
+                .takeMember(sender)
+                .giveMember(recipient)
+                .tokenAmount(token)
+                .build();
+        giftTokenRepository.save(giftToken);
+       
+        
     }
 }

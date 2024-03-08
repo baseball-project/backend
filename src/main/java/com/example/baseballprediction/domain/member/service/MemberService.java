@@ -164,11 +164,11 @@ public class MemberService {
 		return giftHistories;
 	}
 	
-	public void saveGiftToken(String senderName, String recipientName, int token) {
-        Member sender = memberRepository.findByNickname(senderName)
+	public void saveGiftToken(String senderNickName, String recipientNickName, int token) {
+        Member sender = memberRepository.findByNickname(senderNickName)
         		.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
         
-        Member recipient = memberRepository.findByNickname(recipientName)
+        Member recipient = memberRepository.findByNickname(recipientNickName)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
         
         if(sender.equals(recipient)) {

@@ -30,9 +30,10 @@ public class ReplyLikeProjection {
 	private String nickname;
 
 	private String teamName;
+	private boolean isLiked;
 
 	public ReplyLikeProjection(Long id, Long count, String content, LocalDateTime createdAt, String profileImageUrl,
-		String nickname, String teamName) {
+		String nickname, String teamName, boolean isLiked) {
 		this.id = id;
 		this.count = count;
 		this.content = content;
@@ -40,6 +41,7 @@ public class ReplyLikeProjection {
 		this.profileImageUrl = profileImageUrl;
 		this.nickname = nickname;
 		this.teamName = teamName;
+		this.isLiked = isLiked;
 	}
 
 }

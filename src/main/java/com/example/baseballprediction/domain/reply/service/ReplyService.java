@@ -45,10 +45,13 @@ public class ReplyService {
 	private final ReplyReportRepository replyReportRepository;
 
 	@Transactional(readOnly = true)
-	public Page<ReplyDTO> findRepliesByType(ReplyType replyType, int page, int size) {
+	public Page<ReplyDTO> findRepliesByType(ReplyType replyType, int page, int size, String username) {
 		Pageable pageable = PageRequest.of(page, size);
 
-		Page<ReplyLikeProjection> replyProjections = replyRepositoryCustom.findAllRepliesByType(replyType, pageable);
+		Member member = memberRepository.findByUsername(username)
+			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+
+		Page<ReplyLikeProjection> replyProjections = replyRepositoryCustom.findAllRepliesByType(replyType, pageable, member.getId());
 
 		List<ReplyLikeProjection> bestReplyLikeProjections = findBestReplies(replyProjections.getContent());
 

@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.baseballprediction.domain.member.entity.Member;
 import com.example.baseballprediction.domain.monthlyfairy.service.MonthlyFairyService;
 import com.example.baseballprediction.domain.reply.dto.ReplyRequest;
 import com.example.baseballprediction.domain.reply.service.ReplyService;
@@ -48,6 +49,7 @@ public class MonthlyFairyController {
 
 	@GetMapping("/replies")
 	public ResponseEntity<ApiResponse<Page<ReplyDTO>>> replyList(
+		@AuthenticationPrincipal MemberDetails memberDetails,
 		@RequestParam(required = false, defaultValue = "0") int page,
 		@RequestParam(required = false, defaultValue = "15") int item) {
 		if (page < 0)
@@ -55,7 +57,7 @@ public class MonthlyFairyController {
 
 		page = page == 0 ? page : page - 1;
 
-		Page<ReplyDTO> replies = replyService.findRepliesByType(ReplyType.FAIRY, page, item);
+		Page<ReplyDTO> replies = replyService.findRepliesByType(ReplyType.FAIRY, page, item, memberDetails.getUsername());
 
 		ApiResponse<Page<ReplyDTO>> response = ApiResponse.success(replies);
 

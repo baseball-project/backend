@@ -21,6 +21,7 @@ public class ReplyResponse {
 		private Long replyId;
 		private String content;
 		private Long likeCount;
+		private Boolean isLiked;
 
 		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
 		@LastModifiedDate
@@ -34,6 +35,7 @@ public class ReplyResponse {
 			this.content = replyLikeProjection.getContent();
 			this.likeCount = replyLikeProjection.getCount();
 			this.createdAt = replyLikeProjection.getCreatedAt();
+			this.isLiked = replyLikeProjection.isLiked();
 		}
 	}
 }

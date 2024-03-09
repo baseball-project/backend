@@ -84,8 +84,8 @@ public class ScrapeService {
 
 			for (Element gameElement : gameElements) {
 				try {
-					String status = gameElement.className().split("-")[1];
-					String gameTime = gameElement.select("div[class=top]").select("ul > li:nth-child(2)").text();
+					String status = gameElement.className().split(" ")[1];
+					String gameTime = gameElement.select("div[class=top]").select("ul > li:nth-child(3)").text();
 					Team homeTeam = teamRepository.findByShortName(gameElement.attributes().get("home_nm"))
 						.orElseThrow();
 					Team awayTeam = teamRepository.findByShortName(gameElement.attributes().get("away_nm"))
@@ -106,6 +106,16 @@ public class ScrapeService {
 					Status newStatus = Status.findByName(status);
 
 					game.updateByScrapeData(homeScore, awayScore, newStatus);
+
+					if (!Status.END.getName().equals(status)) {
+						continue;
+					}
+
+					if (homeScore > awayScore) {
+						game.updateWinTeam(homeTeam);
+					} else {
+						game.updateWinTeam(awayTeam);
+					}
 				} catch (Exception e) {
 					continue;
 				}

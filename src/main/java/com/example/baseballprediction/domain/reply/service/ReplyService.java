@@ -123,11 +123,14 @@ public class ReplyService {
 	}
 
 	@Transactional(readOnly = true)
-	public List<ReplyDTO> findSubReplies(Long parentReplyId) {
+	public List<ReplyDTO> findSubReplies(Long parentReplyId, String username) {
 		Reply parentReply = replyRepository.findById(parentReplyId)
 			.orElseThrow(() -> new NotFoundException(ErrorCode.REPLY_NOT_FOUND));
 
-		List<ReplyLikeProjection> replies = replyRepository.findBySubReplies(parentReply);
+		Member member = memberRepository.findByUsername(username)
+			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+
+		List<ReplyLikeProjection> replies = replyRepository.findBySubReplies(parentReply, member.getId());
 
 		List<ReplyDTO> replyDTOList = replies.stream().map(m -> new ReplyDTO(m)).toList();
 

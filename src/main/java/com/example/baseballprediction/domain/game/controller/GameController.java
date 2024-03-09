@@ -23,6 +23,7 @@ import com.example.baseballprediction.domain.game.dto.GameResponse.GameDtoDaily;
 import com.example.baseballprediction.domain.game.service.GameService;
 import com.example.baseballprediction.domain.gamevote.dto.GameVoteRequest.GameVoteRequestDTO;
 import com.example.baseballprediction.domain.gamevote.service.GameVoteService;
+import com.example.baseballprediction.domain.member.entity.Member;
 import com.example.baseballprediction.domain.reply.dto.ReplyRequest;
 import com.example.baseballprediction.domain.reply.dto.ReplyResponse;
 import com.example.baseballprediction.domain.reply.service.ReplyService;
@@ -127,8 +128,9 @@ public class GameController {
 	}
 
 	@GetMapping("/daily-replies/{replyId}/sub")
-	public ResponseEntity<ApiResponse<List<ReplyResponse.ReplyDTO>>> replySubList(@PathVariable Long replyId) {
-		List<ReplyResponse.ReplyDTO> replies = replyService.findSubReplies(replyId);
+	public ResponseEntity<ApiResponse<List<ReplyResponse.ReplyDTO>>> replySubList(
+		@PathVariable Long replyId, @AuthenticationPrincipal MemberDetails memberDetails) {
+		List<ReplyResponse.ReplyDTO> replies = replyService.findSubReplies(replyId, memberDetails.getUsername());
 
 		ApiResponse<List<ReplyResponse.ReplyDTO>> response = ApiResponse.success(replies);
 

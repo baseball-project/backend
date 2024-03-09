@@ -98,8 +98,8 @@ public class MonthlyFairyController {
 	}
 
 	@GetMapping("/replies/{replyId}/sub")
-	public ResponseEntity<ApiResponse<List<ReplyDTO>>> replySubList(@PathVariable Long replyId) {
-		List<ReplyDTO> replies = replyService.findSubReplies(replyId);
+	public ResponseEntity<ApiResponse<List<ReplyDTO>>> replySubList(@PathVariable Long replyId, @AuthenticationPrincipal MemberDetails memberDetails) {
+		List<ReplyDTO> replies = replyService.findSubReplies(replyId, memberDetails.getUsername());
 
 		ApiResponse<List<ReplyDTO>> response = ApiResponse.success(replies);
 

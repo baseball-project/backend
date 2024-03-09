@@ -76,4 +76,8 @@ public class Game {
 		this.awayTeamScore = awayTeamScore;
 		this.status = status;
 	}
+
+	public void updateWinTeam(Team winTeam) {
+		this.winTeam = winTeam;
+	}
 }

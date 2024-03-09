@@ -18,6 +18,7 @@ import com.example.baseballprediction.global.constant.ReplyType;
 import com.example.baseballprediction.global.util.CustomDateUtil;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.StringExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -30,7 +31,7 @@ import lombok.RequiredArgsConstructor;
 public class ReplyRepositoryCustomImpl {
 	private final JPAQueryFactory queryFactory;
 
-	public Page<ReplyLikeProjection> findAllRepliesByType(ReplyType replyType, Pageable pageable) {
+	public Page<ReplyLikeProjection> findAllRepliesByType(ReplyType replyType, Pageable pageable, Long memberId) {
 		QReply reply = QReply.reply;
 		QReplyLike replyLike = QReplyLike.replyLike;
 		QMember member = QMember.member;
@@ -55,11 +56,11 @@ public class ReplyRepositoryCustomImpl {
 		JPAQuery<ReplyLikeProjection> query = queryFactory.select(
 				Projections.constructor(ReplyLikeProjection.class, reply.id, replyLike.id.count().as("count"),
 					reply.createdAt,
-					reply.content, member.profileImageUrl, member.nickname, team.name))
+					reply.content, member.profileImageUrl, member.nickname, team.name, new CaseBuilder().when(replyLike.member.isNotNull()).then(true).otherwise(false)))
 			.from(reply)
 			.leftJoin(member).on(reply.member.id.eq(member.id))
 			.leftJoin(team).on(reply.member.team.id.eq(team.id))
-			.leftJoin(replyLike).on(replyLike.reply.id.eq(reply.id))
+			.leftJoin(replyLike).on(replyLike.reply.id.eq(reply.id).and(replyLike.member.id.eq(memberId)))
 			.where(reply.type.eq(replyType), whereCondition, reply.parentReply.isNull(),
 				reply.status.eq(ReplyStatus.NORMAL))
 			.groupBy(reply.id)

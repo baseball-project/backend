@@ -57,10 +57,12 @@ public class GameController {
 	//승부 예측 댓글 조회 
 	@GetMapping("/daily-replies")
 	public ResponseEntity<ApiResponse<Page<ReplyDTO>>> replyGameList(
+		@AuthenticationPrincipal MemberDetails memberDetails,
 		@RequestParam(required = false, defaultValue = "0") int page,
 		@RequestParam(required = false, defaultValue = "15") int item) {
 
-		Page<ReplyDTO> replyGameList = replyService.findRepliesByType(ReplyType.GAME, page, item);
+		Page<ReplyDTO> replyGameList = replyService.findRepliesByType(ReplyType.GAME, page, item,
+			memberDetails.getUsername());
 
 		ApiResponse<Page<ReplyDTO>> response = ApiResponse.success(replyGameList);
 

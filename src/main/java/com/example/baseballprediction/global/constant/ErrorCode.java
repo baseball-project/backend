@@ -30,8 +30,12 @@ public enum ErrorCode {
 	REPLY_REPORT_EXIST(HttpStatus.BAD_REQUEST, "이미 신고한 댓글입니다."),
 	MINI_GAME_TOKENS_INSUFFICIENT(HttpStatus.BAD_REQUEST, "미니게임을 만들 토큰이 부족합니다."),
     MINI_GAME_NOT_FOUND(HttpStatus.BAD_REQUEST, "미니게임이 존재하지 않습니다."),
-    MINI_GAME_NOT_PARTICIPATED(HttpStatus.BAD_REQUEST, "투표에 참여하지 않았습니다.");
-
+    MINI_GAME_NOT_PARTICIPATED(HttpStatus.BAD_REQUEST, "투표에 참여하지 않았습니다."),
+    GAME_NOT_FOUND(HttpStatus.BAD_REQUEST, "게임 정보를 찾을 수 없습니다."),
+	MINI_GAME_MAX_VOTE_LIMIT(HttpStatus.BAD_REQUEST, "더 이상 미니게임을 만들 수 없습니다."),
+	MINI_GAME_ALREADY_ENDED(HttpStatus.BAD_REQUEST, "이미 종료된 미니투표 입니다."),
+    MINI_GAME_CURRENTLY_WAITING(HttpStatus.BAD_REQUEST, "현재 대기상태중인 미니투표입니다.");
+	
 	private final HttpStatus httpStatus;
 	private final String message;
 

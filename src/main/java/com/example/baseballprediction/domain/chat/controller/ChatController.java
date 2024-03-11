@@ -13,8 +13,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import com.example.baseballprediction.domain.chat.dto.ChatGiftRequestDTO;
+import com.example.baseballprediction.domain.chat.dto.ChatLeaveMessage;
 import com.example.baseballprediction.domain.chat.dto.ChatMessage;
 import com.example.baseballprediction.domain.chat.dto.ChatProfileDTO;
+import com.example.baseballprediction.domain.chat.dto.ChatLeaveRequest;
 import com.example.baseballprediction.domain.chat.minigame.dto.MiniGameVoteDTO.Options;
 import com.example.baseballprediction.domain.chat.minigame.dto.MiniGameVoteDTO.VoteMessage;
 import com.example.baseballprediction.domain.chat.minigame.dto.MiniGameVoteDTO.VoteResult;
@@ -30,6 +32,7 @@ import com.example.baseballprediction.domain.team.entity.Team;
 import com.example.baseballprediction.domain.team.repository.TeamRepository;
 import com.example.baseballprediction.global.constant.ChatType;
 import com.example.baseballprediction.global.constant.ErrorCode;
+import com.example.baseballprediction.global.constant.Status;
 import com.example.baseballprediction.global.error.exception.BusinessException;
 import com.example.baseballprediction.global.error.exception.NotFoundException;
 import com.example.baseballprediction.global.security.MemberDetails;
@@ -68,7 +71,7 @@ public class ChatController {
 	
 	// 사용자가 채팅방을 나갈 때
     @DeleteMapping("/chat/{gameId}/leave")
-    public ResponseEntity<ApiResponse> chatRoomRemove(@PathVariable String gameId, HttpSession session) {
+    public ResponseEntity<ApiResponse> chatRoomRemove(@PathVariable Long gameId, HttpSession session) {
         String sessionId = session.getId();
         chatService.removeMembeSessionChatRoom(sessionId, gameId);
 
@@ -91,7 +94,15 @@ public class ChatController {
 	    	 ChatProfileDTO chatProfileDTO = new ChatProfileDTO(memberDetails.getName(), memberDetails.getProfileImageUrl(),team.getName()); 
 	    	Options options = new Options(creation.getQuestion(),creation.getOption1(),creation.getOption2());
 	    	MiniGame miniGame = miniGameService.saveCreateVote(creation.getGameId(), options, memberDetails.getMember().getNickname());
-	        messagingTemplate.convertAndSend("/sub/chat/" + creation.getGameId(), new VoteMessage(miniGame.getId(),"투표가 시작되었습니다.",chatProfileDTO,options));
+    	    if (miniGame.getStatus() == Status.PROGRESS) {
+    	    	messagingTemplate.convertAndSend("/sub/chat/" + creation.getGameId(), new VoteMessage(miniGame.getId(),"투표가 시작되었습니다.",chatProfileDTO,options));
+    	    	return;
+    	    }
+    	    
+    	    if(miniGame.getStatus() == Status.READY) {
+    	    	messagingTemplate.convertAndSendToUser(memberDetails.getMember().getNickname() , "/chat/" + creation.getGameId(), new VoteMessage(miniGame.getId(),"투표가 생성됐습니다. 잠시만 기다려주세요.",chatProfileDTO,options));
+    	    	return;
+    	    }
     	}catch (BusinessException e) {
     		sendErrorMessage(headerAccessor, e);
     	}
@@ -102,12 +113,16 @@ public class ChatController {
     @MessageMapping("/chat/vote")
     public void performVoteAdd(@Payload VoteAction action, SimpMessageHeaderAccessor headerAccessor) {
         String nickname = ((MemberDetails) headerAccessor.getSessionAttributes().get("memberDetails")).getMember().getNickname();
-        boolean result = miniGameService.addVote(action.getMiniGameId(), nickname, action.getOption());
-        if(result) {
-            messagingTemplate.convertAndSendToUser(nickname, "/voteResult", new VoteResult("투표해주셔서 감사합니다."));
-        } else {
-            messagingTemplate.convertAndSendToUser(nickname, "/voteResult", new VoteResult("이미 투표하셨습니다."));
-        }
+        try {
+        	boolean result = miniGameService.addVote(action.getMiniGameId(), nickname, action.getOption());
+	        if(result) {
+	            messagingTemplate.convertAndSendToUser(nickname, "/voteResult", new VoteResult("투표해주셔서 감사합니다."));
+	        } else {
+	            messagingTemplate.convertAndSendToUser(nickname, "/voteResult", new VoteResult("이미 투표하셨습니다."));
+	        }
+        }catch(BusinessException e) {
+	    	sendErrorMessage(headerAccessor, e);
+	    }
     }
 
     // 투표 결과 확인
@@ -127,6 +142,18 @@ public class ChatController {
         String nickname = ((MemberDetails) headerAccessor.getSessionAttributes().get("memberDetails")).getMember().getNickname();
         String errorMessage = exception.getMessage(); 
         messagingTemplate.convertAndSendToUser(nickname, "/chat/errors", errorMessage);
+    }
+    
+    @MessageMapping("/chat/leave")
+    public void leaveChatRoomRemove(@Payload ChatLeaveRequest leaveRequest, SimpMessageHeaderAccessor headerAccessor) {
+        String sessionId = headerAccessor.getSessionId();
+        String nickname = ((MemberDetails) headerAccessor.getSessionAttributes().get("memberDetails")).getMember().getNickname();
+        Long gameId = leaveRequest.getGameId();
+
+        chatService.removeMembeSessionChatRoom(sessionId, gameId);
+
+        ChatLeaveMessage leaveMessage = new ChatLeaveMessage(nickname, "님이 채팅방을 떠났습니다.");
+        messagingTemplate.convertAndSend("/sub/chat/" + gameId, leaveMessage);
     }
     
 }

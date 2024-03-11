@@ -6,6 +6,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.stereotype.Service;
+
+import com.example.baseballprediction.global.constant.ErrorCode;
+import com.example.baseballprediction.global.error.exception.NotFoundException;
+
 import lombok.RequiredArgsConstructor;
 
 
@@ -25,15 +29,15 @@ public class ChatService {
         // 해당 채팅방에 클라이언트 세션 추가
         chatRooms.get(gameId).add(sessionId);
     }
-
-    // 사용자가 채팅방에서 퇴장할 때 호출됨
-    public void removeMembeSessionChatRoom(String sessionId, String gameId) {
-        // 해당 채팅방에서 클라이언트 세션 제거
-        chatRooms.computeIfPresent(gameId, (key, sessions) -> {
-        sessions.remove(sessionId);
-        return sessions;
-        });
+    
+    public void removeMembeSessionChatRoom(String webSocketSessionId, Long gameId) {
+        Set<String> sessions = chatRooms.get(String.valueOf(gameId));
+        if (sessions == null) {
+        	throw new NotFoundException(ErrorCode.MEMBER_NOT_FOUND);
+        }
+        sessions.remove(webSocketSessionId);
     }
+    
     // 채팅방의 모든 사용자 세션을 종료하는 메서드
     public void closeChatRoom(String gameId) {
     	chatRooms.remove(gameId);

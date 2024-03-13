@@ -51,14 +51,21 @@ create table game_vote(
     foreign key(member_id) references member(member_id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-create table mini_game (
-	mini_game_id bigint auto_increment primary key,
-	question varchar(100) not null,
-    option1 varchar(100) not null,
-    option2 varchar(100) not null,
-    created_at datetime not null default current_timestamp,
-    modified_at datetime
-)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE mini_game (
+  mini_game_id bigint NOT NULL AUTO_INCREMENT,
+  game_id bigint NOT NULL,
+  question varchar(100) NOT NULL,
+  option1 varchar(100) NOT NULL,
+  option2 varchar(100) NOT NULL,
+  status varchar(20) NOT NULL,
+  start_at datetime DEFAULT NULL,
+  created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  modified_at datetime DEFAULT NULL,
+  PRIMARY KEY (mini_game_id),
+  KEY fk_mini_game_game_id (game_id),
+  CONSTRAINT fk_mini_game_game_id FOREIGN KEY (game_id) REFERENCES game (game_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 create table mini_game_vote(
 	mini_game_vote_id bigint auto_increment primary key,

@@ -85,4 +85,7 @@ public class MiniGame extends BaseEntity {
         );
     }
 
+    public void setStartAt(LocalDateTime startAt) {
+        this.startAt = startAt;
+    }
 }

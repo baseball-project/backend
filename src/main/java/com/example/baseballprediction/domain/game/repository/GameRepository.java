@@ -6,10 +6,12 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.example.baseballprediction.domain.game.dto.GameVoteProjection;
 import com.example.baseballprediction.domain.game.entity.Game;
 import com.example.baseballprediction.domain.team.entity.Team;
+import com.example.baseballprediction.global.constant.Status;
 
 public interface GameRepository extends JpaRepository<Game, Long> {
 	List<Game> findAllByStartedAtBetween(LocalDateTime startedAtStart, LocalDateTime startedAtEnd);
@@ -35,4 +37,10 @@ public interface GameRepository extends JpaRepository<Game, Long> {
 		LocalDateTime startedAtEnd);
 
 	Optional<Game> findByHomeTeamAndAwayTeamAndStartedAt(Team homeTeam, Team awayTeam, LocalDateTime startedAt);
+	
+	@Query("SELECT g.id FROM Game g WHERE DATE(g.startedAt) = CURRENT_DATE AND (g.status = 'READY' OR g.status = 'PROGRESS')")
+	List<Long> findGameIdAndStatus();
+	
+	@Query("SELECT g.id FROM Game g WHERE g.status = :status")
+	List<Long> findGameIdsByStatus(@Param("status") Status status);
 }

@@ -39,7 +39,7 @@ public interface GameRepository extends JpaRepository<Game, Long> {
 	Optional<Game> findByHomeTeamAndAwayTeamAndStartedAt(Team homeTeam, Team awayTeam, LocalDateTime startedAt);
 	
 	@Query("SELECT g.id FROM Game g WHERE DATE(g.startedAt) = CURRENT_DATE AND (g.status = 'READY' OR g.status = 'PROGRESS')")
-    List<Long> findGameIdAndStatus();
+	List<Long> findGameIdAndStatus();
 	
 	@Query("SELECT g.id FROM Game g WHERE g.status = :status")
 	List<Long> findGameIdsByStatus(@Param("status") Status status);

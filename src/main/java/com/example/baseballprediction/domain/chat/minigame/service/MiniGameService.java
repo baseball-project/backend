@@ -2,6 +2,7 @@ package com.example.baseballprediction.domain.chat.minigame.service;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -36,6 +37,10 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class MiniGameService {
 	
+	
+    public static final int MAX_VOTE_LIMIT = 40;
+    public static final int REQUIRED_TOKENS_FOR_VOTE = 5;
+	
 	private final MiniGameRepository miniGameRepository;
 	private final MiniGameVoteRepository miniGameVoteRepository;
 	private final MemberRepository memberRepository;
@@ -43,22 +48,23 @@ public class MiniGameService {
 	private Map<Long, Integer> voteCountPerGame = new ConcurrentHashMap<>();
 	private final GameRepository gameRepository;
 	private final SimpMessageSendingOperations messagingTemplate;
+	private final Map<Long, Object> gameLocks = new ConcurrentHashMap<>();
 
 
 	public MiniGame saveCreateVote(Long gameId,Options options,String nickname) {
 		 
 		int currentVoteCount = voteCountPerGame.getOrDefault(gameId, 0);
-		if (currentVoteCount > 40) {
+		if (currentVoteCount > MAX_VOTE_LIMIT) {
 		    throw new BusinessException(ErrorCode.MINI_GAME_MAX_VOTE_LIMIT);
 		}
 		 Member member = memberRepository.findByNickname(nickname)
 			        .orElseThrow(() ->  new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 		
-		 if (member.getToken() < 5) {
+		 if (member.getToken() < REQUIRED_TOKENS_FOR_VOTE) {
 		        throw new BusinessException(ErrorCode.MINI_GAME_TOKENS_INSUFFICIENT);
 		}
 		 
-		 member.addToken(-5);
+		 member.addToken(-REQUIRED_TOKENS_FOR_VOTE);
 		 memberRepository.save(member);
 		 
 		 Game game = gameRepository.findById(gameId)
@@ -93,7 +99,7 @@ public class MiniGameService {
 	        return false;
 	    }
 
-	    List<MiniGame> readyVotes = miniGameRepository.findByGameIdAndStatusOrderByCreatedAtDesc(gameId, Status.READY);
+	    List<MiniGame> readyVotes = miniGameRepository.findByGameIdAndStatusOrderByCreatedAtAsc(gameId, Status.READY);
 	    
 	    if (readyVotes.isEmpty()) {
 	        return true;
@@ -106,36 +112,50 @@ public class MiniGameService {
 	// 1분마다 실행 3분마다 진행시 스케줄러 반복이 엇나갈걸 대비.
 	@Scheduled(fixedDelay = 60000) 
 	public void modifyCheckAndUpdateVoteStatus() {
-	    List<MiniGame> inProgressVotes = miniGameRepository.findByStatus(Status.PROGRESS);
-	    List<MiniGame> readyVotes = miniGameRepository.findByStatusOrderByCreatedAtAsc(Status.READY);
+		
+	    List<Long> gameIds = gameRepository.findGameIdAndStatus(); 
 
-	    LocalDateTime now = LocalDateTime.now();
-
-	    // 진행 중인 투표 상태를 업데이트한다.
-	    inProgressVotes.forEach(vote -> {
-	        if (Duration.between(vote.getStartAt(), now).toMinutes() >= 3) { 
-	        	modifyVoteStatus(vote, Status.END);
-	            ChatProfileDTO profile = vote.toChatProfileDTO(); 
-	            Options options = vote.toOptions();
-	            messagingTemplate.convertAndSend("/sub/chat/" + vote.getGame().getId(), new VoteMessage(vote.getId(), "투표가 종료되었습니다.", profile, options));
-	        }
-	    });
-
-	    // 대기 중인 투표 중 가장 오래된 투표를 업데이트한다.
-	    if (inProgressVotes.isEmpty() && !readyVotes.isEmpty()) {
-	        MiniGame nextVote = readyVotes.get(0);
-	        modifyVoteStatus(nextVote, Status.PROGRESS);
-	        ChatProfileDTO profile = nextVote.toChatProfileDTO();
-	        Options options = nextVote.toOptions();
-	        messagingTemplate.convertAndSend("/sub/chat/" + nextVote.getGame().getId(), new VoteMessage(nextVote.getId(), "투표가 시작되었습니다.", profile, options));
+	    for (Long gameId : gameIds) {
+	    	// gameIds가 돌면서 같은 gameId에 작업을 할려고 할 때, 접근을 막는다.
+	    	synchronized(getGameLock(gameId)) {
+		        List<MiniGame> inProgressVotes = miniGameRepository.findByGameIdAndStatus(gameId, Status.PROGRESS);
+		        List<MiniGame> readyVotes = miniGameRepository.findByGameIdAndStatusOrderByCreatedAtAsc(gameId, Status.READY);
+	
+		        LocalDateTime now = LocalDateTime.now();
+	
+		        for (MiniGame vote : inProgressVotes) {
+		            if (Duration.between(vote.getStartAt(), now).toMinutes() >= 3) {
+		                modifyVoteStatus(vote, Status.END);
+		                ChatProfileDTO profile = vote.toChatProfileDTO(); 
+		                Options options = vote.toOptions(); 
+		                // 현재 채팅방의 활성 세션에 있는 사용자에게만 메시지 전송
+                        messagingTemplate.convertAndSend("/sub/chat/" + vote.getGame().getId(), new VoteMessage(vote.getId(), "투표가 종료되었습니다.", profile, options));
+		            }
+		        }
+	
+		        if (inProgressVotes.isEmpty() && !readyVotes.isEmpty()) {
+		            MiniGame nextVote = readyVotes.get(0);
+		            modifyVoteStatus(nextVote, Status.PROGRESS);
+		            ChatProfileDTO profile = nextVote.toChatProfileDTO(); 
+		            Options options = nextVote.toOptions(); 
+		            // 현재 채팅방의 활성 세션에 있는 사용자에게만 메시지 전송
+                    messagingTemplate.convertAndSend("/sub/chat/" + nextVote.getGame().getId(), new VoteMessage(nextVote.getId(), "투표가 시작되었습니다.", profile, options));
+		        }
+	    	}
 	    }
 	}
 
-    private void modifyVoteStatus(MiniGame vote, Status status) {
-        vote.updateStatus(status);
-        miniGameRepository.save(vote);
-    }
-	 
+	private void modifyVoteStatus(MiniGame vote, Status status) {
+	    vote.updateStatus(status);
+	    if (status == Status.PROGRESS) {
+	        vote.setStartAt(LocalDateTime.now()); 
+	    }
+	    miniGameRepository.save(vote);
+	}
+
+	private synchronized Object getGameLock(Long gameId) {
+	    return gameLocks.computeIfAbsent(gameId, k -> new Object());
+	}
 	 
     public boolean addVote(Long miniGameId, String nickname, int option) {
     	
@@ -208,5 +228,28 @@ public class MiniGameService {
         VoteResultDTO resultDTO = new VoteResultDTO(voteCreator, myProfile, ratio);
         
         return resultDTO;
+    }
+    
+    //게임이 종료된 뒤 미니투표가 해당 gameId에 남아 있을경우 토큰 환불처리
+    @Scheduled(cron = "0 0 22 * * ?", zone = "Asia/Seoul")
+    public void SaveCancelledVotesAndRefundTokens() {
+    	List<Long> endedGameIds = gameRepository.findGameIdsByStatus(Status.END);
+
+        for (Long gameId : endedGameIds) {
+            synchronized (getGameLock(gameId)) {
+            	List<Status> statuses = Arrays.asList(Status.READY, Status.PROGRESS);
+                List<MiniGame> actionableMiniGames = miniGameRepository.findByGameIdAndStatusIn(gameId, statuses);
+                if (actionableMiniGames.isEmpty()) {
+                    continue; 
+                }
+                actionableMiniGames.forEach(miniGame -> {
+                    miniGame.updateStatus(Status.CANCEL);
+                    Member creator = miniGame.getCreator();
+                    creator.addToken(REQUIRED_TOKENS_FOR_VOTE);
+                    memberRepository.save(creator);
+                });
+                miniGameRepository.saveAll(actionableMiniGames);
+            }
+        }
     }
 }

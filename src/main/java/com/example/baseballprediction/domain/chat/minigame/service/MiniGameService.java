@@ -231,7 +231,6 @@ public class MiniGameService {
     }
     
     //게임이 종료된 뒤 미니투표가 해당 gameId에 남아 있을경우 토큰 환불처리
-    //@Scheduled(cron = "0 0 22 * * ?", zone = "Asia/Seoul")
     @Scheduled(fixedDelay = 60000) 
     public void SaveCancelledVotesAndRefundTokens() {
     	List<Long> endedGameIds = gameRepository.findGameIdsByStatus(Status.END);

@@ -124,7 +124,7 @@ public class MiniGameService {
 		        LocalDateTime now = LocalDateTime.now();
 	
 		        for (MiniGame vote : inProgressVotes) {
-		            if (Duration.between(vote.getStartAt(), now).toMinutes() >= 3) {
+		            if (Duration.between(vote.getStartedAt(), now).toMinutes() >= 3) {
 		                modifyVoteStatus(vote, Status.END);
 		                ChatProfileDTO profile = vote.toChatProfileDTO(); 
 		                Options options = vote.toOptions(); 
@@ -146,7 +146,7 @@ public class MiniGameService {
 	private void modifyVoteStatus(MiniGame vote, Status status) {
 	    vote.updateStatus(status);
 	    if (status == Status.PROGRESS) {
-	        vote.setStartAt(LocalDateTime.now()); 
+	        vote.setStartedAt(LocalDateTime.now()); 
 	    }
 	    miniGameRepository.save(vote);
 	}

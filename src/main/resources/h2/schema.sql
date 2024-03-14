@@ -54,6 +54,7 @@ create table game_vote(
 CREATE TABLE mini_game (
   mini_game_id bigint NOT NULL AUTO_INCREMENT,
   game_id bigint NOT NULL,
+  member_id bigint NOT NULL,
   question varchar(100) NOT NULL,
   option1 varchar(100) NOT NULL,
   option2 varchar(100) NOT NULL,
@@ -63,7 +64,9 @@ CREATE TABLE mini_game (
   modified_at datetime DEFAULT NULL,
   PRIMARY KEY (mini_game_id),
   KEY fk_mini_game_game_id (game_id),
-  CONSTRAINT fk_mini_game_game_id FOREIGN KEY (game_id) REFERENCES game (game_id)
+  KEY fk_mini_game_member_id (member_id),
+  CONSTRAINT fk_mini_game_game_id FOREIGN KEY (game_id) REFERENCES game (game_id),
+  CONSTRAINT fk_mini_game_member_id FOREIGN KEY (member_id) REFERENCES member (member_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 create table mini_game_vote(

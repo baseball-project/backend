@@ -47,7 +47,7 @@ public class MiniGame extends BaseEntity {
 	private String question;
 	private String option1;
 	private String option2;
-	private LocalDateTime startAt;
+	private LocalDateTime startedAt;
 	@Enumerated(EnumType.STRING)
 	private Status status;
 	
@@ -65,7 +65,7 @@ public class MiniGame extends BaseEntity {
 	public void updateStatus(Status status) {
         this.status = status;
         if (Status.PROGRESS == status){
-            this.startAt = LocalDateTime.now();
+            this.startedAt = LocalDateTime.now();
         }
     }
     
@@ -85,8 +85,8 @@ public class MiniGame extends BaseEntity {
         );
     }
     
-    public void setStartAt(LocalDateTime startAt) {
-		this.startAt = startAt;
+    public void setStartedAt(LocalDateTime startedAt) {
+		this.startedAt = startedAt;
 	}
 
 }

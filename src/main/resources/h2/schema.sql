@@ -58,7 +58,7 @@ CREATE TABLE mini_game (
   option1 varchar(100) NOT NULL,
   option2 varchar(100) NOT NULL,
   status varchar(20) NOT NULL,
-  start_at datetime DEFAULT NULL,
+  started_at datetime DEFAULT NULL,
   created_at datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   modified_at datetime DEFAULT NULL,
   PRIMARY KEY (mini_game_id),

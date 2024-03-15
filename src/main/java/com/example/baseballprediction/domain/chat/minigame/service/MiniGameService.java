@@ -101,16 +101,16 @@ public class MiniGameService {
 
 	    List<MiniGame> readyVotes = miniGameRepository.findByGameIdAndStatusOrderByCreatedAtAsc(gameId, Status.READY);
 	    
-	    if (readyVotes.isEmpty()) {
-	        return true;
+	    if (!readyVotes.isEmpty()) {
+	        return false;
 	    }
 
 	    // 가장 최신의 대기 중인 미니투표가 현재 시간으로부터 3분 이전에 생성되었다면 새 미니투표를 만들 수 있다.
-	    return !readyVotes.get(0).getCreatedAt().isAfter(LocalDateTime.now().minusMinutes(3));
+	    return true;
 	}
 	
 	// 1분마다 실행 3분마다 진행시 스케줄러 반복이 엇나갈걸 대비.
-	@Scheduled(fixedDelay = 60000) 
+	@Scheduled(cron = "0 * 13-23 * * ?", zone = "Asia/Seoul") 
 	public void modifyCheckAndUpdateVoteStatus() {
 		
 	    List<Long> gameIds = gameRepository.findGameIdAndStatus(); 

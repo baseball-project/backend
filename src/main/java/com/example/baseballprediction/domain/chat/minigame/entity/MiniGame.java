@@ -41,8 +41,8 @@ public class MiniGame extends BaseEntity {
 	private Game game;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "creator_member_id")
-	private Member creator;
+	@JoinColumn(name = "member_id")
+	private Member member;
 	
 	private String question;
 	private String option1;
@@ -53,8 +53,8 @@ public class MiniGame extends BaseEntity {
 	
 	
 	@Builder
-    public MiniGame(Member creator, Game game, String question, String option1, String option2, Status status) {
-        this.creator = creator;
+    public MiniGame(Member member, Game game, String question, String option1, String option2, Status status) {
+        this.member = member;
         this.game = game;
         this.question = question;
         this.option1 = option1;
@@ -71,9 +71,9 @@ public class MiniGame extends BaseEntity {
     
     public ChatProfileDTO toChatProfileDTO() {
         return new ChatProfileDTO(
-            this.creator.getNickname(),
-            this.creator.getProfileImageUrl(),
-            this.creator.getTeam().getName() 
+            this.member.getNickname(),
+            this.member.getProfileImageUrl(),
+            this.member.getTeam().getName() 
         );
     }
     

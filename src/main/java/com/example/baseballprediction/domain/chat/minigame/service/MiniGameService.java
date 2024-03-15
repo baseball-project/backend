@@ -73,7 +73,7 @@ public class MiniGameService {
 		// 여기서는 옵션을 단순히 저장하지 않고, gameId로 새로운 투표 세션만 생성함.
 		voteRecords.putIfAbsent(gameId, new ConcurrentHashMap<>());
 		MiniGame miniGame = MiniGame.builder()
-		        .creator(member)
+		        .member(member)
 		        .game(game)
 		        .question(options.getQuestion())
 		        .option1(options.getOption1())
@@ -213,10 +213,10 @@ public class MiniGameService {
        
        
         // 투표율과, 투표 만들 사람을 조회
-        MiniGameVoteResultDTO voteResults = miniGameVoteRepository.findVoteRatiosAndCreatorMemberId(miniGameId);
+        MiniGameVoteResultDTO voteResults = miniGameVoteRepository.findVoteRatiosAndMemberId(miniGameId);
 
         // 미니게임 생성자 정보 조회 
-        Member creator = memberRepository.findById(voteResults.getCreatorMemberId())
+        Member creator = memberRepository.findById(voteResults.getMemberId())
             .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
         VoteCreator voteCreator = new VoteCreator(creator.getNickname(), new Options(miniGame.getQuestion(), miniGame.getOption1(), miniGame.getOption2()));
@@ -242,9 +242,9 @@ public class MiniGameService {
                 }
                 actionableMiniGames.forEach(miniGame -> {
                     miniGame.updateStatus(Status.CANCEL);
-                    Member creator = miniGame.getCreator();
-                    creator.addToken(REQUIRED_TOKENS_FOR_VOTE);
-                    memberRepository.save(creator);
+                    Member member = miniGame.getMember();
+                    member.addToken(REQUIRED_TOKENS_FOR_VOTE);
+                    memberRepository.save(member);
                 });
                 miniGameRepository.saveAll(actionableMiniGames);
             }

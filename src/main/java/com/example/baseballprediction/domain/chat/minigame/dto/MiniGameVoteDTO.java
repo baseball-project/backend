@@ -38,11 +38,11 @@ public class MiniGameVoteDTO {
 		private LocalDateTime startedAt;
         
         public VoteMessage(Long miniGameId,String message,ChatProfileDTO profile,Options options,LocalDateTime startedAt) {
-        	this.miniGameId = miniGameId;
-            this.message = message;
-        	this.profile = new ChatProfileDTO(profile.getNickname(),profile.getProfileImageUrl(),profile.getTeamName());
-            this.miniGames = new Options(options.getQuestion(),options.getOption1(), options.getOption2());
-            this.startedAt = startedAt;
+			this.miniGameId = miniGameId;
+			this.message = message;
+			this.profile = new ChatProfileDTO(profile.getNickname(),profile.getProfileImageUrl(),profile.getTeamName());
+			this.miniGames = new Options(options.getQuestion(),options.getOption1(), options.getOption2());
+			this.startedAt = startedAt;
             
         }
 

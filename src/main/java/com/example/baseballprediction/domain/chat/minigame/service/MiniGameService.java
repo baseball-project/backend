@@ -143,23 +143,23 @@ public class MiniGameService {
 	
 	public void SaveVoteEndResults(Long miniGameId) {
 		MiniGameVoteResultDTO voteResults = miniGameVoteRepository.findVoteRatiosAndMemberId(miniGameId);
-	    MiniGame miniGame = miniGameRepository.findById(miniGameId)
-	        .orElseThrow(() -> new BusinessException(ErrorCode.MINI_GAME_NOT_FOUND));
-
-	    if (miniGame.getStatus() == Status.END) {
-	    	 throw new BusinessException(ErrorCode.MINI_GAME_ALREADY_ENDED);
-	    }
-
-	    miniGame.updateStatus(Status.END);
-	    miniGameRepository.save(miniGame);
-
-	    String resultMessage = String.format("%s 투표 결과: %s %d%%, %s %d%%로 마감되었습니다.",
-                miniGame.getQuestion(),
-                miniGame.getOption1(), voteResults.getOption1VoteRatio(),
-                miniGame.getOption2(), voteResults.getOption2VoteRatio());
-	    
-
-	    messagingTemplate.convertAndSend("/sub/chat/" + miniGame.getGame().getId(), new VoteResult(resultMessage));
+		MiniGame miniGame = miniGameRepository.findById(miniGameId)
+		    .orElseThrow(() -> new BusinessException(ErrorCode.MINI_GAME_NOT_FOUND));
+		
+		if (miniGame.getStatus() == Status.END) {
+			 throw new BusinessException(ErrorCode.MINI_GAME_ALREADY_ENDED);
+		}
+		
+		miniGame.updateStatus(Status.END);
+		miniGameRepository.save(miniGame);
+		
+		String resultMessage = String.format("%s 투표 결과: %s %d%%, %s %d%%로 마감되었습니다.",
+		        miniGame.getQuestion(),
+		        miniGame.getOption1(), voteResults.getOption1VoteRatio(),
+		        miniGame.getOption2(), voteResults.getOption2VoteRatio());
+		
+		
+		messagingTemplate.convertAndSend("/sub/chat/" + miniGame.getGame().getId(), new VoteResult(resultMessage));
 	}
 
 	private void modifyVoteStatus(MiniGame vote, Status status) {

@@ -1,6 +1,7 @@
 package com.example.baseballprediction.domain.chat.controller;
 
 
+import java.time.LocalDateTime;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
@@ -91,16 +92,17 @@ public class ChatController {
     	 MemberDetails memberDetails = (MemberDetails) headerAccessor.getSessionAttributes().get("memberDetails");
     	 try {
 	    	Team team = teamRepository.findById(memberDetails.getTeamId()).orElseThrow(() -> new NotFoundException(ErrorCode.TEAM_NOT_FOUND));
-	    	 ChatProfileDTO chatProfileDTO = new ChatProfileDTO(memberDetails.getName(), memberDetails.getProfileImageUrl(),team.getName()); 
+	    	ChatProfileDTO chatProfileDTO = new ChatProfileDTO(memberDetails.getName(), memberDetails.getProfileImageUrl(),team.getName()); 
 	    	Options options = new Options(creation.getQuestion(),creation.getOption1(),creation.getOption2());
 	    	MiniGame miniGame = miniGameService.saveCreateVote(creation.getGameId(), options, memberDetails.getMember().getNickname());
+	    	LocalDateTime startedAt = miniGame.getStartedAt();
     	    if (miniGame.getStatus() == Status.PROGRESS) {
-    	    	messagingTemplate.convertAndSend("/sub/chat/" + creation.getGameId(), new VoteMessage(miniGame.getId(),"투표가 시작되었습니다.",chatProfileDTO,options));
+    	    	messagingTemplate.convertAndSend("/sub/chat/" + creation.getGameId(), new VoteMessage(miniGame.getId(),"투표가 시작되었습니다.",chatProfileDTO,options,startedAt));
     	    	return;
     	    }
     	    
     	    if(miniGame.getStatus() == Status.READY) {
-    	    	messagingTemplate.convertAndSendToUser(memberDetails.getMember().getNickname() , "/chat/" + creation.getGameId(), new VoteMessage(miniGame.getId(),"투표가 생성됐습니다. 잠시만 기다려주세요.",chatProfileDTO,options));
+    	    	messagingTemplate.convertAndSendToUser(memberDetails.getMember().getNickname() , "/chat/" + creation.getGameId(), new VoteMessage(miniGame.getId(),"투표가 생성됐습니다. 잠시만 기다려주세요.",chatProfileDTO,options,startedAt));
     	    	return;
     	    }
     	}catch (BusinessException e) {

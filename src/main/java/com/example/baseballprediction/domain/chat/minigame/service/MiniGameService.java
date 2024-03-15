@@ -16,6 +16,7 @@ import com.example.baseballprediction.domain.chat.minigame.dto.MiniGameVoteDTO.O
 import com.example.baseballprediction.domain.chat.minigame.dto.MiniGameVoteDTO.VoteCreator;
 import com.example.baseballprediction.domain.chat.minigame.dto.MiniGameVoteDTO.VoteMessage;
 import com.example.baseballprediction.domain.chat.minigame.dto.MiniGameVoteDTO.VoteRatio;
+import com.example.baseballprediction.domain.chat.minigame.dto.MiniGameVoteDTO.VoteResult;
 import com.example.baseballprediction.domain.chat.minigame.dto.MiniGameVoteDTO.VoteResultDTO;
 import com.example.baseballprediction.domain.chat.minigame.dto.MiniGameVoteResultDTO;
 import com.example.baseballprediction.domain.chat.minigame.entity.MiniGame;
@@ -105,7 +106,6 @@ public class MiniGameService {
 	        return false;
 	    }
 
-	    // 가장 최신의 대기 중인 미니투표가 현재 시간으로부터 3분 이전에 생성되었다면 새 미니투표를 만들 수 있다.
 	    return true;
 	}
 	
@@ -125,10 +125,7 @@ public class MiniGameService {
 	
 		        for (MiniGame vote : inProgressVotes) {
 		            if (Duration.between(vote.getStartedAt(), now).toMinutes() >= 3) {
-		                modifyVoteStatus(vote, Status.END);
-		                ChatProfileDTO profile = vote.toChatProfileDTO(); 
-		                Options options = vote.toOptions(); 
-                        messagingTemplate.convertAndSend("/sub/chat/" + vote.getGame().getId(), new VoteMessage(vote.getId(), "투표가 종료되었습니다.", profile, options));
+		            	SaveVoteEndResults(vote.getId());		                
 		            }
 		        }
 	
@@ -137,10 +134,32 @@ public class MiniGameService {
 		            modifyVoteStatus(nextVote, Status.PROGRESS);
 		            ChatProfileDTO profile = nextVote.toChatProfileDTO(); 
 		            Options options = nextVote.toOptions(); 
-	            	messagingTemplate.convertAndSend("/sub/chat/" + nextVote.getGame().getId(), new VoteMessage(nextVote.getId(), "투표가 시작되었습니다.", profile, options));
+		            LocalDateTime startedAt = nextVote.getStartedAt();
+	            	messagingTemplate.convertAndSend("/sub/chat/" + nextVote.getGame().getId(), new VoteMessage(nextVote.getId(), "투표가 시작되었습니다.", profile, options,startedAt));
 		        }
 	    	}
 	    }
+	}
+	
+	public void SaveVoteEndResults(Long miniGameId) {
+		MiniGameVoteResultDTO voteResults = miniGameVoteRepository.findVoteRatiosAndMemberId(miniGameId);
+	    MiniGame miniGame = miniGameRepository.findById(miniGameId)
+	        .orElseThrow(() -> new BusinessException(ErrorCode.MINI_GAME_NOT_FOUND));
+
+	    if (miniGame.getStatus() == Status.END) {
+	    	 throw new BusinessException(ErrorCode.MINI_GAME_ALREADY_ENDED);
+	    }
+
+	    miniGame.updateStatus(Status.END);
+	    miniGameRepository.save(miniGame);
+
+	    String resultMessage = String.format("%s 투표 결과: %s %d%%, %s %d%%로 마감되었습니다.",
+                miniGame.getQuestion(),
+                miniGame.getOption1(), voteResults.getOption1VoteRatio(),
+                miniGame.getOption2(), voteResults.getOption2VoteRatio());
+	    
+
+	    messagingTemplate.convertAndSend("/sub/chat/" + miniGame.getGame().getId(), new VoteResult(resultMessage));
 	}
 
 	private void modifyVoteStatus(MiniGame vote, Status status) {

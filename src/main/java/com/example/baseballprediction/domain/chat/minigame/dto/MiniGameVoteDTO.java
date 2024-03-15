@@ -1,7 +1,13 @@
 package com.example.baseballprediction.domain.chat.minigame.dto;
 
 
+import java.time.LocalDateTime;
+
+import org.springframework.data.annotation.LastModifiedDate;
+
 import com.example.baseballprediction.domain.chat.dto.ChatProfileDTO;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Getter;
 
 
@@ -26,12 +32,17 @@ public class MiniGameVoteDTO {
 		private String message;
 		private ChatProfileDTO profile;
 		private Options miniGames;
+		
+		@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+		@LastModifiedDate
+		private LocalDateTime startedAt;
         
-        public VoteMessage(Long miniGameId,String message,ChatProfileDTO profile,Options options) {
+        public VoteMessage(Long miniGameId,String message,ChatProfileDTO profile,Options options,LocalDateTime startedAt) {
         	this.miniGameId = miniGameId;
             this.message = message;
         	this.profile = new ChatProfileDTO(profile.getNickname(),profile.getProfileImageUrl(),profile.getTeamName());
             this.miniGames = new Options(options.getQuestion(),options.getOption1(), options.getOption2());
+            this.startedAt = startedAt;
             
         }
 
@@ -82,6 +93,4 @@ public class MiniGameVoteDTO {
 	    	this.option2VoteRatio = option2VoteRatio;
 	    }
 	}
-	
-
 }

@@ -51,13 +51,13 @@ public class MemberResponse {
 	@AllArgsConstructor
 	public static class GiftHistoryDTO {
 		private String nickname;
-		private String profileImageUrl;
+		private String teamName;
 		private int token;
 		private String takeDate;
 
 		public GiftHistoryDTO(GiftToken giftToken) {
 			this.nickname = giftToken.getTakeMember().getNickname();
-			this.profileImageUrl = giftToken.getTakeMember().getProfileImageUrl();
+			this.teamName = giftToken.getTakeMember().getTeam().getName();
 			this.token = giftToken.getTokenAmount();
 			this.takeDate = CustomDateUtil.dateToString(giftToken.getCreatedAt());
 		}

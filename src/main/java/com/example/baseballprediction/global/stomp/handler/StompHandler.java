@@ -4,6 +4,7 @@ package com.example.baseballprediction.global.stomp.handler;
 import com.example.baseballprediction.domain.chat.service.ChatService;
 import com.example.baseballprediction.domain.game.entity.Game;
 import com.example.baseballprediction.domain.game.repository.GameRepository;
+import com.example.baseballprediction.domain.gamevote.repository.GameVoteRepository;
 import com.example.baseballprediction.domain.member.entity.Member;
 import com.example.baseballprediction.domain.member.repository.MemberRepository;
 import com.example.baseballprediction.global.constant.ErrorCode;
@@ -36,6 +37,7 @@ public class StompHandler implements ChannelInterceptor {
     private final GameRepository gameRepository;
     private final MemberRepository memberRepository;
     private final ChatService chatService;
+    private final GameVoteRepository gameVoteRepository;
 	
 	@Override
     public Message<?> preSend(Message<?> message, MessageChannel channel) {
@@ -73,6 +75,12 @@ public class StompHandler implements ChannelInterceptor {
             
         }
 
+		boolean gameVoteExists = gameVoteRepository.existsByGameIdAndMemberId(Long.parseLong(gameId), memberId);
+		
+		if (!gameVoteExists) {
+		    return createErrorMessage(accessor.getSessionId(), "투표 완료 후 채팅방에 입장 할 수 있습니다.");
+		}
+        
         MemberDetails memberDetails = createMemberDetails(memberId);
         if (accessor.getSessionAttributes() == null) {
             accessor.setSessionAttributes(new ConcurrentHashMap<>());
@@ -93,7 +101,7 @@ public class StompHandler implements ChannelInterceptor {
     }
 
     private boolean canEnterChatRoom(Game game) {
-        return game.getStatus().equals(Status.READY) || game.getStatus().equals(Status.PROGRESS);
+        return game.getStatus().equals(Status.PROGRESS);
     }
 
     private MemberDetails createMemberDetails(Long memberId) {

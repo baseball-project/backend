@@ -53,13 +53,10 @@ public class ChatService {
         sessions.remove(sessionId);
     }
     
-    @Scheduled(cron = "0 0/20 2 * * ?", zone = "Asia/Seoul")
+    //@Scheduled(cron = "0 0/20 2 * * ?", zone = "Asia/Seoul")
+    @Scheduled(fixedDelay = 60000)
 	public void removeSessionForEndedGames() {
 		List<Long> endedGameIds = gameRepository.findGameIdsByStatus(Status.END);
-		
-		if (endedGameIds == null || endedGameIds.isEmpty()) {
-		    return;
-		}
 		
 		endedGameIds.forEach(gameId -> {
 		    String gameIdString = String.valueOf(gameId);

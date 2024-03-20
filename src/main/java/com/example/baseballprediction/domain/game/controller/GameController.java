@@ -47,7 +47,7 @@ public class GameController {
 	@GetMapping("")
 	public ResponseEntity<ApiResponse<List<GameDtoDaily>>> gameDailyTodayList() {
 
-		List<GameDtoDaily> gameDtoDailyList = gameService.findDailyGame();
+		List<GameDtoDaily> gameDtoDailyList = gameService.findDailyGame(null);
 
 		ApiResponse<List<GameDtoDaily>> response = ApiResponse.success(gameDtoDailyList);
 
@@ -156,5 +156,17 @@ public class GameController {
 
 		return ResponseEntity.ok(response);
 	}
+	
+	@GetMapping("/loginUser")
+	public ResponseEntity<ApiResponse<List<GameDtoDaily>>> gameDailyTodayListForLoggedInUser(
+			@AuthenticationPrincipal MemberDetails memberDetails) {
+	
+		List<GameDtoDaily> gameDtoDailyList = gameService.findDailyGame(memberDetails.getMember().getId());
+	
+		ApiResponse<List<GameDtoDaily>> response = ApiResponse.success(gameDtoDailyList);
+	
+		return ResponseEntity.ok(response);
+	
+	}	
 
 }

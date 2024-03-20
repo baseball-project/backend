@@ -32,12 +32,12 @@ public class GameResponse {
 
 		private String status;
 
-		public GameDtoDaily(Game game, Team homeTeam, Team awayTeam, GameVoteRatioDTO gameVoteRatioDTO) {
+		public GameDtoDaily(Game game, Team homeTeam, Team awayTeam, GameVoteRatioDTO gameVoteRatioDTO,boolean homeTeamHasVoted, boolean awayTeamHasVoted) {
 			this.gameId = game.getId();
 			this.homeTeam = new TeamDailyDTO(homeTeam, game.getHomeTeamScore(), gameVoteRatioDTO.getHomeTeamVoteRatio(),
-				homeTeam.getId());
+				homeTeam.getId(),homeTeamHasVoted);
 			this.awayTeam = new TeamDailyDTO(awayTeam, game.getAwayTeamScore(), gameVoteRatioDTO.getAwayTeamVoteRatio(),
-				awayTeam.getId());
+				awayTeam.getId(),awayTeamHasVoted);
 			this.gameTime = game.getStartedAt();
 			this.status = game.getStatus().toString();
 		}
@@ -52,13 +52,15 @@ public class GameResponse {
 		private int score;
 		private int voteRatio;
 		private int id;
+		private boolean hasVote;
 
-		public TeamDailyDTO(Team team, int score, int voteRatio, int id) {
+		public TeamDailyDTO(Team team, int score, int voteRatio, int id,boolean hasVote) {
 			this.teamName = team.getName();
 			this.teamShortName = team.getShortName();
 			this.score = score;
 			this.voteRatio = voteRatio;
 			this.id = id;
+			this.hasVote = hasVote;
 		}
 
 	}

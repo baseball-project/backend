@@ -31,7 +31,7 @@ public class GameService {
 	private final GameVoteRepository gameVoteRepository;
 	private final MemberRepository memberRepository;
 
-	public List<GameDtoDaily> findDailyGame() {
+	public List<GameDtoDaily> findDailyGame(Long memberId) {
 		List<Game> games = gameRepository.findAll();
 
 		List<GameDtoDaily> gameDTOList = new ArrayList<>();
@@ -43,9 +43,17 @@ public class GameService {
 			if (gameFormatDate.equals(formatDate)) {
 				GameVoteRatioDTO gameVoteRatioDTO = gameVoteRepository.findVoteRatio(game.getHomeTeam().getId(),
 					game.getAwayTeam().getId(), game.getId()).orElseThrow();
+				
+				boolean homeTeamHasVoted = false;
+				boolean awayTeamHasVoted = false;
+				
+				if(memberId != null) {
+					homeTeamHasVoted = gameVoteRepository.existsByGameIdAndTeamIdAndMemberId(game.getId(), game.getHomeTeam().getId(), memberId);
+					awayTeamHasVoted = gameVoteRepository.existsByGameIdAndTeamIdAndMemberId(game.getId(), game.getAwayTeam().getId(), memberId);
+				}
 
 				GameDtoDaily dailygame = new GameDtoDaily(game, game.getHomeTeam(), game.getAwayTeam(),
-					gameVoteRatioDTO);
+					gameVoteRatioDTO,homeTeamHasVoted, awayTeamHasVoted);
 
 				gameDTOList.add(dailygame);
 

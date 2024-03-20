@@ -23,4 +23,6 @@ public interface GameVoteRepository extends JpaRepository<GameVote, Long> {
 	Optional<GameVoteRatioDTO> findVoteRatio(@Param("homeTeamid") int homeTeamid, @Param("awayTeamid") int awayTeamid, @Param("gameId") Long gameId);
 	
 	boolean existsByGameIdAndMemberId(Long gameId, Long memberId);
+	
+	boolean existsByGameIdAndTeamIdAndMemberId(Long gameId,int teamId,Long memberId);
 }

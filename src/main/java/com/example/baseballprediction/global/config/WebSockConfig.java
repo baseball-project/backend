@@ -21,7 +21,8 @@ public class WebSockConfig implements WebSocketMessageBrokerConfigurer {
 	
 	@Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-		registry.addEndpoint("/chat").setAllowedOriginPatterns("*").withSockJS(); 
+		registry.addEndpoint("/chat").setAllowedOriginPatterns("*").withSockJS()
+		.setClientLibraryUrl("https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.js"); 
 		// 서버 로컬에서 테스트 할 경우 주석 풀기 
 		//registry.addEndpoint("/chat").setAllowedOrigins("*"); 
     }

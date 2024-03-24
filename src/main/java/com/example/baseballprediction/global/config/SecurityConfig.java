@@ -65,7 +65,7 @@ public class SecurityConfig {
 				new AntPathRequestMatcher("/health"),
 				new AntPathRequestMatcher("/games"),
 				new AntPathRequestMatcher("/games/daily-replies"),
-				new AntPathRequestMatcher("/chat")
+				new AntPathRequestMatcher("/chat/**")
 			).permitAll()
 			.anyRequest().authenticated());
 

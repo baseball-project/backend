@@ -8,6 +8,7 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -81,8 +82,9 @@ public class ChatController {
     
     // 선물하기 기능
     @PutMapping("/gift/token")
-	 public ResponseEntity<ApiResponse> giftTokenAdd(@RequestBody ChatGiftRequestDTO chatGiftRequestDTO) {
-		memberService.saveGiftToken(chatGiftRequestDTO.getSenderNickName(), chatGiftRequestDTO.getRecipientNickName(), chatGiftRequestDTO.getToken());
+	 public ResponseEntity<ApiResponse> giftTokenAdd(@RequestBody ChatGiftRequestDTO chatGiftRequestDTO,
+			 @AuthenticationPrincipal MemberDetails memberDetails) {
+		memberService.saveGiftToken(memberDetails.getMember().getId(), chatGiftRequestDTO.getRecipientNickName(), chatGiftRequestDTO.getToken());
 
 	   	return ResponseEntity.ok(ApiResponse.successWithNoData());
 	}

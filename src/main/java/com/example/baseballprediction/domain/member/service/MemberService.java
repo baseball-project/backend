@@ -164,14 +164,14 @@ public class MemberService {
 		return giftHistories;
 	}
 	
-	public void saveGiftToken(String senderNickName, String recipientNickName, int token) {
-        Member sender = memberRepository.findByNickname(senderNickName)
+	public void saveGiftToken(Long senderId, String recipientNickName, int token) {
+        Member sender = memberRepository.findById(senderId)
         		.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
         
         Member recipient = memberRepository.findByNickname(recipientNickName)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
         
-        if(sender.equals(recipient)) {
+        if(sender.getNickname().equals(recipient.getNickname())) {
         	throw new BusinessException(ErrorCode.GIFTING_TO_SELF_NOT_ALLOWED);
         }
         int senderCurrentToken = sender.getToken();

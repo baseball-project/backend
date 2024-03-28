@@ -8,7 +8,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public enum Status {
-	READY("cont"), PROGRESS("progress"), END("end"), CANCEL("cancel");
+	READY("cont"), PROGRESS("ing"), END("end"), CANCEL("cancel");
 
 	private final String name;
 

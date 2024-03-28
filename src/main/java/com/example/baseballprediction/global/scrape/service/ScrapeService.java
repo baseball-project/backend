@@ -91,8 +91,13 @@ public class ScrapeService {
 					Team awayTeam = teamRepository.findByShortName(gameElement.attributes().get("away_nm"))
 						.orElseThrow();
 					Elements teamElements = gameElement.select("div[class=middle]").select("div[class=info]");
-					String homeScoreStr = teamElements.select("div[class=team home]").select("div:nth-child(2)").text();
-					String awayScoreStr = teamElements.select("div[class=team away]").select("div:nth-child(2)").text();
+					String homeScoreStr = "0";
+					String awayScoreStr = "0";
+
+					if (!status.equals(Status.CANCEL.getName())) {
+						homeScoreStr = teamElements.select("div[class=team home]").select("div:nth-child(2)").text();
+						awayScoreStr = teamElements.select("div[class=team away]").select("div:nth-child(2)").text();
+					}
 					int homeScore = Integer.parseInt(
 						homeScoreStr.isEmpty() ? "0" : homeScoreStr);
 					int awayScore = Integer.parseInt(

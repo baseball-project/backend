@@ -8,4 +8,5 @@ import lombok.NoArgsConstructor;
 public class ChatGiftRequestDTO {
 	private String recipientNickName;
 	private int token;
+	private String comment;
 }

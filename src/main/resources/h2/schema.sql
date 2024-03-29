@@ -51,7 +51,7 @@ create table game_vote(
     foreign key(member_id) references member(member_id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE mini_game (
+create TABLE mini_game (
   mini_game_id bigint NOT NULL AUTO_INCREMENT,
   game_id bigint NOT NULL,
   member_id bigint NOT NULL,
@@ -86,6 +86,7 @@ create table gift_token_log(
     take_member_id bigint not null,
     give_member_id bigint not null,
     token_amount int not null,
+    comment varchar(100),
     created_at datetime not null default current_timestamp,
     modified_at datetime,
     foreign key(take_member_id) references member(member_id),

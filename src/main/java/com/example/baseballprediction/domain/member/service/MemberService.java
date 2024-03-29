@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.baseballprediction.domain.chat.dto.ChatGiftRequestDTO;
 import com.example.baseballprediction.domain.gifttoken.entity.GiftToken;
 import com.example.baseballprediction.domain.gifttoken.repository.GiftTokenRepository;
 import com.example.baseballprediction.domain.member.dto.FairyProjection;
@@ -29,7 +30,6 @@ import com.example.baseballprediction.domain.team.repository.TeamRepository;
 import com.example.baseballprediction.global.constant.ErrorCode;
 import com.example.baseballprediction.global.constant.ImageType;
 import com.example.baseballprediction.global.error.exception.BusinessException;
-import com.example.baseballprediction.global.error.exception.InsufficientTokenException;
 import com.example.baseballprediction.global.error.exception.NotFoundException;
 import com.example.baseballprediction.global.security.jwt.JwtTokenProvider;
 import com.example.baseballprediction.global.util.S3UploadService;
@@ -163,36 +163,36 @@ public class MemberService {
 
 		return giftHistories;
 	}
-	
-	public void saveGiftToken(Long senderId, String recipientNickName, int token) {
-        Member sender = memberRepository.findById(senderId)
-        		.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
-        
-        Member recipient = memberRepository.findByNickname(recipientNickName)
-                .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
-        
-        if(sender.getNickname().equals(recipient.getNickname())) {
-        	throw new BusinessException(ErrorCode.GIFTING_TO_SELF_NOT_ALLOWED);
-        }
-        int senderCurrentToken = sender.getToken();
-        
-        if(senderCurrentToken < token) {
-        	throw new BusinessException(ErrorCode.INSUFFICIENT_TOKENS);
-        }
-    	sender.addToken(-token);
-    	recipient.addToken(token);
 
-        memberRepository.save(sender);
-        memberRepository.save(recipient);
-        
-        
-        GiftToken giftToken = GiftToken.builder()
-                .takeMember(sender)
-                .giveMember(recipient)
-                .tokenAmount(token)
-                .build();
-        giftTokenRepository.save(giftToken);
-       
-        
-    }
+	public void saveGiftToken(Long senderId, ChatGiftRequestDTO chatGiftRequestDTO) {
+		Member sender = memberRepository.findById(senderId)
+			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+
+		Member recipient = memberRepository.findByNickname(chatGiftRequestDTO.getRecipientNickName())
+			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+
+		if (sender.getNickname().equals(recipient.getNickname())) {
+			throw new BusinessException(ErrorCode.GIFTING_TO_SELF_NOT_ALLOWED);
+		}
+		int senderCurrentToken = sender.getToken();
+
+		int token = chatGiftRequestDTO.getToken();
+
+		if (senderCurrentToken < token) {
+			throw new BusinessException(ErrorCode.INSUFFICIENT_TOKENS);
+		}
+		sender.addToken(-token);
+		recipient.addToken(token);
+
+		memberRepository.save(sender);
+		memberRepository.save(recipient);
+
+		GiftToken giftToken = GiftToken.builder()
+			.takeMember(sender)
+			.giveMember(recipient)
+			.tokenAmount(token)
+			.comment(chatGiftRequestDTO.getComment())
+			.build();
+		giftTokenRepository.save(giftToken);
+	}
 }

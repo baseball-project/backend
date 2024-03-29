@@ -9,15 +9,14 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import com.example.baseballprediction.domain.member.entity.Member;
 
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-@Getter
-@RequiredArgsConstructor
 public class MemberDetails implements UserDetails, OAuth2User {
 	private final Member member;
 
 	private Map<String, Object> attributes;
+
+	public MemberDetails(Member member) {
+		this.member = member;
+	}
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -71,8 +70,16 @@ public class MemberDetails implements UserDetails, OAuth2User {
 	public String getProfileImageUrl() {
 		return member.getProfileImageUrl();
 	}
-	
+
 	public Integer getTeamId() {
 		return member.getTeam().getId();
+	}
+
+	public Member getMember() {
+		return this.member;
+	}
+
+	public Map<String, Object> getAttributes() {
+		return this.attributes;
 	}
 }

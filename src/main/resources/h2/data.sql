@@ -9,15 +9,15 @@ insert into team(name, short_name, color, created_at) values ('삼성 라이온�
 insert into team(name, short_name, color, created_at) values ('한화 이글스', '한화', '', current_timestamp);
 insert into team(name, short_name, color, created_at) values ('키움 히어로즈', '키움', '', current_timestamp);
 
-insert into member(username, social, password, nickname, team_id, token, level, created_at) values
-('playdot1', 'KAKAO', '$2a$12$bYyLgOHWLAhfIJ7FwZ3S..ArxyhrKWxdGvK55XFLIyT9p1NNul0aK', '테스트유저1', 1, 0, 1, current_timestamp),
-('playdot2', 'KAKAO', '$2a$12$bYyLgOHWLAhfIJ7FwZ3S..ArxyhrKWxdGvK55XFLIyT9p1NNul0aK', '테스트유저2', 3, 0, 1, current_timestamp),
-('playdot3', 'KAKAO', '$2a$12$bYyLgOHWLAhfIJ7FwZ3S..ArxyhrKWxdGvK55XFLIyT9p1NNul0aK', '테스트유저3', 4, 0, 1, current_timestamp),
-('playdot4', 'KAKAO', '$2a$12$bYyLgOHWLAhfIJ7FwZ3S..ArxyhrKWxdGvK55XFLIyT9p1NNul0aK', '테스트유저4', 5, 0, 1, current_timestamp),
-('playdot5', 'KAKAO', '$2a$12$bYyLgOHWLAhfIJ7FwZ3S..ArxyhrKWxdGvK55XFLIyT9p1NNul0aK', '테스트유저5', 7, 0, 1, current_timestamp);
+insert into member(username, social, password, nickname, team_id, token, level, is_new_member, created_at) values
+('playdot1', 'KAKAO', '$2a$12$bYyLgOHWLAhfIJ7FwZ3S..ArxyhrKWxdGvK55XFLIyT9p1NNul0aK', '테스트유저1', 1, 0, 1, false, current_timestamp),
+('playdot2', 'KAKAO', '$2a$12$bYyLgOHWLAhfIJ7FwZ3S..ArxyhrKWxdGvK55XFLIyT9p1NNul0aK', '테스트유저2', 3, 0, 1, false, current_timestamp),
+('playdot3', 'KAKAO', '$2a$12$bYyLgOHWLAhfIJ7FwZ3S..ArxyhrKWxdGvK55XFLIyT9p1NNul0aK', '테스트유저3', 4, 0, 1, false, current_timestamp),
+('playdot4', 'KAKAO', '$2a$12$bYyLgOHWLAhfIJ7FwZ3S..ArxyhrKWxdGvK55XFLIyT9p1NNul0aK', '테스트유저4', 5, 0, 1, false, current_timestamp),
+('playdot5', 'KAKAO', '$2a$12$bYyLgOHWLAhfIJ7FwZ3S..ArxyhrKWxdGvK55XFLIyT9p1NNul0aK', '테스트유저5', 7, 0, 1, false, current_timestamp);
 
-INSERT INTO game(away_team_id, away_team_score, home_team_id, home_team_score, win_team_id, game_id, started_at, status) VALUES
-(7, 0, 5, 0, NULL, 1, '2023-12-15 14:00:00', 'READY'),
+insert into game(away_team_id, away_team_score, home_team_id, home_team_score, win_team_id, game_id, started_at, status) values
+(7, 0, 5, 0, null, 1, '2023-12-15 14:00:00', 'READY'),
 (6, 0, 3, 0, NULL, 2,  '2023-12-15 14:00:00', 'READY'),
 (4, 0, 8, 0, NULL, 3,  '2023-12-15 14:00:00', 'READY'),
 (1, 0, 2, 0, NULL, 4,  '2023-12-15 14:00:00', 'READY'),
@@ -79,8 +79,8 @@ INSERT INTO game(away_team_id, away_team_score, home_team_id, home_team_score, w
 (6, 0, 10, 0, NULL, 60,  '2023-12-28 18:30:00', 'READY'),
 (5, 0, 1, 0, NULL, 61,  '2023-12-29 17:00:00', 'READY'),
 (4, 0, 3, 0, NULL, 62,  '2023-12-29 17:00:00', 'READY');
-INSERT INTO game(away_team_id, away_team_score, home_team_id, home_team_score, win_team_id, game_id, started_at, status) values
-(7, 0, 8, 0, NULL, 63,  '2023-12-29 17:00:00', 'READY'),
+insert into game(away_team_id, away_team_score, home_team_id, home_team_score, win_team_id, game_id, started_at, status) values
+(7, 0, 8, 0, null, 63,  '2023-12-29 17:00:00', 'READY'),
 (9, 0, 2, 0, NULL, 64,  '2023-12-29 17:00:00', 'READY'),
 (6, 0, 10, 0, NULL, 65,  '2023-12-29 17:00:00', 'READY'),
 (5, 0, 1, 0, NULL, 66,  '2023-12-30 14:00:00', 'READY'),
@@ -143,15 +143,15 @@ INSERT INTO game(away_team_id, away_team_score, home_team_id, home_team_score, w
 (10, 0, 7, 0, NULL, 123,  '2024-01-12 17:00:00', 'READY'),
 (8, 0, 2, 0, NULL, 124,  '2024-01-12 17:00:00', 'READY');
 
-INSERT INTO game(away_team_id, away_team_score, home_team_id, home_team_score, win_team_id, game_id, started_at, status) values
-(4, 0, 9, 0, NULL, 125,  '2024-01-12 17:00:00', 'READY'),
+insert into game(away_team_id, away_team_score, home_team_id, home_team_score, win_team_id, game_id, started_at, status) values
+(4, 0, 9, 0, null, 125,  '2024-01-12 17:00:00', 'READY'),
 (6, 0, 1, 0, NULL, 126,  '2024-01-13 14:00:00', 'READY'),
 (5, 0, 3, 0, NULL, 127,  '2024-01-13 14:00:00', 'READY'),
 (10, 0, 7, 0, NULL, 128,  '2024-01-13 14:00:00', 'READY'),
 (8, 0, 2, 0, NULL, 129,  '2024-01-13 14:00:00', 'READY'),
 (4, 0, 9, 0, NULL, 130,  '2024-01-13 14:00:00', 'READY');
 
-INSERT INTO monthly_fairy(statistic_month, type, fairy_rank, vote_ratio, member_id) VALUES
+insert into monthly_fairy(statistic_month, type, fairy_rank, vote_ratio, member_id) values
 (202312, 'WIN', 1, 90, 1),
 (202312, 'LOSE', 1, 10, 5),
 (202312, 'WIN', 2, 75, 2),

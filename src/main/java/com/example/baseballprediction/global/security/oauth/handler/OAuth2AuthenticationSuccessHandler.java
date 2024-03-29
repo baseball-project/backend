@@ -29,7 +29,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 		Authentication authentication) throws IOException, ServletException {
 		ObjectMapper objectMapper = new ObjectMapper();
 		MemberDetails memberDetails = (MemberDetails)authentication.getPrincipal();
-		String token = JwtTokenProvider.createToken(memberDetails.getUsername());
+		String token = JwtTokenProvider.createToken(memberDetails.getMember());
 
 		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 		response.setCharacterEncoding(StandardCharsets.UTF_8.name());

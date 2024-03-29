@@ -64,7 +64,7 @@ public class StompHandler implements ChannelInterceptor {
 
         String extractedToken = extractToken(authorizationHeader);
         // 토큰이 유효하지 않은 경우
-        try {
+		try {
 			if (extractedToken == null || !jwtTokenProvider.validateToken(extractedToken)) {}
 		}catch(JwtException e) {
 			throw new MessageDeliveryException("INVALID_TOKEN");

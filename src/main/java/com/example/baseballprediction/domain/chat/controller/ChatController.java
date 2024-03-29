@@ -3,6 +3,7 @@ package com.example.baseballprediction.domain.chat.controller;
 import java.time.LocalDateTime;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.handler.annotation.SendTo;
@@ -96,7 +97,6 @@ public class ChatController {
 	@MessageMapping("/chat/createVote")
 	public void createVoteSave(@Payload VoteCreation creation, SimpMessageHeaderAccessor headerAccessor) {
 		MemberDetails memberDetails = (MemberDetails)headerAccessor.getSessionAttributes().get("memberDetails");
-		try {
 			Team team = teamRepository.findById(memberDetails.getTeamId())
 				.orElseThrow(() -> new NotFoundException(ErrorCode.TEAM_NOT_FOUND));
 			ChatProfileDTO chatProfileDTO = new ChatProfileDTO(memberDetails.getName(),
@@ -117,9 +117,6 @@ public class ChatController {
 					new VoteMessage(miniGame.getId(), "투표가 생성됐습니다. 잠시만 기다려주세요.", chatProfileDTO, options, startedAt));
 				return;
 			}
-		} catch (BusinessException e) {
-			sendErrorMessage(headerAccessor, e);
-		}
 	}
 
 	//  투표 할 때
@@ -127,16 +124,12 @@ public class ChatController {
 	public void performVoteAdd(@Payload VoteAction action, SimpMessageHeaderAccessor headerAccessor) {
 		String nickname = ((MemberDetails)headerAccessor.getSessionAttributes().get("memberDetails")).getMember()
 			.getNickname();
-		try {
 			boolean result = miniGameService.addVote(action.getMiniGameId(), nickname, action.getOption());
 			if (result) {
 				messagingTemplate.convertAndSendToUser(nickname, "/voteResult", new VoteResult("투표해주셔서 감사합니다."));
 			} else {
 				messagingTemplate.convertAndSendToUser(nickname, "/voteResult", new VoteResult("이미 투표하셨습니다."));
 			}
-		} catch (BusinessException e) {
-			sendErrorMessage(headerAccessor, e);
-		}
 	}
 
 	// 투표 결과 확인
@@ -144,21 +137,10 @@ public class ChatController {
 	public void VoteResultDetails(@Payload ResultRatioDTO resultRatioDTO, SimpMessageHeaderAccessor headerAccessor) {
 		String nickname = ((MemberDetails)headerAccessor.getSessionAttributes().get("memberDetails")).getMember()
 			.getNickname();
-		try {
 			VoteResultDTO voteResult = miniGameService.findPerformVoteAndGetResults(resultRatioDTO.getMiniGameId(),
 				nickname);
 			messagingTemplate.convertAndSendToUser(nickname, "/voteRatioResults/" + resultRatioDTO.getMiniGameId(),
 				voteResult);
-		} catch (BusinessException e) {
-			sendErrorMessage(headerAccessor, e);
-		}
-	}
-
-	private void sendErrorMessage(SimpMessageHeaderAccessor headerAccessor, BusinessException exception) {
-		String nickname = ((MemberDetails)headerAccessor.getSessionAttributes().get("memberDetails")).getMember()
-			.getNickname();
-		String errorMessage = exception.getMessage();
-		messagingTemplate.convertAndSendToUser(nickname, "/chat/errors", errorMessage);
 	}
 
 	@MessageMapping("/chat/leave")
@@ -173,5 +155,12 @@ public class ChatController {
 		ChatLeaveMessage leaveMessage = new ChatLeaveMessage(nickname, "님이 채팅방을 떠났습니다.");
 		messagingTemplate.convertAndSend("/sub/chat/" + gameId, leaveMessage);
 	}
+	
+	@MessageExceptionHandler(BusinessException.class)
+    public void handleBusinessException(BusinessException exception, SimpMessageHeaderAccessor headerAccessor) {
+        String errorMessage = exception.getMessage();
+        String nickname = ((MemberDetails) headerAccessor.getSessionAttributes().get("memberDetails")).getMember().getNickname();
+        messagingTemplate.convertAndSendToUser(nickname, "/chat/errors", errorMessage);
+    }
 
 }

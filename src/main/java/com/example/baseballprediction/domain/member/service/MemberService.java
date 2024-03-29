@@ -32,6 +32,7 @@ import com.example.baseballprediction.global.constant.ImageType;
 import com.example.baseballprediction.global.error.exception.BusinessException;
 import com.example.baseballprediction.global.error.exception.NotFoundException;
 import com.example.baseballprediction.global.security.jwt.JwtTokenProvider;
+import com.example.baseballprediction.global.security.oauth.dto.OAuthResponse;
 import com.example.baseballprediction.global.util.S3UploadService;
 
 import lombok.RequiredArgsConstructor;
@@ -91,6 +92,10 @@ public class MemberService {
 			ImageType.PROFILE);
 
 		member.updateDetails(uploadFileName, detailsDTO.getNickname(), detailsDTO.getComment());
+
+		if (member.isNewMember()) {
+			member.setIsNewMember(false);
+		}
 	}
 
 	@Transactional(readOnly = true)
@@ -194,5 +199,15 @@ public class MemberService {
 			.comment(chatGiftRequestDTO.getComment())
 			.build();
 		giftTokenRepository.save(giftToken);
+	}
+
+	public OAuthResponse.LoginDTO oauth2Login(String username) {
+		Member member = memberRepository.findByUsername(username)
+			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+
+		String teamName = member.getTeam() == null ? null : member.getTeam().getName();
+
+		return new OAuthResponse.LoginDTO(member.isNewMember(), member.getProfileImageUrl(), member.getNickname(),
+			teamName);
 	}
 }

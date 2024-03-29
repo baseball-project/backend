@@ -29,6 +29,7 @@ import com.example.baseballprediction.global.constant.ErrorCode;
 import com.example.baseballprediction.global.error.exception.BusinessException;
 import com.example.baseballprediction.global.security.MemberDetails;
 import com.example.baseballprediction.global.security.jwt.JwtTokenProvider;
+import com.example.baseballprediction.global.security.oauth.dto.OAuthResponse;
 import com.example.baseballprediction.global.util.ApiResponse;
 
 import jakarta.validation.Valid;
@@ -144,6 +145,17 @@ public class MemberController {
 			nickname);
 
 		ApiResponse<MemberResponse.NicknameDTO> response = ApiResponse.success(responseDTO);
+
+		return ResponseEntity.ok(response);
+	}
+
+	@GetMapping("/login/success")
+	public ResponseEntity<ApiResponse<OAuthResponse.LoginDTO>> oauth2LoginSuccess(
+		@AuthenticationPrincipal MemberDetails memberDetails) {
+
+		OAuthResponse.LoginDTO loginDTO = memberService.oauth2Login(memberDetails.getMember().getUsername());
+
+		ApiResponse<OAuthResponse.LoginDTO> response = ApiResponse.success(loginDTO);
 
 		return ResponseEntity.ok(response);
 	}

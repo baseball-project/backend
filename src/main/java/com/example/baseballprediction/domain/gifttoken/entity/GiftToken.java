@@ -2,6 +2,7 @@ package com.example.baseballprediction.domain.gifttoken.entity;
 
 import com.example.baseballprediction.domain.BaseEntity;
 import com.example.baseballprediction.domain.member.entity.Member;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -38,13 +39,16 @@ public class GiftToken extends BaseEntity {
 
 	@Column(nullable = false)
 	private int tokenAmount;
-	
+
+	@Column(length = 100)
+	private String comment;
+
 	@Builder
-	public GiftToken(Member takeMember, Member giveMember, int tokenAmount) {
-        this.takeMember = takeMember;
-        this.giveMember = giveMember;
-        this.tokenAmount = tokenAmount;
-    }
-	
-	
+	public GiftToken(Member takeMember, Member giveMember, int tokenAmount, String comment) {
+		this.takeMember = takeMember;
+		this.giveMember = giveMember;
+		this.tokenAmount = tokenAmount;
+		this.comment = comment;
+	}
+
 }

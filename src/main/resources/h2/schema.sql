@@ -18,6 +18,7 @@ create table member (
     member_comment varchar(100),
 	token int default 0 not null,
     level int default 1 not null,
+    is_new_member tinyint(1) not null,
 	created_at datetime not null default current_timestamp,
     modified_at datetime,
     foreign key(team_id) references team(team_id)

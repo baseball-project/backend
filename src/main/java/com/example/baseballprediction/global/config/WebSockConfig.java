@@ -8,6 +8,7 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
+import com.example.baseballprediction.global.stomp.handler.StompErrorHandler;
 import com.example.baseballprediction.global.stomp.handler.StompHandler;
 
 import lombok.RequiredArgsConstructor;
@@ -18,13 +19,13 @@ import lombok.RequiredArgsConstructor;
 public class WebSockConfig implements WebSocketMessageBrokerConfigurer {
 	
 	private final StompHandler stompHandler;
+	private final StompErrorHandler stompErrorHandler;
 	
 	@Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
 		registry.addEndpoint("/chat").setAllowedOriginPatterns("*").withSockJS()
 		.setClientLibraryUrl("https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.js"); 
-		// 서버 로컬에서 테스트 할 경우 주석 풀기 
-		//registry.addEndpoint("/chat").setAllowedOrigins("*"); 
+		registry.setErrorHandler(stompErrorHandler);
     }
 
     @Override

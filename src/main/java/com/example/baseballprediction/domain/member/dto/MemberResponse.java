@@ -53,12 +53,15 @@ public class MemberResponse {
 		private String nickname;
 		private String teamName;
 		private int token;
+
+		private String comment;
 		private String takeDate;
 
 		public GiftHistoryDTO(GiftToken giftToken) {
 			this.nickname = giftToken.getTakeMember().getNickname();
 			this.teamName = giftToken.getTakeMember().getTeam().getName();
 			this.token = giftToken.getTokenAmount();
+			this.comment = giftToken.getComment();
 			this.takeDate = CustomDateUtil.dateToString(giftToken.getCreatedAt());
 		}
 	}

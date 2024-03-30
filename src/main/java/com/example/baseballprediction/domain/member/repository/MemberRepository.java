@@ -5,9 +5,7 @@ import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
-import com.example.baseballprediction.domain.chat.dto.ChatProfileDTO;
 import com.example.baseballprediction.domain.member.dto.FairyProjection;
 import com.example.baseballprediction.domain.member.dto.ProfileProjection;
 import com.example.baseballprediction.domain.member.entity.Member;
@@ -23,9 +21,9 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 			+ "sum(case when f.type = 'LOSE' then 1 else 0 end) as loseFairyCount) "
 			+ "FROM Member m "
 			+ "INNER JOIN MonthlyFairy f ON f.member = m "
-			+ "WHERE m.id = :memberId "
+			+ "WHERE m.nickname = :nickname "
 			+ "GROUP BY m.nickname, m.profileImageUrl")
-	Optional<ProfileProjection> findProfile(@Param("memberId") Long memberId);
+	Optional<ProfileProjection> findProfile(String nickname);
 
 	@Query(
 		value =

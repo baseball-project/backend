@@ -118,8 +118,8 @@ public class MemberService {
 	}
 
 	@Transactional(readOnly = true)
-	public ProfileProjection findProfile(Long memberId) {
-		ProfileProjection profile = memberRepository.findProfile(memberId)
+	public ProfileProjection findProfile(String nickname) {
+		ProfileProjection profile = memberRepository.findProfile(nickname)
 			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
 		return profile;

@@ -5,11 +5,10 @@ import java.util.Map;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import com.example.baseballprediction.domain.member.entity.Member;
 
-public class MemberDetails implements UserDetails, OAuth2User {
+public class MemberDetails implements UserDetails {
 	private final Member member;
 
 	private Map<String, Object> attributes;
@@ -33,7 +32,6 @@ public class MemberDetails implements UserDetails, OAuth2User {
 		return member.getUsername();
 	}
 
-	@Override
 	public String getName() {
 		return member.getNickname();
 	}
@@ -56,11 +54,6 @@ public class MemberDetails implements UserDetails, OAuth2User {
 	@Override
 	public boolean isEnabled() {
 		return false;
-	}
-
-	@Override
-	public <A> A getAttribute(String name) {
-		return OAuth2User.super.getAttribute(name);
 	}
 
 	public boolean isNewMember() {

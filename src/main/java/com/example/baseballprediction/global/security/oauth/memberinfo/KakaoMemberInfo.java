@@ -1,26 +1,36 @@
 package com.example.baseballprediction.global.security.oauth.memberinfo;
 
-import java.util.Map;
-
 import com.example.baseballprediction.global.constant.SocialType;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
 public class KakaoMemberInfo implements OAuth2MemberInfo {
-	private Map<String, Object> attributes;
+	private String id;
+	@JsonProperty("connected_at")
+	private String connectedAt;
+	@JsonProperty("kakao_account")
+	private KakaoAccount kakaoAccount;
 
-	private Map<String, Object> kakaoAccountAttributes;
-
-	private Map<String, Object> profileAttributes;
-
-	public KakaoMemberInfo(Map<String, Object> attributes) {
-		this.attributes = attributes;
-		this.kakaoAccountAttributes = (Map<String, Object>)attributes.get("kakao_account");
-		this.profileAttributes = (Map<String, Object>)kakaoAccountAttributes.get("profile");
+	@Getter
+	@Setter
+	public class KakaoAccount {
+		@JsonProperty("has_email")
+		private Boolean hasEmail;
+		@JsonProperty("email_needs_agreement")
+		private Boolean emailNeedsAgreement;
+		@JsonProperty("is_email_valid")
+		private Boolean isEmailValid;
+		@JsonProperty("is_email_verified")
+		private Boolean isEmailVerified;
+		private String email;
 	}
 
 	@Override
-
 	public String getProviderId() {
-		return attributes.get("id").toString();
+		return id;
 	}
 
 	@Override
@@ -30,7 +40,7 @@ public class KakaoMemberInfo implements OAuth2MemberInfo {
 
 	@Override
 	public String getEmail() {
-		return kakaoAccountAttributes.get("email").toString();
+		return kakaoAccount.email;
 	}
 
 }

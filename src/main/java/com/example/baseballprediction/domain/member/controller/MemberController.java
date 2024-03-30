@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,8 +29,9 @@ import com.example.baseballprediction.global.constant.ErrorCode;
 import com.example.baseballprediction.global.error.exception.BusinessException;
 import com.example.baseballprediction.global.security.MemberDetails;
 import com.example.baseballprediction.global.security.jwt.JwtTokenProvider;
-import com.example.baseballprediction.global.security.oauth.dto.OAuthResponse;
+import com.example.baseballprediction.global.security.oauth.service.OAuth2MemberService;
 import com.example.baseballprediction.global.util.ApiResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +40,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class MemberController {
 	private final MemberService memberService;
+	private final OAuth2MemberService oAuth2MemberService;
 
 	@PostMapping("/login")
 	public ResponseEntity<ApiResponse<Object>> login(@RequestBody MemberRequest.LoginDTO loginDTO) {
@@ -148,14 +151,16 @@ public class MemberController {
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping("/login/success")
-	public ResponseEntity<ApiResponse<OAuthResponse.LoginDTO>> oauth2LoginSuccess(
-		@AuthenticationPrincipal MemberDetails memberDetails) {
+	@GetMapping("/login/oauth2/code/{registrationId}")
+	public ResponseEntity<ApiResponse<Object>> loginWithOAuth2(@PathVariable String registrationId,
+		@RequestParam String code) {
+		try {
+			Map<String, Object> response = oAuth2MemberService.login(code);
 
-		OAuthResponse.LoginDTO loginDTO = memberService.oauth2Login(memberDetails.getMember().getUsername());
-
-		ApiResponse<OAuthResponse.LoginDTO> response = ApiResponse.success(loginDTO);
-
-		return ResponseEntity.ok(response);
+			ApiResponse<Object> apiResponse = ApiResponse.success(response.get("body"));
+			return ResponseEntity.ok().header(JwtTokenProvider.HEADER, (String)response.get("token")).body(apiResponse);
+		} catch (JsonProcessingException e) {
+			throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR);
+		}
 	}
 }

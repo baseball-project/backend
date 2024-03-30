@@ -10,7 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -77,9 +76,9 @@ public class MemberController {
 		return ResponseEntity.ok(ApiResponse.successWithNoData());
 	}
 
-	@GetMapping("/profiles/{memberId}")
-	public ResponseEntity<ApiResponse<ProfileProjection>> profileList(@PathVariable Long memberId) {
-		ProfileProjection profile = memberService.findProfile(memberId);
+	@GetMapping("/profiles")
+	public ResponseEntity<ApiResponse<ProfileProjection>> profileList(@RequestParam String nickname) {
+		ProfileProjection profile = memberService.findProfile(nickname);
 
 		return ResponseEntity.ok(ApiResponse.success(profile));
 	}

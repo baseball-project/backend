@@ -47,6 +47,7 @@ security:
           authorization-grant-type: ${CLIENT.TYPE}
           redirect-uri: ${NAVER.REDIRECT}
           scope: ${NAVER.SCOPE}
+          state: ${NAVER.STATE}
       provider:
         kakao:
           authorization-uri: https://kauth.kakao.com/oauth/authorize

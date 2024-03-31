@@ -13,8 +13,7 @@ import com.example.baseballprediction.domain.member.repository.MemberRepository;
 import com.example.baseballprediction.global.constant.SocialType;
 import com.example.baseballprediction.global.security.jwt.JwtTokenProvider;
 import com.example.baseballprediction.global.security.oauth.dto.OAuthResponse;
-import com.example.baseballprediction.global.security.oauth.memberinfo.KakaoMemberInfo;
-import com.fasterxml.jackson.core.JsonProcessingException;
+import com.example.baseballprediction.global.security.oauth.memberinfo.OAuth2MemberInfo;
 
 import lombok.RequiredArgsConstructor;
 
@@ -23,13 +22,23 @@ import lombok.RequiredArgsConstructor;
 public class OAuth2MemberService {
 	private final MemberRepository memberRepository;
 	private final KakaoApiClient kakaoApiClient;
+	private final NaverApiClient naverApiClient;
+	private final GoogleApiClient googleApiClient;
 
 	@Transactional(readOnly = true)
-	public Map<String, Object> login(String code) throws JsonProcessingException {
-		KakaoMemberInfo kakaoMemberInfo = kakaoApiClient.requestMemberInfo(code);
+	public Map<String, Object> login(String code, SocialType socialType) {
+		OAuth2MemberInfo oAuth2MemberInfo = null;
 
-		Member member = createOrFindMember(kakaoMemberInfo.getEmail(), kakaoMemberInfo.getSocialType(),
-			"KAKAO_" + kakaoMemberInfo.getId());
+		if (socialType == SocialType.KAKAO) {
+			oAuth2MemberInfo = kakaoApiClient.requestMemberInfo(code);
+		} else if (socialType == SocialType.NAVER) {
+			oAuth2MemberInfo = naverApiClient.requestMemberInfo(code);
+		} else if (socialType == SocialType.GOOGLE) {
+			oAuth2MemberInfo = googleApiClient.requestMemberInfo(code);
+		}
+
+		Member member = createOrFindMember(oAuth2MemberInfo.getEmail(), oAuth2MemberInfo.getSocialType(),
+			oAuth2MemberInfo.generateNickname());
 
 		Map<String, Object> response = new HashMap<>();
 		response.put("token", JwtTokenProvider.createToken(member));

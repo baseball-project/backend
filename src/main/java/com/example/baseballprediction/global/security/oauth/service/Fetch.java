@@ -7,9 +7,11 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 public class Fetch {
-	public static ResponseEntity<String> kakao(String url, HttpMethod method, MultiValueMap<String, String> body) {
+	public static ResponseEntity<String> getTokenEntity(String url, HttpMethod method,
+		MultiValueMap<String, String> body) {
 		RestTemplate rt = new RestTemplate();
 
 		HttpHeaders headers = new HttpHeaders();
@@ -21,7 +23,7 @@ public class Fetch {
 		return responseEntity;
 	}
 
-	public static ResponseEntity<String> kakao(String url, HttpMethod method, String accessToken) {
+	public static ResponseEntity<String> getMemberInfoEntity(String url, HttpMethod method, String accessToken) {
 		RestTemplate rt = new RestTemplate();
 
 		HttpHeaders headers = new HttpHeaders();
@@ -31,6 +33,24 @@ public class Fetch {
 		HttpEntity<?> httpEntity = new HttpEntity<>(headers);
 
 		ResponseEntity<String> responseEntity = rt.exchange(url, method, httpEntity, String.class);
+		return responseEntity;
+	}
+
+	public static ResponseEntity<String> getMemberInfoEntityWithGoogle(String url, HttpMethod method,
+		String accessToken) {
+		RestTemplate rt = new RestTemplate();
+
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+		HttpEntity<?> httpEntity = new HttpEntity<>(headers);
+
+		String newUrl = UriComponentsBuilder.fromHttpUrl(url).queryParam("access_token", accessToken).toUriString();
+
+		ResponseEntity<String> responseEntity = rt.exchange(
+			newUrl, method,
+			httpEntity, String.class);
+
 		return responseEntity;
 	}
 }

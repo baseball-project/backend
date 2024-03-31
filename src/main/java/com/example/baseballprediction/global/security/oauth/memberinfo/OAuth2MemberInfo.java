@@ -8,4 +8,6 @@ public interface OAuth2MemberInfo {
 	SocialType getSocialType();
 
 	String getEmail();
+
+	String generateNickname();
 }

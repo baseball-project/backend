@@ -26,12 +26,12 @@ import com.example.baseballprediction.domain.member.dto.MemberResponse;
 import com.example.baseballprediction.domain.member.dto.ProfileProjection;
 import com.example.baseballprediction.domain.member.service.MemberService;
 import com.example.baseballprediction.global.constant.ErrorCode;
+import com.example.baseballprediction.global.constant.SocialType;
 import com.example.baseballprediction.global.error.exception.BusinessException;
 import com.example.baseballprediction.global.security.MemberDetails;
 import com.example.baseballprediction.global.security.jwt.JwtTokenProvider;
 import com.example.baseballprediction.global.security.oauth.service.OAuth2MemberService;
 import com.example.baseballprediction.global.util.ApiResponse;
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -154,13 +154,10 @@ public class MemberController {
 	@GetMapping("/login/oauth2/code/{registrationId}")
 	public ResponseEntity<ApiResponse<Object>> loginWithOAuth2(@PathVariable String registrationId,
 		@RequestParam String code) {
-		try {
-			Map<String, Object> response = oAuth2MemberService.login(code);
+		Map<String, Object> response = oAuth2MemberService.login(code,
+			SocialType.valueOf(registrationId.toUpperCase()));
 
-			ApiResponse<Object> apiResponse = ApiResponse.success(response.get("body"));
-			return ResponseEntity.ok().header(JwtTokenProvider.HEADER, (String)response.get("token")).body(apiResponse);
-		} catch (JsonProcessingException e) {
-			throw new BusinessException(ErrorCode.INTERNAL_SERVER_ERROR);
-		}
+		ApiResponse<Object> apiResponse = ApiResponse.success(response.get("body"));
+		return ResponseEntity.ok().header(JwtTokenProvider.HEADER, (String)response.get("token")).body(apiResponse);
 	}
 }

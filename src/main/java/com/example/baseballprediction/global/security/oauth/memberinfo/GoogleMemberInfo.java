@@ -1,19 +1,21 @@
 package com.example.baseballprediction.global.security.oauth.memberinfo;
 
-import java.util.Map;
-
 import com.example.baseballprediction.global.constant.SocialType;
 
-public class GoogleMemberInfo implements OAuth2MemberInfo {
-	private Map<String, Object> attributes;
+import lombok.Getter;
 
-	public GoogleMemberInfo(Map<String, Object> attributes) {
-		this.attributes = attributes;
-	}
+@Getter
+public class GoogleMemberInfo implements OAuth2MemberInfo {
+	private String id;
+
+	private String email;
+	private String verifiedEmail;
+	private String picture;
 
 	@Override
+
 	public String getProviderId() {
-		return attributes.get("sub").toString();
+		return this.id;
 	}
 
 	@Override
@@ -23,6 +25,11 @@ public class GoogleMemberInfo implements OAuth2MemberInfo {
 
 	@Override
 	public String getEmail() {
-		return attributes.get("email").toString();
+		return this.email;
+	}
+
+	@Override
+	public String generateNickname() {
+		return "GOOGLE_" + this.id;
 	}
 }

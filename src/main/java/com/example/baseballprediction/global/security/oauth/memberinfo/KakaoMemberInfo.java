@@ -43,4 +43,8 @@ public class KakaoMemberInfo implements OAuth2MemberInfo {
 		return kakaoAccount.email;
 	}
 
+	@Override
+	public String generateNickname() {
+		return "KAKAO_" + id;
+	}
 }

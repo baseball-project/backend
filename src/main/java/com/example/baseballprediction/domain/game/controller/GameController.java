@@ -23,7 +23,6 @@ import com.example.baseballprediction.domain.game.dto.GameResponse.GameDtoDaily;
 import com.example.baseballprediction.domain.game.service.GameService;
 import com.example.baseballprediction.domain.gamevote.dto.GameVoteRequest.GameVoteRequestDTO;
 import com.example.baseballprediction.domain.gamevote.service.GameVoteService;
-import com.example.baseballprediction.domain.member.entity.Member;
 import com.example.baseballprediction.domain.reply.dto.ReplyRequest;
 import com.example.baseballprediction.domain.reply.dto.ReplyResponse;
 import com.example.baseballprediction.domain.reply.service.ReplyService;
@@ -62,8 +61,10 @@ public class GameController {
 		@RequestParam(required = false, defaultValue = "0") int page,
 		@RequestParam(required = false, defaultValue = "15") int item) {
 
+		String username = memberDetails == null ? null : memberDetails.getUsername();
+
 		Page<ReplyDTO> replyGameList = replyService.findRepliesByType(ReplyType.GAME, page, item,
-			memberDetails.getUsername());
+			username);
 
 		ApiResponse<Page<ReplyDTO>> response = ApiResponse.success(replyGameList);
 
@@ -156,17 +157,17 @@ public class GameController {
 
 		return ResponseEntity.ok(response);
 	}
-	
+
 	@GetMapping("/loginUser")
 	public ResponseEntity<ApiResponse<List<GameDtoDaily>>> gameDailyTodayListForLoggedInUser(
-			@AuthenticationPrincipal MemberDetails memberDetails) {
-	
+		@AuthenticationPrincipal MemberDetails memberDetails) {
+
 		List<GameDtoDaily> gameDtoDailyList = gameService.findDailyGame(memberDetails.getMember().getId());
-	
+
 		ApiResponse<List<GameDtoDaily>> response = ApiResponse.success(gameDtoDailyList);
-	
+
 		return ResponseEntity.ok(response);
-	
-	}	
+
+	}
 
 }

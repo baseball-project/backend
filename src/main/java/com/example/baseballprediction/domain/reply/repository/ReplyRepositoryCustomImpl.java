@@ -18,7 +18,6 @@ import com.example.baseballprediction.global.constant.ReplyType;
 import com.example.baseballprediction.global.util.CustomDateUtil;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.StringExpression;
 import com.querydsl.jpa.impl.JPAQuery;
@@ -53,14 +52,18 @@ public class ReplyRepositoryCustomImpl {
 			whereCondition = dateCondition.eq(CustomDateUtil.dateToString(LocalDate.now()));
 		}
 
+		BooleanExpression isLikedExpression = Expressions.booleanTemplate("CASE WHEN {0} THEN 1 ELSE 0 END",
+			replyLike.member.id.eq(memberId));
+
 		JPAQuery<ReplyLikeProjection> query = queryFactory.select(
 				Projections.constructor(ReplyLikeProjection.class, reply.id, replyLike.id.count().as("count"),
 					reply.createdAt,
-					reply.content, member.profileImageUrl, member.nickname, team.name, new CaseBuilder().when(replyLike.member.isNotNull()).then(true).otherwise(false)))
+					reply.content, member.profileImageUrl, member.nickname, team.name,
+					isLikedExpression.max().as("isLiked")))
 			.from(reply)
 			.leftJoin(member).on(reply.member.id.eq(member.id))
 			.leftJoin(team).on(reply.member.team.id.eq(team.id))
-			.leftJoin(replyLike).on(replyLike.reply.id.eq(reply.id).and(replyLike.member.id.eq(memberId)))
+			.leftJoin(replyLike).on(replyLike.reply.id.eq(reply.id))
 			.where(reply.type.eq(replyType), whereCondition, reply.parentReply.isNull(),
 				reply.status.eq(ReplyStatus.NORMAL))
 			.groupBy(reply.id)

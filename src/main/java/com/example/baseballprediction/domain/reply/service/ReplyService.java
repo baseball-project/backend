@@ -48,19 +48,28 @@ public class ReplyService {
 	public Page<ReplyDTO> findRepliesByType(ReplyType replyType, int page, int size, String username) {
 		Pageable pageable = PageRequest.of(page, size);
 
-		Member member = memberRepository.findByUsername(username)
-			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+		Member member = null;
+		Long memberId = 0L;
 
-		Page<ReplyLikeProjection> replyProjections = replyRepositoryCustom.findAllRepliesByType(replyType, pageable, member.getId());
+		if (username != null) {
+			member = memberRepository.findByUsername(username)
+				.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+
+			memberId = member.getId();
+		}
+		Page<ReplyLikeProjection> replyProjections = replyRepositoryCustom.findAllRepliesByType(replyType, pageable,
+			memberId);
 
 		List<ReplyLikeProjection> bestReplyLikeProjections = findBestReplies(replyProjections.getContent());
 
-		List<ReplyLikeProjection> remainingReplies = remainReplies(replyProjections.getContent(), bestReplyLikeProjections);
+		List<ReplyLikeProjection> remainingReplies = remainReplies(replyProjections.getContent(),
+			bestReplyLikeProjections);
 
 		List<ReplyLikeProjection> replies = new ArrayList<>(bestReplyLikeProjections);
 		replies.addAll(remainingReplies);
 
-		Page<ReplyDTO> response = new PageImpl<>(replies.stream().map(ReplyDTO::new).collect(Collectors.toList()), pageable, replyProjections.getTotalElements());
+		Page<ReplyDTO> response = new PageImpl<>(replies.stream().map(ReplyDTO::new).collect(Collectors.toList()),
+			pageable, replyProjections.getTotalElements());
 
 		return response;
 	}
@@ -72,7 +81,8 @@ public class ReplyService {
 			.collect(Collectors.toList());
 	}
 
-	private List<ReplyLikeProjection> remainReplies(List<ReplyLikeProjection> replyLikeProjections, List<ReplyLikeProjection> bestReplyLikeProjections) {
+	private List<ReplyLikeProjection> remainReplies(List<ReplyLikeProjection> replyLikeProjections,
+		List<ReplyLikeProjection> bestReplyLikeProjections) {
 		return replyLikeProjections.stream()
 			.filter(reply -> !bestReplyLikeProjections.contains(reply))
 			.collect(Collectors.toList());

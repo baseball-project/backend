@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.example.baseballprediction.domain.chat.dto.ChatGiftRequestDTO;
+import com.example.baseballprediction.domain.chat.dto.ChatRequestDTO.ChatGiftRequestDTO;
 import com.example.baseballprediction.domain.gifttoken.entity.GiftToken;
 import com.example.baseballprediction.domain.gifttoken.repository.GiftTokenRepository;
 import com.example.baseballprediction.domain.member.dto.FairyProjection;

@@ -11,6 +11,8 @@ import com.example.baseballprediction.domain.member.entity.Member;
 import com.example.baseballprediction.domain.member.repository.MemberRepository;
 import com.example.baseballprediction.domain.team.entity.Team;
 import com.example.baseballprediction.domain.team.repository.TeamRepository;
+import com.example.baseballprediction.global.constant.ErrorCode;
+import com.example.baseballprediction.global.error.exception.BusinessException;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -31,7 +33,7 @@ public class GameVoteService {
 		GameVote gameVoteCheck = gameVoteRepository.findByMemberIdAndGameId(member.getId(), gameId);
 		
 		if(gameVoteCheck != null) {
-			throw new RuntimeException("이미 투표를 완료 하셨습니다.");
+			throw new BusinessException(ErrorCode.VOTING_ALREADY_COMPLETED);
 		}
 		
 			GameVote gameVote = GameVote.builder()
@@ -49,7 +51,7 @@ public class GameVoteService {
 		GameVote gameVote = gameVoteRepository.findByMemberIdAndGameId(member.getId(), gameId);
 		
 		if(gameVote == null) {
-			throw new RuntimeException("투표한 데이터가 없습니다.");
+			throw new BusinessException(ErrorCode.VOTING_DATA_NOT_FOUND);
 		}
 		
 		gameVote.modifyTeam(team);
@@ -62,7 +64,7 @@ public class GameVoteService {
 		GameVote gameVote = gameVoteRepository.findByMemberIdAndGameId(member.getId(), gameId);
 		
 		if(gameVote == null) {
-			throw new RuntimeException("투표한 데이터가 없습니다.");
+			throw new BusinessException(ErrorCode.VOTING_DATA_NOT_FOUND);
 		}
 		
 		gameVoteRepository.delete(gameVote);

@@ -3,7 +3,7 @@ package com.example.baseballprediction.domain.chat.minigame.entity;
 import java.time.LocalDateTime;
 
 import com.example.baseballprediction.domain.BaseEntity;
-import com.example.baseballprediction.domain.chat.dto.ChatProfileDTO;
+import com.example.baseballprediction.domain.chat.dto.ChatEventDTO.ChatProfileDTO;
 import com.example.baseballprediction.domain.chat.minigame.dto.MiniGameVoteDTO.Options;
 import com.example.baseballprediction.domain.game.entity.Game;
 import com.example.baseballprediction.domain.member.entity.Member;

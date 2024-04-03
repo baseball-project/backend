@@ -11,7 +11,8 @@ import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import com.example.baseballprediction.domain.chat.dto.ChatProfileDTO;
+
+import com.example.baseballprediction.domain.chat.dto.ChatEventDTO.ChatProfileDTO;
 import com.example.baseballprediction.domain.chat.minigame.dto.MiniGameVoteDTO.Options;
 import com.example.baseballprediction.domain.chat.minigame.dto.MiniGameVoteDTO.VoteCreator;
 import com.example.baseballprediction.domain.chat.minigame.dto.MiniGameVoteDTO.VoteMessage;

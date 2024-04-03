@@ -90,7 +90,7 @@ public class StompHandler implements ChannelInterceptor {
             accessor.setSessionAttributes(new ConcurrentHashMap<>());
         }
         String sessionId = accessor.getSessionId();
-        chatService.addChatRoom(sessionId, gameId);
+        chatService.addChatRoom(sessionId, Long.parseLong(gameId));
         accessor.getSessionAttributes().put("memberDetails", memberDetails);
 
         return message;

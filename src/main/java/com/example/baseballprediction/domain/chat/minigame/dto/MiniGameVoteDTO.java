@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 
 import org.springframework.data.annotation.LastModifiedDate;
 
-import com.example.baseballprediction.domain.chat.dto.ChatProfileDTO;
+import com.example.baseballprediction.domain.chat.dto.ChatEventDTO.ChatProfileDTO;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Getter;

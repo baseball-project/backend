@@ -38,7 +38,9 @@ public enum ErrorCode {
 	GAMEID_OR_AUTH_TOKEN_MISSING(HttpStatus.BAD_REQUEST, "gameId 및 인증 토큰 값이 없습니다."),
 	INVALID_TOKEN(HttpStatus.BAD_REQUEST, "인증 토큰이 유효하지 않습니다."),
 	GAME_OR_CHATROOM_NOT_FOUND(HttpStatus.BAD_REQUEST, "게임이 존재하지 않거나 채팅방에 입장 할 수 없습니다."),
-	VOTING_REQUIRED_FOR_ENTRY(HttpStatus.BAD_REQUEST, "투표 완료 후 채팅방에 입장 할 수 있습니다.");
+	VOTING_REQUIRED_FOR_ENTRY(HttpStatus.BAD_REQUEST, "투표 완료 후 채팅방에 입장 할 수 있습니다."),
+	VOTING_ALREADY_COMPLETED(HttpStatus.BAD_REQUEST, "이미 투표를 완료 하셨습니다."),
+	VOTING_DATA_NOT_FOUND(HttpStatus.BAD_REQUEST, "투표한 데이터가 없습니다.");
 	
 	private final HttpStatus httpStatus;
 	private final String message;

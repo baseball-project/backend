@@ -16,11 +16,11 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.baseballprediction.domain.chat.dto.ChatGiftRequestDTO;
-import com.example.baseballprediction.domain.chat.dto.ChatLeaveMessage;
-import com.example.baseballprediction.domain.chat.dto.ChatLeaveRequest;
-import com.example.baseballprediction.domain.chat.dto.ChatMessage;
-import com.example.baseballprediction.domain.chat.dto.ChatProfileDTO;
+import com.example.baseballprediction.domain.chat.dto.ChatEventDTO.ChatLeaveMessage;
+import com.example.baseballprediction.domain.chat.dto.ChatEventDTO.ChatMessage;
+import com.example.baseballprediction.domain.chat.dto.ChatEventDTO.ChatProfileDTO;
+import com.example.baseballprediction.domain.chat.dto.ChatRequestDTO.ChatGiftRequestDTO;
+import com.example.baseballprediction.domain.chat.dto.ChatRequestDTO.ChatLeaveRequest;
 import com.example.baseballprediction.domain.chat.minigame.dto.MiniGameVoteDTO.Options;
 import com.example.baseballprediction.domain.chat.minigame.dto.MiniGameVoteDTO.VoteMessage;
 import com.example.baseballprediction.domain.chat.minigame.dto.MiniGameVoteDTO.VoteResult;
@@ -73,16 +73,6 @@ public class ChatController {
 			message.SendProfile(chatProfileDTO);
 			messagingTemplate.convertAndSend("/sub/chat/" + message.getGameId(), message);
 		}
-	}
-
-	// 사용자가 채팅방을 나갈 때
-	@DeleteMapping("/chat/{gameId}/leave")
-	public ResponseEntity<ApiResponse> chatRoomRemove(@PathVariable Long gameId, HttpSession session) {
-
-		String sessionId = session.getId();
-		chatService.removeMembeSessionChatRoom(sessionId, gameId);
-
-		return ResponseEntity.ok(ApiResponse.successWithNoData());
 	}
 
 	// 선물하기 기능

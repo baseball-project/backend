@@ -7,7 +7,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import com.example.baseballprediction.domain.chat.service.ChatService;
 import com.example.baseballprediction.domain.game.dto.GameResponse;
 import com.example.baseballprediction.domain.game.dto.GameResponse.GameDtoDaily;
 import com.example.baseballprediction.domain.game.dto.GameVoteProjection;
@@ -17,6 +19,7 @@ import com.example.baseballprediction.domain.gamevote.dto.GameVoteRatioDTO;
 import com.example.baseballprediction.domain.gamevote.repository.GameVoteRepository;
 import com.example.baseballprediction.domain.member.entity.Member;
 import com.example.baseballprediction.domain.member.repository.MemberRepository;
+import com.example.baseballprediction.domain.team.entity.Team;
 import com.example.baseballprediction.global.constant.ErrorCode;
 import com.example.baseballprediction.global.error.exception.NotFoundException;
 import com.example.baseballprediction.global.util.CustomDateUtil;
@@ -31,6 +34,8 @@ public class GameService {
 	private final GameVoteRepository gameVoteRepository;
 	private final MemberRepository memberRepository;
 
+	private final ChatService chatService;
+
 	public List<GameDtoDaily> findDailyGame(Long memberId) {
 		List<Game> games = gameRepository.findAll();
 
@@ -43,17 +48,19 @@ public class GameService {
 			if (gameFormatDate.equals(formatDate)) {
 				GameVoteRatioDTO gameVoteRatioDTO = gameVoteRepository.findVoteRatio(game.getHomeTeam().getId(),
 					game.getAwayTeam().getId(), game.getId()).orElseThrow();
-				
+
 				boolean homeTeamHasVoted = false;
 				boolean awayTeamHasVoted = false;
-				
-				if(memberId != null) {
-					homeTeamHasVoted = gameVoteRepository.existsByGameIdAndTeamIdAndMemberId(game.getId(), game.getHomeTeam().getId(), memberId);
-					awayTeamHasVoted = gameVoteRepository.existsByGameIdAndTeamIdAndMemberId(game.getId(), game.getAwayTeam().getId(), memberId);
+
+				if (memberId != null) {
+					homeTeamHasVoted = gameVoteRepository.existsByGameIdAndTeamIdAndMemberId(game.getId(),
+						game.getHomeTeam().getId(), memberId);
+					awayTeamHasVoted = gameVoteRepository.existsByGameIdAndTeamIdAndMemberId(game.getId(),
+						game.getAwayTeam().getId(), memberId);
 				}
 
 				GameDtoDaily dailygame = new GameDtoDaily(game, game.getHomeTeam(), game.getAwayTeam(),
-					gameVoteRatioDTO,homeTeamHasVoted, awayTeamHasVoted);
+					gameVoteRatioDTO, homeTeamHasVoted, awayTeamHasVoted);
 
 				gameDTOList.add(dailygame);
 
@@ -87,6 +94,11 @@ public class GameService {
 		}
 
 		return gameResults;
+	}
+
+	@Transactional
+	public void updateWinTeam(Game game, Team team) {
+		game.updateWinTeam(team);
 	}
 
 }

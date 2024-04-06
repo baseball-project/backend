@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.example.baseballprediction.domain.game.entity.Game;
 import com.example.baseballprediction.domain.game.repository.GameRepository;
+import com.example.baseballprediction.domain.game.service.GameService;
 import com.example.baseballprediction.domain.team.entity.Team;
 import com.example.baseballprediction.domain.team.repository.TeamRepository;
 import com.example.baseballprediction.global.constant.Status;
@@ -30,6 +31,8 @@ public class ScrapeService {
 	private final GameRepository gameRepository;
 
 	private String currentDate;
+
+	private final GameService gameService;
 
 	public void addSchedules() {
 		WebDriver webDriver = WebDriverUtil.getChromeDriver();
@@ -116,11 +119,9 @@ public class ScrapeService {
 						continue;
 					}
 
-					if (homeScore > awayScore) {
-						game.updateWinTeam(homeTeam);
-					} else {
-						game.updateWinTeam(awayTeam);
-					}
+					Team winTeam = homeScore > awayScore ? homeTeam : awayTeam;
+
+					gameService.updateWinTeam(game, winTeam);
 				} catch (Exception e) {
 					continue;
 				}

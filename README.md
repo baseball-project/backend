@@ -7,18 +7,18 @@ KBO 경기를 크롤링하여 승부예측 및 승리요정이라는 통계를 �
 
 ## 기술스택
 
-<center>
-<img src="https://img.shields.io/badge/Java 17-DD0700?style=for-the-badge&logoColor=white">
-<img src="https://img.shields.io/badge/Spring Boot 3.1.6-6DB33F?style=for-the-badge&logo=springboot&logoColor=white">
-<img src="https://img.shields.io/badge/Spring Data Jpa-6DB33F?style=for-the-badge&logo=springboot&logoColor=white">
-<img src="https://img.shields.io/badge/querydsl-0769AD?style=for-the-badge&logoColor=white">
-<img src="https://img.shields.io/badge/mysql-4479A1?style=for-the-badge&logo=mysql&logoColor=white">
-<img src="https://img.shields.io/badge/junit5-25A162?style=for-the-badge&logo=junit5&logoColor=white">
-<img src="https://img.shields.io/badge/gradle-02303A?style=for-the-badge&logo=gradle&logoColor=white">
-<img src="https://img.shields.io/badge/github actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white">
-<img src="https://img.shields.io/badge/amazon ec2-FF9900?style=for-the-badge&logo=amazonec2&logoColor=white">
-<img src="https://img.shields.io/badge/amazon s3-569A31?style=for-the-badge&logo=amazons3&logoColor=white">
-</center>
+<p align="center">
+<img src="https://img.shields.io/badge/Java 17-DD0700?style=flat&logoColor=white">
+<img src="https://img.shields.io/badge/SpringBoot 3.1.6-6DB33F?style=flat&logo=springboot&logoColor=white">
+<img src="https://img.shields.io/badge/Spring Data JPA-6DB33F?style=flat&logo=springboot&logoColor=white">
+<img src="https://img.shields.io/badge/QueryDSL-0769AD?style=flat&logoColor=white">
+<img src="https://img.shields.io/badge/MySQL-4479A1?style=flat&logo=mysql&logoColor=white">
+<img src="https://img.shields.io/badge/JUnit5-25A162?style=flat&logo=junit5&logoColor=white">
+<img src="https://img.shields.io/badge/Gradle-02303A?style=flat&logo=gradle&logoColor=white">
+<img src="https://img.shields.io/badge/Github Actions-2088FF?style=flat&logo=githubactions&logoColor=white">
+<img src="https://img.shields.io/badge/AWS EC2-FF9900?style=flat&logo=amazonec2&logoColor=white">
+<img src="https://img.shields.io/badge/AWS S3-569A31?style=flat&logo=amazons3&logoColor=white">
+</p>
 
 ## 프로젝트 설정
 

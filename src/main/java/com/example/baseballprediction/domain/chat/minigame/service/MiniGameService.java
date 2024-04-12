@@ -248,26 +248,21 @@ public class MiniGameService {
         return resultDTO;
     }
     
-    //게임이 종료된 뒤 미니투표가 해당 gameId에 남아 있을경우 토큰 환불처리
-    @Scheduled(cron = "0 0 2 * * ?", zone = "Asia/Seoul")
-    public void SaveCancelledVotesAndRefundTokens() {
-    	List<Long> endedGameIds = gameRepository.findGameIdsByStatus(Status.END);
-
-        for (Long gameId : endedGameIds) {
-            synchronized (getGameLock(gameId)) {
-            	List<Status> statuses = Arrays.asList(Status.READY, Status.PROGRESS);
-                List<MiniGame> actionableMiniGames = miniGameRepository.findByGameIdAndStatusIn(gameId, statuses);
-                if (actionableMiniGames.isEmpty()) {
-                    continue; 
-                }
-                actionableMiniGames.forEach(miniGame -> {
-                    miniGame.updateStatus(Status.CANCEL);
-                    Member member = miniGame.getMember();
-                    member.addToken(REQUIRED_TOKENS_FOR_VOTE);
-                    memberRepository.save(member);
-                });
-                miniGameRepository.saveAll(actionableMiniGames);
-            }
-        }
-    }
+	//게임이 종료된 뒤 미니투표가 해당 gameId에 남아 있을경우 토큰 환불처리
+	public void SaveCancelledVotesAndRefundTokens(Long gameId) {
+	    synchronized (getGameLock(gameId)) {
+	    	List<Status> statuses = Arrays.asList(Status.READY, Status.PROGRESS);
+	        List<MiniGame> actionableMiniGames = miniGameRepository.findByGameIdAndStatusIn(gameId, statuses);
+	        if (actionableMiniGames.isEmpty()) {
+	            return; 
+	        }
+	        actionableMiniGames.forEach(miniGame -> {
+	            miniGame.updateStatus(Status.CANCEL);
+	            Member member = miniGame.getMember();
+	            member.addToken(REQUIRED_TOKENS_FOR_VOTE);
+	            memberRepository.save(member);
+	        });
+	        miniGameRepository.saveAll(actionableMiniGames);
+	    }
+	}
 }

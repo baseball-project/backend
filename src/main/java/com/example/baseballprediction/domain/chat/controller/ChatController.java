@@ -21,6 +21,7 @@ import com.example.baseballprediction.domain.chat.dto.ChatEventDTO.ChatMessage;
 import com.example.baseballprediction.domain.chat.dto.ChatEventDTO.ChatProfileDTO;
 import com.example.baseballprediction.domain.chat.dto.ChatRequestDTO.ChatGiftRequestDTO;
 import com.example.baseballprediction.domain.chat.dto.ChatRequestDTO.ChatLeaveRequest;
+import com.example.baseballprediction.domain.chat.dto.GameTeamType;
 import com.example.baseballprediction.domain.chat.minigame.dto.MiniGameVoteDTO.Options;
 import com.example.baseballprediction.domain.chat.minigame.dto.MiniGameVoteDTO.VoteMessage;
 import com.example.baseballprediction.domain.chat.minigame.dto.MiniGameVoteDTO.VoteResult;
@@ -64,13 +65,16 @@ public class ChatController {
 			.orElseThrow(() -> new NotFoundException(ErrorCode.TEAM_NOT_FOUND));
 		ChatProfileDTO chatProfileDTO = new ChatProfileDTO(memberDetails.getName(), memberDetails.getProfileImageUrl(),
 			team.getName());
+		GameTeamType gameTeamType = chatService.findDailyGameTeamType(message.getGameId(), memberDetails.getMember().getId());
 		if (ChatType.ENTER.equals(message.getType())) {
 			message.setMessage(memberDetails.getName() + "님이 입장하셨습니다.");
-			message.SendProfile(chatProfileDTO);
+			message.sendProfile(chatProfileDTO);
+			message.setTeamType(gameTeamType.getTeamType());
 			messagingTemplate.convertAndSend("/sub/chat/" + message.getGameId(), message);
 		} else if (ChatType.NORMAL.equals(message.getType()) || ChatType.BAWWLING.equals(message.getType())) {
 			message.setMessage(message.getMessage());
-			message.SendProfile(chatProfileDTO);
+			message.sendProfile(chatProfileDTO);
+			message.setTeamType(gameTeamType.getTeamType());
 			messagingTemplate.convertAndSend("/sub/chat/" + message.getGameId(), message);
 		}
 	}

@@ -43,7 +43,7 @@ public class ChatEventDTO {
 	    	this.profile = new ChatProfileDTO(chatProfileDTO.getNickname(),chatProfileDTO.getProfileImageUrl(),chatProfileDTO.getTeamName());
 	    }
 	    
-	    public void setTeamType(String teamType) {
+		public void setTeamType(String teamType) {
 			this.teamType = teamType;
 			
 		}

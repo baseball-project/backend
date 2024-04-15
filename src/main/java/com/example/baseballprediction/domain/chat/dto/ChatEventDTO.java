@@ -25,24 +25,24 @@ public class ChatEventDTO {
 	@Getter
 	public static class ChatMessage {
 
-	    private ChatType type;
-	    private Long gameId;
-	    private String message;
-	    private ChatProfileDTO profile;
-	    private String teamType;
-	    
-	    public void setMessage(String message) {
-	    	this.message = message;
-	    }
-	    
-	    public void sendProfile( ChatProfileDTO chatProfileDTO) {
-	    	setProfile(chatProfileDTO);
-	    }
-	    
-	    private void setProfile(ChatProfileDTO chatProfileDTO) {
-	    	this.profile = new ChatProfileDTO(chatProfileDTO.getNickname(),chatProfileDTO.getProfileImageUrl(),chatProfileDTO.getTeamName());
-	    }
-	    
+		private ChatType type;
+		private Long gameId;
+		private String message;
+		private ChatProfileDTO profile;
+		private String teamType;
+		
+		public void setMessage(String message) {
+			this.message = message;
+		}
+		
+		public void sendProfile( ChatProfileDTO chatProfileDTO) {
+			setProfile(chatProfileDTO);
+		}
+		
+		private void setProfile(ChatProfileDTO chatProfileDTO) {
+			this.profile = new ChatProfileDTO(chatProfileDTO.getNickname(),chatProfileDTO.getProfileImageUrl(),chatProfileDTO.getTeamName());
+		}
+		
 		public void setTeamType(String teamType) {
 			this.teamType = teamType;
 			

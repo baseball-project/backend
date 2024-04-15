@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.example.baseballprediction.domain.chat.dto.GameTeamType;
 import com.example.baseballprediction.domain.game.dto.GameVoteProjection;
 import com.example.baseballprediction.domain.game.entity.Game;
 import com.example.baseballprediction.domain.team.entity.Team;
@@ -43,4 +44,16 @@ public interface GameRepository extends JpaRepository<Game, Long> {
 	
 	@Query("SELECT g.id FROM Game g WHERE g.status = :status")
 	List<Long> findGameIdsByStatus(@Param("status") Status status);
+	
+	@Query(value = "SELECT " +
+	           "(CASE " +
+	           " WHEN gv.team_id = g.home_team_id THEN 'home' " +
+	           " WHEN gv.team_id = g.away_team_id THEN 'away' " +
+	           "END) as teamType " +
+	           "FROM game g " +
+	           "INNER JOIN game_vote gv ON g.game_id = gv.game_id " +
+	           "INNER JOIN team t ON gv.team_id = t.team_id " +
+	           "INNER JOIN member m ON gv.member_id = m.member_id " +
+	           "WHERE g.game_id = :gameId AND m.member_id = :memberId", nativeQuery = true)
+	GameTeamType findTeamTypeByGameIdAndMemberId(@Param("gameId") Long gameId, @Param("memberId") Long memberId);
 }

@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Service;
 
+import com.example.baseballprediction.domain.chat.dto.GameTeamType;
 import com.example.baseballprediction.domain.game.repository.GameRepository;
 import com.example.baseballprediction.global.constant.ErrorCode;
 import com.example.baseballprediction.global.error.exception.NotFoundException;
@@ -46,5 +47,10 @@ public class ChatService {
 
 	public void removeSession(String sessionId) {
 		sessions.remove(sessionId);
+	}
+	
+	public GameTeamType findDailyGameTeamType(Long gameId, Long memberId) {
+		GameTeamType gameTeamType = gameRepository.findTeamTypeByGameIdAndMemberId(gameId,memberId);
+		return gameTeamType;
 	}
 }

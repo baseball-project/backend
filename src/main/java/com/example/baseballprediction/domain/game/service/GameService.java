@@ -9,20 +9,22 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.baseballprediction.domain.chat.service.ChatService;
 import com.example.baseballprediction.domain.game.dto.GameResponse;
 import com.example.baseballprediction.domain.game.dto.GameResponse.GameDtoDaily;
 import com.example.baseballprediction.domain.game.dto.GameVoteProjection;
 import com.example.baseballprediction.domain.game.entity.Game;
 import com.example.baseballprediction.domain.game.repository.GameRepository;
 import com.example.baseballprediction.domain.gamevote.dto.GameVoteRatioDTO;
+import com.example.baseballprediction.domain.gamevote.entity.QGameVote;
 import com.example.baseballprediction.domain.gamevote.repository.GameVoteRepository;
+import com.example.baseballprediction.domain.gamevote.repository.GameVoteRepositoryCustomImpl;
 import com.example.baseballprediction.domain.member.entity.Member;
 import com.example.baseballprediction.domain.member.repository.MemberRepository;
 import com.example.baseballprediction.domain.team.entity.Team;
 import com.example.baseballprediction.global.constant.ErrorCode;
 import com.example.baseballprediction.global.error.exception.NotFoundException;
 import com.example.baseballprediction.global.util.CustomDateUtil;
+import com.querydsl.jpa.impl.JPAQueryFactory;
 
 import lombok.RequiredArgsConstructor;
 
@@ -33,13 +35,22 @@ public class GameService {
 	private final GameRepository gameRepository;
 	private final GameVoteRepository gameVoteRepository;
 	private final MemberRepository memberRepository;
+	private final GameVoteRepositoryCustomImpl gameVoteRepositoryCustomImpl;
 
-	private final ChatService chatService;
-
-	public List<GameDtoDaily> findDailyGame(Long memberId) {
+	public List<GameDtoDaily> findDailyGame(String username) {
 		List<Game> games = gameRepository.findAll();
 
 		List<GameDtoDaily> gameDTOList = new ArrayList<>();
+		
+		Member member = null;
+		Long memberId = 0L;
+		
+		if (username != null) {
+			member = memberRepository.findByUsername(username)
+				.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+	
+			memberId = member.getId();
+		}
 
 		for (Game game : games) {
 			String formatDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
@@ -52,11 +63,9 @@ public class GameService {
 				boolean homeTeamHasVoted = false;
 				boolean awayTeamHasVoted = false;
 
-				if (memberId != null) {
-					homeTeamHasVoted = gameVoteRepository.existsByGameIdAndTeamIdAndMemberId(game.getId(),
-						game.getHomeTeam().getId(), memberId);
-					awayTeamHasVoted = gameVoteRepository.existsByGameIdAndTeamIdAndMemberId(game.getId(),
-						game.getAwayTeam().getId(), memberId);
+				if (memberId != null && memberId != 0) {
+					homeTeamHasVoted = gameVoteRepositoryCustomImpl.existsByGameIdAndTeamIdAndMemberId(game.getId(), game.getHomeTeam().getId(), memberId);
+					awayTeamHasVoted = gameVoteRepositoryCustomImpl.existsByGameIdAndTeamIdAndMemberId(game.getId(), game.getAwayTeam().getId(), memberId);		
 				}
 
 				GameDtoDaily dailygame = new GameDtoDaily(game, game.getHomeTeam(), game.getAwayTeam(),

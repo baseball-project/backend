@@ -44,12 +44,14 @@ public class GameController {
 
 	//오늘의 승부예측 경기 list 조회
 	@GetMapping("")
-	public ResponseEntity<ApiResponse<List<GameDtoDaily>>> gameDailyTodayList() {
+	public ResponseEntity<ApiResponse<List<GameDtoDaily>>> gameDailyTodayList(
+			@AuthenticationPrincipal MemberDetails memberDetails) {
 
-		List<GameDtoDaily> gameDtoDailyList = gameService.findDailyGame(null);
-
+		String username = memberDetails == null ? null : memberDetails.getUsername();
+		
+		List<GameDtoDaily> gameDtoDailyList = gameService.findDailyGame(username);
 		ApiResponse<List<GameDtoDaily>> response = ApiResponse.success(gameDtoDailyList);
-
+		
 		return ResponseEntity.ok(response);
 
 	}
@@ -158,16 +160,5 @@ public class GameController {
 		return ResponseEntity.ok(response);
 	}
 
-	@GetMapping("/loginUser")
-	public ResponseEntity<ApiResponse<List<GameDtoDaily>>> gameDailyTodayListForLoggedInUser(
-		@AuthenticationPrincipal MemberDetails memberDetails) {
-
-		List<GameDtoDaily> gameDtoDailyList = gameService.findDailyGame(memberDetails.getMember().getId());
-
-		ApiResponse<List<GameDtoDaily>> response = ApiResponse.success(gameDtoDailyList);
-
-		return ResponseEntity.ok(response);
-
-	}
 
 }

@@ -23,7 +23,7 @@ public class ReplyLikeService {
 	private final ReplyRepository replyRepository;
 	private final MemberRepository memberRepository;
 
-	public void saveReplyLike(String username, Long replyId) {
+	public ReplyLike saveReplyLike(String username, Long replyId) {
 		Member member = memberRepository.findByUsername(username).orElseThrow(() -> new NotFoundException(
 			ErrorCode.MEMBER_NOT_FOUND));
 
@@ -39,7 +39,7 @@ public class ReplyLikeService {
 			.reply(reply)
 			.build();
 
-		replyLikeRepository.save(replyLike);
+		return replyLikeRepository.save(replyLike);
 	}
 
 	@Transactional(readOnly = true)
@@ -61,12 +61,8 @@ public class ReplyLikeService {
 			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 		Reply reply = replyRepository.findById(replyId)
 			.orElseThrow(() -> new NotFoundException(ErrorCode.REPLY_NOT_FOUND));
-		ReplyLike replyLike = replyLikeRepository.findByReply(reply)
+		ReplyLike replyLike = replyLikeRepository.findByMemberAndReply(member, reply)
 			.orElseThrow(() -> new NotFoundException(ErrorCode.REPLY_LIKE_NOT_FOUND));
-
-		if (!replyLike.getMember().equals(member)) {
-			throw new BusinessException(ErrorCode.REPLY_LIKE_MEMBER_INVALID);
-		}
 
 		replyLikeRepository.delete(replyLike);
 	}

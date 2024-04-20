@@ -88,7 +88,7 @@ public class ReplyService {
 			.collect(Collectors.toList());
 	}
 
-	public void addReply(ReplyType replyType, String username, String content) {
+	public Reply addReply(ReplyType replyType, String username, String content) {
 		Member member = memberRepository.findByUsername(username).orElseThrow(
 			() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
@@ -98,10 +98,10 @@ public class ReplyService {
 			.type(replyType)
 			.build();
 
-		replyRepository.save(reply);
+		return replyRepository.save(reply);
 	}
 
-	public void addSubReply(Long replyId, ReplyType replyType, String username, String content) {
+	public Reply addSubReply(Long replyId, ReplyType replyType, String username, String content) {
 		Reply parentReply = replyRepository.findById(replyId)
 			.orElseThrow(() -> new NotFoundException(ErrorCode.REPLY_NOT_FOUND));
 
@@ -115,7 +115,7 @@ public class ReplyService {
 			.parentReply(parentReply)
 			.build();
 
-		replyRepository.save(reply);
+		return replyRepository.save(reply);
 	}
 
 	public void deleteReply(Long replyId, String username) {
@@ -151,7 +151,7 @@ public class ReplyService {
 		return Arrays.stream(ReportType.values()).map(m -> new ListDTO(m.name(), m.getComment())).toList();
 	}
 
-	public void addReplyReport(Long replyId, String username, ReportType reportType) {
+	public ReplyReport addReplyReport(Long replyId, String username, ReportType reportType) {
 		Member member = memberRepository.findByUsername(username)
 			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
@@ -168,7 +168,7 @@ public class ReplyService {
 			.reportType(reportType)
 			.build();
 
-		replyReportRepository.save(replyReport);
+		return replyReportRepository.save(replyReport);
 	}
 
 	private boolean isExistReport(Member member, Reply reply) {

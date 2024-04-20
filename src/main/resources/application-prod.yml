@@ -7,7 +7,7 @@ server:
 spring:
   profiles:
     active:
-      - prod
+      on-profile: prod
   datasource:
     url: jdbc:mysql://${RDS.HOSTNAME}:${RDS.PORT}/${RDS.DBNAME}
     driver-class-name: com.mysql.cj.jdbc.Driver

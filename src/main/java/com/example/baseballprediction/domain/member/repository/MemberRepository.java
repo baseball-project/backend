@@ -20,7 +20,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 			+ "sum(case when f.type = 'WIN' then 1 else 0 end) as winFairyCount, "
 			+ "sum(case when f.type = 'LOSE' then 1 else 0 end) as loseFairyCount) "
 			+ "FROM Member m "
-			+ "INNER JOIN MonthlyFairy f ON f.member = m "
+			+ "LEFT JOIN MonthlyFairy f ON f.member = m "
 			+ "WHERE m.nickname = :nickname "
 			+ "GROUP BY m.nickname, m.profileImageUrl")
 	Optional<ProfileProjection> findProfile(String nickname);

@@ -24,7 +24,7 @@ public class MemberResponse {
 			this.profileImageUrl = member.getProfileImageUrl();
 			this.level = member.getLevel();
 			this.token = member.getToken();
-			this.teamName = member.getTeam().getName();
+			this.teamName = member.getTeam() == null ? null : member.getTeam().getName();
 			this.comment = member.getComment();
 		}
 	}
@@ -59,7 +59,8 @@ public class MemberResponse {
 
 		public GiftHistoryDTO(GiftToken giftToken) {
 			this.nickname = giftToken.getTakeMember().getNickname();
-			this.teamName = giftToken.getTakeMember().getTeam().getName();
+			this.teamName =
+				giftToken.getTakeMember().getTeam() == null ? null : giftToken.getTakeMember().getTeam().getName();
 			this.token = giftToken.getTokenAmount();
 			this.comment = giftToken.getComment();
 			this.takeDate = CustomDateUtil.dateToString(giftToken.getCreatedAt());

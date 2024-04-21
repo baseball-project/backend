@@ -1,5 +1,7 @@
 package com.example.baseballprediction.domain.member.entity;
 
+import java.util.Objects;
+
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
@@ -89,6 +91,7 @@ public class Member extends BaseEntity {
 		this.nickname = nickname;
 		this.socialType = socialType;
 		this.isNewMember = isNewMember;
+		this.token = 0;
 	}
 
 	public void changeTeam(Team team) {
@@ -120,5 +123,20 @@ public class Member extends BaseEntity {
 
 	public void addToken(int token) {
 		this.token += token;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		Member member = (Member)o;
+		return Objects.equals(id, member.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
 	}
 }

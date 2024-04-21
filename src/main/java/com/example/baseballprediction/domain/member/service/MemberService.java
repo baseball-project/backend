@@ -88,8 +88,11 @@ public class MemberService {
 			throw new BusinessException(ErrorCode.MEMBER_NICKNAME_EXIST);
 		}
 
-		String uploadFileName = s3UploadService.updateFile(profileImage, member.getProfileImageUrl(),
-			ImageType.PROFILE);
+		String uploadFileName = null;
+		if (profileImage != null) {
+			uploadFileName = s3UploadService.updateFile(profileImage, member.getProfileImageUrl(),
+				ImageType.PROFILE);
+		}
 
 		member.updateDetails(uploadFileName, detailsDTO.getNickname(), detailsDTO.getComment());
 
@@ -188,9 +191,6 @@ public class MemberService {
 		}
 		sender.addToken(-token);
 		recipient.addToken(token);
-
-		memberRepository.save(sender);
-		memberRepository.save(recipient);
 
 		GiftToken giftToken = GiftToken.builder()
 			.takeMember(sender)

@@ -2,6 +2,7 @@ package com.example.baseballprediction.domain.member.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -21,6 +22,7 @@ public class MemberRequest {
 
 	@Getter
 	@NoArgsConstructor
+	@AllArgsConstructor
 	public static class DetailsDTO {
 		@NotBlank(message = "닉네임을 입력해주세요.")
 		@Size(max = 20, message = "닉네임은 20자 이하로 설정할 수 있습니다.")

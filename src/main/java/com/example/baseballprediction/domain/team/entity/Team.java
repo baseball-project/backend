@@ -11,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -31,6 +32,12 @@ public class Team extends BaseEntity {
 	private String shortName;
 	@Column(length = 16)
 	private String color;
+	
+	@Builder
+	public Team(String name, String shortName) {
+		this.name = name;
+		this.shortName = shortName;
+	}
 
 	@Override
 	public boolean equals(Object o) {

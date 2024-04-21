@@ -1,5 +1,7 @@
 package com.example.baseballprediction.domain.reply.entity;
 
+import java.util.Objects;
+
 import com.example.baseballprediction.domain.BaseEntity;
 import com.example.baseballprediction.domain.member.entity.Member;
 import com.example.baseballprediction.global.constant.ReplyStatus;
@@ -59,5 +61,20 @@ public class Reply extends BaseEntity {
 
 	public void updateBlind() {
 		this.status = ReplyStatus.BLIND;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o)
+			return true;
+		if (o == null || getClass() != o.getClass())
+			return false;
+		Reply reply = (Reply)o;
+		return Objects.equals(id, reply.id);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(id);
 	}
 }

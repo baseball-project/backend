@@ -27,7 +27,7 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
 	@Query(
 		value =
-			"select row_number() over(order by count desc) as rank, case when type = 'WIN' then '승리요정' else '패배요정' end || ' ' || fairy_rank || '등' as title, count"
+			"select row_number() over(order by count desc) as totalRank, case when type = 'WIN' then '승리요정' else '패배요정' end || ' ' || fairy_rank || '등' as title, count"
 				+ "  from (select type, fairy_rank, count(*) as count "
 				+ "  from monthly_fairy "
 				+ " where member_id = :memberId "

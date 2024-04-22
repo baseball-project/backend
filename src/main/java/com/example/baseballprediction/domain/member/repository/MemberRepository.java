@@ -27,11 +27,11 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 
 	@Query(
 		value =
-			"select row_number() over(order by count desc) as totalRank, case when type = 'WIN' then '승리요정' else '패배요정' end || ' ' || fairy_rank || '등' as title, count"
+			"select row_number() over(order by s.count desc) as totalRank, case when s.type = 'WIN' then '승리요정' else '패배요정' end || ' ' || s.fairy_rank || '등' as title, s.count"
 				+ "  from (select type, fairy_rank, count(*) as count "
 				+ "  from monthly_fairy "
 				+ " where member_id = :memberId "
-				+ "group by type, fairy_rank) "
+				+ "group by type, fairy_rank) s "
 				+ "order by count desc",
 		nativeQuery = true
 	)

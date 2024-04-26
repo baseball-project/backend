@@ -1,6 +1,7 @@
 package com.example.baseballprediction.domain.chat.dto;
 
 import com.example.baseballprediction.domain.team.entity.Team;
+import com.example.baseballprediction.global.constant.ChatMessageType;
 import com.example.baseballprediction.global.constant.ChatType;
 
 import lombok.AllArgsConstructor;
@@ -15,9 +16,9 @@ public class ChatEventDTO {
 		private String nickname;
 	    private String message;
 
-	    public ChatLeaveMessage(String nickname, String message) {
+	    public ChatLeaveMessage(String nickname, ChatMessageType message) {
 	        this.nickname = nickname;
-	        this.message = message;
+	        this.message = message.getMessage();
 	    }
 		
 	}

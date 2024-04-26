@@ -172,6 +172,7 @@ public class MemberService {
 		return giftHistories;
 	}
 
+	@Transactional(readOnly = false)
 	public void saveGiftToken(Long senderId, ChatGiftRequestDTO chatGiftRequestDTO) {
 		Member sender = memberRepository.findById(senderId)
 			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));

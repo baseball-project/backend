@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import org.springframework.data.annotation.LastModifiedDate;
 
 import com.example.baseballprediction.domain.chat.dto.ChatEventDTO.ChatProfileDTO;
+import com.example.baseballprediction.global.constant.ChatMessageType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 
 import lombok.Getter;
@@ -37,9 +38,9 @@ public class MiniGameVoteDTO {
 		@LastModifiedDate
 		private LocalDateTime startedAt;
         
-        public VoteMessage(Long miniGameId,String message,ChatProfileDTO profile,Options options,LocalDateTime startedAt) {
+        public VoteMessage(Long miniGameId,ChatMessageType message,ChatProfileDTO profile,Options options,LocalDateTime startedAt) {
 			this.miniGameId = miniGameId;
-			this.message = message;
+			this.message = message.getMessage();
 			this.profile = new ChatProfileDTO(profile.getNickname(),profile.getProfileImageUrl(),profile.getTeamName());
 			this.miniGames = new Options(options.getQuestion(),options.getOption1(), options.getOption2());
 			this.startedAt = startedAt;
@@ -55,6 +56,8 @@ public class MiniGameVoteDTO {
         public VoteResult(String message) {
         	this.message = message;
         }
+        
+        
     }
 
 	@Getter

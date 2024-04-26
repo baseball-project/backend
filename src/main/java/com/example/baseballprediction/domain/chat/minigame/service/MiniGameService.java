@@ -28,6 +28,7 @@ import com.example.baseballprediction.domain.game.entity.Game;
 import com.example.baseballprediction.domain.game.repository.GameRepository;
 import com.example.baseballprediction.domain.member.entity.Member;
 import com.example.baseballprediction.domain.member.repository.MemberRepository;
+import com.example.baseballprediction.global.constant.ChatMessageType;
 import com.example.baseballprediction.global.constant.ErrorCode;
 import com.example.baseballprediction.global.constant.Status;
 import com.example.baseballprediction.global.error.exception.BusinessException;
@@ -53,6 +54,7 @@ public class MiniGameService {
 	private final Map<Long, Object> gameLocks = new ConcurrentHashMap<>();
 
 
+	@Transactional(readOnly = false)
 	public MiniGame saveCreateVote(Long gameId,Options options,String nickname) {
 		 
 		int currentVoteCount = voteCountPerGame.getOrDefault(gameId, 0);
@@ -96,6 +98,7 @@ public class MiniGameService {
 		return savedMiniGame;
 	}
 	 
+	@Transactional(readOnly = true)
 	private boolean findStartNewVote(Long gameId) {
 	    if (!miniGameRepository.findByGameIdAndStatus(gameId, Status.PROGRESS).isEmpty()) {
 	        return false;
@@ -111,6 +114,7 @@ public class MiniGameService {
 	}
 	
 	// 1분마다 실행 3분마다 진행시 스케줄러 반복이 엇나갈걸 대비.
+	@Transactional(readOnly = false)
 	@Scheduled(cron = "0 * 13-23 * * ?", zone = "Asia/Seoul") 
 	public void modifyCheckAndUpdateVoteStatus() {
 		
@@ -136,12 +140,13 @@ public class MiniGameService {
 		            ChatProfileDTO profile = nextVote.toChatProfileDTO(); 
 		            Options options = nextVote.toOptions(); 
 		            LocalDateTime startedAt = nextVote.getStartedAt();
-	            	messagingTemplate.convertAndSend("/sub/chat/" + nextVote.getGame().getId(), new VoteMessage(nextVote.getId(), "투표가 시작되었습니다.", profile, options,startedAt));
+	            	messagingTemplate.convertAndSend("/sub/chat/" + nextVote.getGame().getId(), new VoteMessage(nextVote.getId(), ChatMessageType.VOTE_STARTED, profile, options,startedAt));
 		        }
 	    	}
 	    }
 	}
 	
+	@Transactional(readOnly = false)
 	public void SaveVoteEndResults(Long miniGameId) {
 		MiniGameVoteResultDTO voteResults = miniGameVoteRepository.findVoteRatiosAndMemberId(miniGameId);
 		MiniGame miniGame = miniGameRepository.findById(miniGameId)
@@ -163,6 +168,7 @@ public class MiniGameService {
 		messagingTemplate.convertAndSend("/sub/chat/" + miniGame.getGame().getId(), new VoteResult(resultMessage));
 	}
 
+	@Transactional(readOnly = false)
 	private void modifyVoteStatus(MiniGame vote, Status status) {
 	    vote.updateStatus(status);
 	    if (status == Status.PROGRESS) {
@@ -175,6 +181,7 @@ public class MiniGameService {
 	    return gameLocks.computeIfAbsent(gameId, k -> new Object());
 	}
 	 
+	@Transactional(readOnly = false)
     public boolean addVote(Long miniGameId, String nickname, int option) {
     	
     	MiniGame miniGame = miniGameRepository.findById(miniGameId)
@@ -249,6 +256,7 @@ public class MiniGameService {
     }
     
 	//게임이 종료된 뒤 미니투표가 해당 gameId에 남아 있을경우 토큰 환불처리
+    @Transactional(readOnly = false)
 	public void SaveCancelledVotesAndRefundTokens(Long gameId) {
 	    synchronized (getGameLock(gameId)) {
 	    	List<Status> statuses = Arrays.asList(Status.READY, Status.PROGRESS);

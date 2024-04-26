@@ -35,6 +35,7 @@ import com.example.baseballprediction.domain.chat.service.ChatService;
 import com.example.baseballprediction.domain.member.service.MemberService;
 import com.example.baseballprediction.domain.team.entity.Team;
 import com.example.baseballprediction.domain.team.repository.TeamRepository;
+import com.example.baseballprediction.global.constant.ChatMessageType;
 import com.example.baseballprediction.global.constant.ChatType;
 import com.example.baseballprediction.global.constant.ErrorCode;
 import com.example.baseballprediction.global.constant.Status;
@@ -44,6 +45,7 @@ import com.example.baseballprediction.global.security.MemberDetails;
 import com.example.baseballprediction.global.util.ApiResponse;
 
 import jakarta.servlet.http.HttpSession;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
@@ -67,7 +69,7 @@ public class ChatController {
 			team.getName());
 		GameTeamType gameTeamType = chatService.findDailyGameTeamType(message.getGameId(), memberDetails.getMember().getId());
 		if (ChatType.ENTER.equals(message.getType())) {
-			message.setMessage(memberDetails.getName() + "님이 입장하셨습니다.");
+			message.setMessage(memberDetails.getName() + ChatMessageType.ENTER_MESSAGE);
 			message.sendProfile(chatProfileDTO);
 			message.setTeamType(gameTeamType.getTeamType());
 			messagingTemplate.convertAndSend("/sub/chat/" + message.getGameId(), message);
@@ -81,7 +83,7 @@ public class ChatController {
 
 	// 선물하기 기능
 	@PutMapping("/gift/token")
-	public ResponseEntity<ApiResponse> giftTokenAdd(@RequestBody ChatGiftRequestDTO chatGiftRequestDTO,
+	public ResponseEntity<ApiResponse> giftTokenAdd(@Valid @RequestBody ChatGiftRequestDTO chatGiftRequestDTO,
 		@AuthenticationPrincipal MemberDetails memberDetails) {
 		memberService.saveGiftToken(memberDetails.getMember().getId(), chatGiftRequestDTO);
 
@@ -99,16 +101,17 @@ public class ChatController {
 			MiniGame miniGame = miniGameService.saveCreateVote(creation.getGameId(), options,
 				memberDetails.getMember().getNickname());
 			LocalDateTime startedAt = miniGame.getStartedAt();
+			
 			if (miniGame.getStatus() == Status.PROGRESS) {
 				messagingTemplate.convertAndSend("/sub/chat/" + creation.getGameId(),
-					new VoteMessage(miniGame.getId(), "투표가 시작되었습니다.", chatProfileDTO, options, startedAt));
+					new VoteMessage(miniGame.getId(), ChatMessageType.VOTE_STARTED, chatProfileDTO, options, startedAt));
 				return;
 			}
 
 			if (miniGame.getStatus() == Status.READY) {
 				messagingTemplate.convertAndSendToUser(memberDetails.getMember().getNickname(),
 					"/chat/" + creation.getGameId(),
-					new VoteMessage(miniGame.getId(), "투표가 생성됐습니다. 잠시만 기다려주세요.", chatProfileDTO, options, startedAt));
+					new VoteMessage(miniGame.getId(), ChatMessageType.VOTE_CREATED, chatProfileDTO, options, startedAt));
 				return;
 			}
 	}
@@ -120,9 +123,9 @@ public class ChatController {
 			.getNickname();
 			boolean result = miniGameService.addVote(action.getMiniGameId(), nickname, action.getOption());
 			if (result) {
-				messagingTemplate.convertAndSendToUser(nickname, "/voteResult", new VoteResult("투표해주셔서 감사합니다."));
+				messagingTemplate.convertAndSendToUser(nickname, "/voteResult", new VoteResult(ChatMessageType.THANK_YOU_FOR_VOTING.getMessage()));
 			} else {
-				messagingTemplate.convertAndSendToUser(nickname, "/voteResult", new VoteResult("이미 투표하셨습니다."));
+				messagingTemplate.convertAndSendToUser(nickname, "/voteResult", new VoteResult(ChatMessageType.ALREADY_VOTED.getMessage()));
 			}
 	}
 
@@ -146,7 +149,7 @@ public class ChatController {
 
 		chatService.removeMembeSessionChatRoom(sessionId, gameId);
 
-		ChatLeaveMessage leaveMessage = new ChatLeaveMessage(nickname, "님이 채팅방을 떠났습니다.");
+		ChatLeaveMessage leaveMessage = new ChatLeaveMessage(nickname, ChatMessageType.LEAVE_MESSAGE);
 		messagingTemplate.convertAndSend("/sub/chat/" + gameId, leaveMessage);
 	}
 	

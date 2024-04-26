@@ -5,6 +5,7 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +38,7 @@ public class GameService {
 	private final MemberRepository memberRepository;
 	private final GameVoteRepositoryCustomImpl gameVoteRepositoryCustomImpl;
 
+	@Transactional(readOnly = true)
 	public List<GameDtoDaily> findDailyGame(String username) {
 		List<Game> games = gameRepository.findAll();
 
@@ -46,41 +48,52 @@ public class GameService {
 		Long memberId = 0L;
 		
 		if (username != null) {
-			member = memberRepository.findByUsername(username)
-				.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
-	
-			memberId = member.getId();
+			memberId = getMemberId(username);
 		}
-
+		String currentDate = getCurrentDate();
+		
 		for (Game game : games) {
-			String formatDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-			String gameFormatDate = game.getStartedAt().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-
-			if (gameFormatDate.equals(formatDate)) {
-				GameVoteRatioDTO gameVoteRatioDTO = gameVoteRepository.findVoteRatio(game.getHomeTeam().getId(),
-					game.getAwayTeam().getId(), game.getId()).orElseThrow();
-
-				boolean homeTeamHasVoted = false;
-				boolean awayTeamHasVoted = false;
-
-				if (memberId != null && memberId != 0) {
-					homeTeamHasVoted = gameVoteRepositoryCustomImpl.existsByGameIdAndTeamIdAndMemberId(game.getId(), game.getHomeTeam().getId(), memberId);
-					awayTeamHasVoted = gameVoteRepositoryCustomImpl.existsByGameIdAndTeamIdAndMemberId(game.getId(), game.getAwayTeam().getId(), memberId);		
-				}
-
-				GameDtoDaily dailygame = new GameDtoDaily(game, game.getHomeTeam(), game.getAwayTeam(),
-					gameVoteRatioDTO, homeTeamHasVoted, awayTeamHasVoted);
-
-				gameDTOList.add(dailygame);
-
-			}
-
-		}
+            if (isGameToday(game, currentDate)) {
+                GameDtoDaily gameDto = findGameDtoDaily(game, memberId);
+                gameDTOList.add(gameDto);
+            }
+        }
 
 		return gameDTOList;
+	}
+	
+	 private Long getMemberId(String username) {
+	        return memberRepository.findByUsername(username)
+	                               .map(Member::getId)
+	                               .orElse(0L);
+	    }
 
+	private String getCurrentDate() {
+        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 	}
 
+    private boolean isGameToday(Game game, String currentDate) {
+        return game.getStartedAt().format(DateTimeFormatter.ofPattern("yyyyMMdd")).equals(currentDate);
+    }
+    
+    @Transactional(readOnly = true)
+    private GameDtoDaily findGameDtoDaily(Game game, Long memberId) {
+        GameVoteRatioDTO gameVoteRatioDTO = gameVoteRepository.findVoteRatio(game.getHomeTeam().getId(),
+            game.getAwayTeam().getId(), game.getId()).orElseThrow();
+        
+        boolean homeTeamHasVoted = false;
+        boolean awayTeamHasVoted = false;
+
+        if (memberId > 0) {
+            homeTeamHasVoted = gameVoteRepositoryCustomImpl.existsByGameIdAndTeamIdAndMemberId(game.getId(), game.getHomeTeam().getId(), memberId);
+            awayTeamHasVoted = gameVoteRepositoryCustomImpl.existsByGameIdAndTeamIdAndMemberId(game.getId(), game.getAwayTeam().getId(), memberId);
+        }
+
+        return new GameDtoDaily(game, game.getHomeTeam(), game.getAwayTeam(), gameVoteRatioDTO, homeTeamHasVoted, awayTeamHasVoted);
+    }
+
+
+	@Transactional(readOnly = true)
 	public List<GameResponse.PastGameDTO> findGameResult(String username, String startDate, String endDate) {
 		Member member = memberRepository.findByUsername(username)
 			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));

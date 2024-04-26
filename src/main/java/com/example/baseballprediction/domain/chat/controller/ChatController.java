@@ -10,8 +10,6 @@ import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageSendingOperations;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -32,7 +30,7 @@ import com.example.baseballprediction.domain.chat.minigame.dto.MiniGameVoteReque
 import com.example.baseballprediction.domain.chat.minigame.entity.MiniGame;
 import com.example.baseballprediction.domain.chat.minigame.service.MiniGameService;
 import com.example.baseballprediction.domain.chat.service.ChatService;
-import com.example.baseballprediction.domain.member.service.MemberService;
+import com.example.baseballprediction.domain.member.service.ProfileService;
 import com.example.baseballprediction.domain.team.entity.Team;
 import com.example.baseballprediction.domain.team.repository.TeamRepository;
 import com.example.baseballprediction.global.constant.ChatMessageType;
@@ -44,7 +42,6 @@ import com.example.baseballprediction.global.error.exception.NotFoundException;
 import com.example.baseballprediction.global.security.MemberDetails;
 import com.example.baseballprediction.global.util.ApiResponse;
 
-import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -55,7 +52,7 @@ public class ChatController {
 	private final SimpMessageSendingOperations messagingTemplate;
 	private final ChatService chatService;
 	private final TeamRepository teamRepository;
-	private final MemberService memberService;
+	private final ProfileService profileService;
 	private final MiniGameService miniGameService;
 
 	@MessageMapping("/chat/message")
@@ -67,7 +64,8 @@ public class ChatController {
 			.orElseThrow(() -> new NotFoundException(ErrorCode.TEAM_NOT_FOUND));
 		ChatProfileDTO chatProfileDTO = new ChatProfileDTO(memberDetails.getName(), memberDetails.getProfileImageUrl(),
 			team.getName());
-		GameTeamType gameTeamType = chatService.findDailyGameTeamType(message.getGameId(), memberDetails.getMember().getId());
+		GameTeamType gameTeamType = chatService.findDailyGameTeamType(message.getGameId(),
+			memberDetails.getMember().getId());
 		if (ChatType.ENTER.equals(message.getType())) {
 			message.setMessage(ChatMessageType.getEnterMessage(ChatMessageType.ENTER_MESSAGE, memberDetails.getName()));
 			message.sendProfile(chatProfileDTO);
@@ -85,7 +83,7 @@ public class ChatController {
 	@PutMapping("/gift/token")
 	public ResponseEntity<ApiResponse> giftTokenAdd(@Valid @RequestBody ChatGiftRequestDTO chatGiftRequestDTO,
 		@AuthenticationPrincipal MemberDetails memberDetails) {
-		memberService.saveGiftToken(memberDetails.getMember().getId(), chatGiftRequestDTO);
+		profileService.saveGiftToken(memberDetails.getMember().getId(), chatGiftRequestDTO);
 
 		return ResponseEntity.ok(ApiResponse.successWithNoData());
 	}
@@ -93,27 +91,27 @@ public class ChatController {
 	@MessageMapping("/chat/createVote")
 	public void createVoteSave(@Payload VoteCreation creation, SimpMessageHeaderAccessor headerAccessor) {
 		MemberDetails memberDetails = (MemberDetails)headerAccessor.getSessionAttributes().get("memberDetails");
-			Team team = teamRepository.findById(memberDetails.getTeamId())
-				.orElseThrow(() -> new NotFoundException(ErrorCode.TEAM_NOT_FOUND));
-			ChatProfileDTO chatProfileDTO = new ChatProfileDTO(memberDetails.getName(),
-				memberDetails.getProfileImageUrl(), team.getName());
-			Options options = new Options(creation.getQuestion(), creation.getOption1(), creation.getOption2());
-			MiniGame miniGame = miniGameService.saveCreateVote(creation.getGameId(), options,
-				memberDetails.getMember().getNickname());
-			LocalDateTime startedAt = miniGame.getStartedAt();
-			
-			if (miniGame.getStatus() == Status.PROGRESS) {
-				messagingTemplate.convertAndSend("/sub/chat/" + creation.getGameId(),
-					new VoteMessage(miniGame.getId(), ChatMessageType.VOTE_STARTED, chatProfileDTO, options, startedAt));
-				return;
-			}
+		Team team = teamRepository.findById(memberDetails.getTeamId())
+			.orElseThrow(() -> new NotFoundException(ErrorCode.TEAM_NOT_FOUND));
+		ChatProfileDTO chatProfileDTO = new ChatProfileDTO(memberDetails.getName(),
+			memberDetails.getProfileImageUrl(), team.getName());
+		Options options = new Options(creation.getQuestion(), creation.getOption1(), creation.getOption2());
+		MiniGame miniGame = miniGameService.saveCreateVote(creation.getGameId(), options,
+			memberDetails.getMember().getNickname());
+		LocalDateTime startedAt = miniGame.getStartedAt();
 
-			if (miniGame.getStatus() == Status.READY) {
-				messagingTemplate.convertAndSendToUser(memberDetails.getMember().getNickname(),
-					"/chat/" + creation.getGameId(),
-					new VoteMessage(miniGame.getId(), ChatMessageType.VOTE_CREATED, chatProfileDTO, options, startedAt));
-				return;
-			}
+		if (miniGame.getStatus() == Status.PROGRESS) {
+			messagingTemplate.convertAndSend("/sub/chat/" + creation.getGameId(),
+				new VoteMessage(miniGame.getId(), ChatMessageType.VOTE_STARTED, chatProfileDTO, options, startedAt));
+			return;
+		}
+
+		if (miniGame.getStatus() == Status.READY) {
+			messagingTemplate.convertAndSendToUser(memberDetails.getMember().getNickname(),
+				"/chat/" + creation.getGameId(),
+				new VoteMessage(miniGame.getId(), ChatMessageType.VOTE_CREATED, chatProfileDTO, options, startedAt));
+			return;
+		}
 	}
 
 	//  투표 할 때
@@ -121,12 +119,14 @@ public class ChatController {
 	public void performVoteAdd(@Payload VoteAction action, SimpMessageHeaderAccessor headerAccessor) {
 		String nickname = ((MemberDetails)headerAccessor.getSessionAttributes().get("memberDetails")).getMember()
 			.getNickname();
-			boolean result = miniGameService.addVote(action.getMiniGameId(), nickname, action.getOption());
-			if (result) {
-				messagingTemplate.convertAndSendToUser(nickname, "/voteResult", new VoteResult(ChatMessageType.THANK_YOU_FOR_VOTING.getMessage()));
-			} else {
-				messagingTemplate.convertAndSendToUser(nickname, "/voteResult", new VoteResult(ChatMessageType.ALREADY_VOTED.getMessage()));
-			}
+		boolean result = miniGameService.addVote(action.getMiniGameId(), nickname, action.getOption());
+		if (result) {
+			messagingTemplate.convertAndSendToUser(nickname, "/voteResult",
+				new VoteResult(ChatMessageType.THANK_YOU_FOR_VOTING.getMessage()));
+		} else {
+			messagingTemplate.convertAndSendToUser(nickname, "/voteResult",
+				new VoteResult(ChatMessageType.ALREADY_VOTED.getMessage()));
+		}
 	}
 
 	// 투표 결과 확인
@@ -134,10 +134,10 @@ public class ChatController {
 	public void VoteResultDetails(@Payload ResultRatioDTO resultRatioDTO, SimpMessageHeaderAccessor headerAccessor) {
 		String nickname = ((MemberDetails)headerAccessor.getSessionAttributes().get("memberDetails")).getMember()
 			.getNickname();
-			VoteResultDTO voteResult = miniGameService.findPerformVoteAndGetResults(resultRatioDTO.getMiniGameId(),
-				nickname);
-			messagingTemplate.convertAndSendToUser(nickname, "/voteRatioResults/" + resultRatioDTO.getMiniGameId(),
-				voteResult);
+		VoteResultDTO voteResult = miniGameService.findPerformVoteAndGetResults(resultRatioDTO.getMiniGameId(),
+			nickname);
+		messagingTemplate.convertAndSendToUser(nickname, "/voteRatioResults/" + resultRatioDTO.getMiniGameId(),
+			voteResult);
 	}
 
 	@MessageMapping("/chat/leave")
@@ -152,12 +152,13 @@ public class ChatController {
 		ChatLeaveMessage leaveMessage = new ChatLeaveMessage(nickname, ChatMessageType.LEAVE_MESSAGE);
 		messagingTemplate.convertAndSend("/sub/chat/" + gameId, leaveMessage);
 	}
-	
+
 	@MessageExceptionHandler(BusinessException.class)
-    public void handleBusinessException(BusinessException exception, SimpMessageHeaderAccessor headerAccessor) {
-        String errorMessage = exception.getMessage();
-        String nickname = ((MemberDetails) headerAccessor.getSessionAttributes().get("memberDetails")).getMember().getNickname();
-        messagingTemplate.convertAndSendToUser(nickname, "/chat/errors", errorMessage);
-    }
+	public void handleBusinessException(BusinessException exception, SimpMessageHeaderAccessor headerAccessor) {
+		String errorMessage = exception.getMessage();
+		String nickname = ((MemberDetails)headerAccessor.getSessionAttributes().get("memberDetails")).getMember()
+			.getNickname();
+		messagingTemplate.convertAndSendToUser(nickname, "/chat/errors", errorMessage);
+	}
 
 }

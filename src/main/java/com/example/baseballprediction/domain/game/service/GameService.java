@@ -63,7 +63,7 @@ public class GameService {
 	}
 	
 	private Long getMemberId(String username) {
-        return memberRepository.findByUsername(username)
+		return memberRepository.findByUsername(username)
 	                               .map(Member::getId)
 	                               .orElse(0L);
 	}

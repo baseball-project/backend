@@ -62,14 +62,14 @@ public class GameService {
 		return gameDTOList;
 	}
 	
-	 private Long getMemberId(String username) {
-	        return memberRepository.findByUsername(username)
+	private Long getMemberId(String username) {
+        return memberRepository.findByUsername(username)
 	                               .map(Member::getId)
 	                               .orElse(0L);
-	    }
+	}
 
 	private String getCurrentDate() {
-        return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+		return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 	}
 
     private boolean isGameToday(Game game, String currentDate) {

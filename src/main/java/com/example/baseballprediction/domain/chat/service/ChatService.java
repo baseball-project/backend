@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.example.baseballprediction.domain.chat.dto.GameTeamType;
 import com.example.baseballprediction.domain.game.repository.GameRepository;
@@ -49,6 +50,7 @@ public class ChatService {
 		sessions.remove(sessionId);
 	}
 	
+	@Transactional(readOnly = true)
 	public GameTeamType findDailyGameTeamType(Long gameId, Long memberId) {
 		GameTeamType gameTeamType = gameRepository.findTeamTypeByGameIdAndMemberId(gameId,memberId);
 		return gameTeamType;

@@ -26,7 +26,7 @@ public class GameVoteService {
 	private final TeamRepository teamRepository;
 	private final GameRepository gameRepository;
 	
-	@Transactional(readOnly = false)
+	@Transactional
 	public void addGameVote(String username,Long gameId,GameVoteRequestDTO gameVoteRequestDTO) {
 		Member member = memberRepository.findByUsername(username).orElseThrow();
 		Team team = teamRepository.findById(gameVoteRequestDTO.getTeamId()).orElseThrow();

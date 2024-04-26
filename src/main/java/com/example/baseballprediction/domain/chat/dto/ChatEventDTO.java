@@ -14,12 +14,12 @@ public class ChatEventDTO {
 	public static class ChatLeaveMessage {
 		
 		private String nickname;
-	    private String message;
-
-	    public ChatLeaveMessage(String nickname, ChatMessageType message) {
-	        this.nickname = nickname;
-	        this.message = message.getMessage();
-	    }
+		private String message;
+		
+		public ChatLeaveMessage(String nickname, ChatMessageType message) {
+		    this.nickname = nickname;
+		    this.message = message.getMessage();
+		}
 		
 	}
 	

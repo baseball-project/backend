@@ -11,6 +11,6 @@ public class GameVoteRequest {
 	public static class GameVoteRequestDTO {
 		
 		@NotNull(message = "teamId는 필수입니다.")
-	    private Integer teamId;
+		private Integer teamId;
 	}
 }

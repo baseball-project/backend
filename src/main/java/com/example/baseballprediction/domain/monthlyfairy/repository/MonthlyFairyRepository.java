@@ -11,6 +11,9 @@ import com.example.baseballprediction.domain.member.entity.Member;
 import com.example.baseballprediction.domain.monthlyfairy.entity.MonthlyFairy;
 
 public interface MonthlyFairyRepository extends JpaRepository<MonthlyFairy, Long> {
+	@Query("SELECT f FROM MonthlyFairy f"
+		+ " JOIN FETCH f.member m"
+		+ " WHERE f.month = :month")
 	List<MonthlyFairy> findByMonth(int month);
 
 	List<MonthlyFairy> findByMember(Member member);

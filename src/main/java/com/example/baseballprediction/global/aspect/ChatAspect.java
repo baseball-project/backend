@@ -28,6 +28,6 @@ public class ChatAspect {
 	@AfterReturning("execution(* com.example.baseballprediction.domain.game..*Service.updateWinTeam(..))")
 	public void cancelMiniGamesAndRefundTokens(JoinPoint joinPoint) {
 		Game game = (Game)joinPoint.getArgs()[0];
-		miniGameService.SaveCancelledVotesAndRefundTokens(game.getId());
+		miniGameService.saveCancelledVotesAndRefundTokens(game.getId());
 	}
 }

@@ -31,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class GameService {
 
 	private final GameRepository gameRepository;
@@ -38,10 +39,9 @@ public class GameService {
 	private final MemberRepository memberRepository;
 	private final GameVoteRepositoryCustomImpl gameVoteRepositoryCustomImpl;
 
-	@Transactional(readOnly = true)
 	public List<GameDtoDaily> findDailyGame(String username) {
 		List<Game> games = gameRepository.findAll();
-
+	
 		List<GameDtoDaily> gameDTOList = new ArrayList<>();
 		
 		Member member = null;
@@ -53,12 +53,12 @@ public class GameService {
 		String currentDate = getCurrentDate();
 		
 		for (Game game : games) {
-            if (isGameToday(game, currentDate)) {
-                GameDtoDaily gameDto = findGameDtoDaily(game, memberId);
-                gameDTOList.add(gameDto);
-            }
-        }
-
+	        if (isGameToday(game, currentDate)) {
+	            GameDtoDaily gameDto = findGameDtoDaily(game, memberId);
+	            gameDTOList.add(gameDto);
+	        }
+	    }
+	
 		return gameDTOList;
 	}
 	
@@ -67,57 +67,55 @@ public class GameService {
 	                               .map(Member::getId)
 	                               .orElse(0L);
 	}
-
+	
 	private String getCurrentDate() {
 		return LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 	}
-
-    private boolean isGameToday(Game game, String currentDate) {
-        return game.getStartedAt().format(DateTimeFormatter.ofPattern("yyyyMMdd")).equals(currentDate);
-    }
-    
-    @Transactional(readOnly = true)
-    private GameDtoDaily findGameDtoDaily(Game game, Long memberId) {
-        GameVoteRatioDTO gameVoteRatioDTO = gameVoteRepository.findVoteRatio(game.getHomeTeam().getId(),
-            game.getAwayTeam().getId(), game.getId()).orElseThrow();
-        
-        boolean homeTeamHasVoted = false;
-        boolean awayTeamHasVoted = false;
-
-        if (memberId > 0) {
-            homeTeamHasVoted = gameVoteRepositoryCustomImpl.existsByGameIdAndTeamIdAndMemberId(game.getId(), game.getHomeTeam().getId(), memberId);
-            awayTeamHasVoted = gameVoteRepositoryCustomImpl.existsByGameIdAndTeamIdAndMemberId(game.getId(), game.getAwayTeam().getId(), memberId);
-        }
-
-        return new GameDtoDaily(game, game.getHomeTeam(), game.getAwayTeam(), gameVoteRatioDTO, homeTeamHasVoted, awayTeamHasVoted);
-    }
-
-
-	@Transactional(readOnly = true)
+	
+	private boolean isGameToday(Game game, String currentDate) {
+	    return game.getStartedAt().format(DateTimeFormatter.ofPattern("yyyyMMdd")).equals(currentDate);
+	}
+	
+	private GameDtoDaily findGameDtoDaily(Game game, Long memberId) {
+	    GameVoteRatioDTO gameVoteRatioDTO = gameVoteRepository.findVoteRatio(game.getHomeTeam().getId(),
+	        game.getAwayTeam().getId(), game.getId()).orElseThrow();
+	    
+	    boolean homeTeamHasVoted = false;
+	    boolean awayTeamHasVoted = false;
+	
+	    if (memberId > 0) {
+	        homeTeamHasVoted = gameVoteRepositoryCustomImpl.existsByGameIdAndTeamIdAndMemberId(game.getId(), game.getHomeTeam().getId(), memberId);
+	        awayTeamHasVoted = gameVoteRepositoryCustomImpl.existsByGameIdAndTeamIdAndMemberId(game.getId(), game.getAwayTeam().getId(), memberId);
+	    }
+	
+	    return new GameDtoDaily(game, game.getHomeTeam(), game.getAwayTeam(), gameVoteRatioDTO, homeTeamHasVoted, awayTeamHasVoted);
+	}
+	
+	
 	public List<GameResponse.PastGameDTO> findGameResult(String username, String startDate, String endDate) {
 		Member member = memberRepository.findByUsername(username)
 			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
-
+	
 		LocalDateTime startDateTime = LocalDateTime.of(CustomDateUtil.stringToDate(startDate), LocalTime.of(0, 0));
 		LocalDateTime endDateTime = LocalDateTime.of(CustomDateUtil.stringToDate(endDate), LocalTime.of(23, 59));
-
+	
 		List<GameVoteProjection> gameVoteProjections = gameRepository.findPastGameByStartedAtBetween(member.getId(),
 			startDateTime, endDateTime);
-
+	
 		List<GameResponse.PastGameDTO> gameResults = new ArrayList<>();
-
+	
 		for (GameVoteProjection gameVoteProjection : gameVoteProjections) {
 			Integer homeTeamId = gameVoteProjection.getHomeTeamId();
 			Integer awayTeamId = gameVoteProjection.getAwayTeamId();
 			GameVoteRatioDTO gameVoteRatioDTO = gameVoteRepository.findVoteRatio(gameVoteProjection.getHomeTeamId(),
 				gameVoteProjection.getAwayTeamId(), gameVoteProjection.getGameId()).orElseThrow();
-
+	
 			gameResults.add(new GameResponse.PastGameDTO(gameVoteProjection, gameVoteRatioDTO));
 		}
-
+	
 		return gameResults;
 	}
-
+	
 	@Transactional
 	public void updateWinTeam(Game game, Team team) {
 		game.updateWinTeam(team);

@@ -37,7 +37,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class MiniGameService {
 	
 	
@@ -54,7 +54,7 @@ public class MiniGameService {
 	private final Map<Long, Object> gameLocks = new ConcurrentHashMap<>();
 
 
-	@Transactional(readOnly = false)
+	@Transactional
 	public MiniGame saveCreateVote(Long gameId,Options options,String nickname) {
 		 
 		int currentVoteCount = voteCountPerGame.getOrDefault(gameId, 0);
@@ -98,28 +98,27 @@ public class MiniGameService {
 		return savedMiniGame;
 	}
 	 
-	@Transactional(readOnly = true)
 	private boolean findStartNewVote(Long gameId) {
 	    if (!miniGameRepository.findByGameIdAndStatus(gameId, Status.PROGRESS).isEmpty()) {
 	        return false;
 	    }
-
+	
 	    List<MiniGame> readyVotes = miniGameRepository.findByGameIdAndStatusOrderByCreatedAtAsc(gameId, Status.READY);
 	    
 	    if (!readyVotes.isEmpty()) {
 	        return false;
 	    }
-
+	
 	    return true;
 	}
 	
 	// 1분마다 실행 3분마다 진행시 스케줄러 반복이 엇나갈걸 대비.
-	@Transactional(readOnly = false)
+	@Transactional
 	@Scheduled(cron = "0 * 13-23 * * ?", zone = "Asia/Seoul") 
 	public void modifyCheckAndUpdateVoteStatus() {
 		
 	    List<Long> gameIds = gameRepository.findGameIdAndStatus(); 
-
+	
 	    for (Long gameId : gameIds) {
 	    	// gameIds가 돌면서 같은 gameId에 작업을 할려고 할 때, 접근을 막는다.
 	    	synchronized(getGameLock(gameId)) {
@@ -146,7 +145,7 @@ public class MiniGameService {
 	    }
 	}
 	
-	@Transactional(readOnly = false)
+	@Transactional
 	public void saveVoteEndResults(Long miniGameId) {
 		MiniGameVoteResultDTO voteResults = miniGameVoteRepository.findVoteRatiosAndMemberId(miniGameId);
 		MiniGame miniGame = miniGameRepository.findById(miniGameId)
@@ -167,8 +166,8 @@ public class MiniGameService {
 		
 		messagingTemplate.convertAndSend("/sub/chat/" + miniGame.getGame().getId(), new VoteResult(resultMessage));
 	}
-
-	@Transactional(readOnly = false)
+	
+	@Transactional
 	private void modifyVoteStatus(MiniGame vote, Status status) {
 	    vote.updateStatus(status);
 	    if (status == Status.PROGRESS) {
@@ -176,87 +175,86 @@ public class MiniGameService {
 	    }
 	    miniGameRepository.save(vote);
 	}
-
+	
 	private synchronized Object getGameLock(Long gameId) {
 	    return gameLocks.computeIfAbsent(gameId, k -> new Object());
 	}
 	 
-	@Transactional(readOnly = false)
-    public boolean addVote(Long miniGameId, String nickname, int option) {
-    	
-    	MiniGame miniGame = miniGameRepository.findById(miniGameId)
-    	        .orElseThrow(() -> new NotFoundException(ErrorCode.MINI_GAME_NOT_FOUND));
-    	if (miniGame.getStatus() == Status.END) {
-            throw new BusinessException(ErrorCode.MINI_GAME_ALREADY_ENDED);
-        }
-    	
-    	if (miniGame.getStatus() == Status.READY) {
-            throw new BusinessException(ErrorCode.MINI_GAME_CURRENTLY_WAITING);
-        }
-    	
-        Map<String, Integer> gameVotes = voteRecords.getOrDefault(miniGameId, new ConcurrentHashMap<>());
-
-        Optional<MiniGameVote> existingVote = miniGameVoteRepository.findByMiniGameIdAndMemberNickname(miniGameId, nickname);
-        if (gameVotes.containsKey(nickname) && existingVote.isPresent()) {
-        	 return false; // 이미 투표함
-        }
-        // 세션을 저장한다. 
-        gameVotes.put(nickname, option);
-        voteRecords.put(miniGameId, gameVotes);
-        // db저장
-        Member member = memberRepository.findByNickname(nickname)
-            .orElseThrow(() ->  new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
-
-        MiniGameVote vote = MiniGameVote.builder()
-            .miniGame(miniGame)
-            .member(member)
-            .voteOption(option)
-            .build();
-        miniGameVoteRepository.save(vote);
-
-        return true; // 투표 성공
-    }
+	@Transactional
+	public boolean addVote(Long miniGameId, String nickname, int option) {
+		
+		MiniGame miniGame = miniGameRepository.findById(miniGameId)
+		        .orElseThrow(() -> new NotFoundException(ErrorCode.MINI_GAME_NOT_FOUND));
+		if (miniGame.getStatus() == Status.END) {
+	        throw new BusinessException(ErrorCode.MINI_GAME_ALREADY_ENDED);
+	    }
+		
+		if (miniGame.getStatus() == Status.READY) {
+	        throw new BusinessException(ErrorCode.MINI_GAME_CURRENTLY_WAITING);
+	    }
+		
+	    Map<String, Integer> gameVotes = voteRecords.getOrDefault(miniGameId, new ConcurrentHashMap<>());
 	
-    @Transactional(readOnly = true) 
+	    Optional<MiniGameVote> existingVote = miniGameVoteRepository.findByMiniGameIdAndMemberNickname(miniGameId, nickname);
+	    if (gameVotes.containsKey(nickname) && existingVote.isPresent()) {
+	    	 return false; // 이미 투표함
+	    }
+	    // 세션을 저장한다. 
+	    gameVotes.put(nickname, option);
+	    voteRecords.put(miniGameId, gameVotes);
+	    // db저장
+	    Member member = memberRepository.findByNickname(nickname)
+	        .orElseThrow(() ->  new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+	
+	    MiniGameVote vote = MiniGameVote.builder()
+	        .miniGame(miniGame)
+	        .member(member)
+	        .voteOption(option)
+	        .build();
+	    miniGameVoteRepository.save(vote);
+	
+	    return true; // 투표 성공
+	}
+	
 	public VoteResultDTO findPerformVoteAndGetResults(Long miniGameId, String nickname) {
-
-        // 미니게임이 존재하는지 확인
-        MiniGame miniGame = miniGameRepository.findById(miniGameId)
-            .orElseThrow(() -> new BusinessException(ErrorCode.MINI_GAME_NOT_FOUND));
-
-        if (miniGame.getStatus() == Status.END) {
-            throw new BusinessException(ErrorCode.MINI_GAME_ALREADY_ENDED);
-        }
-    	
-    	if (miniGame.getStatus() == Status.READY) {
-            throw new BusinessException(ErrorCode.MINI_GAME_CURRENTLY_WAITING);
-        }
-       // 사용자의 프로필 조회
-       Member member = memberRepository.findByNickname(nickname)
-           .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
-        
-       MiniGameVote vote = miniGameVoteRepository.findByMiniGameIdAndMemberNickname(miniGameId, nickname)
+	
+	    // 미니게임이 존재하는지 확인
+	    MiniGame miniGame = miniGameRepository.findById(miniGameId)
+	        .orElseThrow(() -> new BusinessException(ErrorCode.MINI_GAME_NOT_FOUND));
+	
+	    if (miniGame.getStatus() == Status.END) {
+	        throw new BusinessException(ErrorCode.MINI_GAME_ALREADY_ENDED);
+	    }
+		
+		if (miniGame.getStatus() == Status.READY) {
+	        throw new BusinessException(ErrorCode.MINI_GAME_CURRENTLY_WAITING);
+	    }
+	   // 사용자의 프로필 조회
+	   Member member = memberRepository.findByNickname(nickname)
+	       .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+	    
+	   MiniGameVote vote = miniGameVoteRepository.findByMiniGameIdAndMemberNickname(miniGameId, nickname)
 		   .orElseThrow(() -> new BusinessException(ErrorCode.MINI_GAME_NOT_PARTICIPATED));
-       
-       
-        // 투표율과, 투표 만들 사람을 조회
-        MiniGameVoteResultDTO voteResults = miniGameVoteRepository.findVoteRatiosAndMemberId(miniGameId);
-
-        // 미니게임 생성자 정보 조회 
-        Member creator = memberRepository.findById(voteResults.getMemberId())
-            .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
-
-        VoteCreator voteCreator = new VoteCreator(creator.getNickname(), new Options(miniGame.getQuestion(), miniGame.getOption1(), miniGame.getOption2()));
-        ChatProfileDTO myProfile = new ChatProfileDTO(member.getNickname(), member.getProfileImageUrl(), member.getTeam().getName());
-        
-        VoteRatio ratio = new VoteRatio(voteResults.getOption1VoteRatio(), voteResults.getOption2VoteRatio());
-        VoteResultDTO resultDTO = new VoteResultDTO(voteCreator, myProfile, ratio);
-        
-        return resultDTO;
-    }
-    
+	   
+	   
+	    // 투표율과, 투표 만들 사람을 조회
+	    MiniGameVoteResultDTO voteResults = miniGameVoteRepository.findVoteRatiosAndMemberId(miniGameId);
+	
+	    // 미니게임 생성자 정보 조회 
+	    Member creator = memberRepository.findById(voteResults.getMemberId())
+	        .orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
+	
+	    VoteCreator voteCreator = new VoteCreator(creator.getNickname(), new Options(miniGame.getQuestion(), miniGame.getOption1(), miniGame.getOption2()));
+	    ChatProfileDTO myProfile = new ChatProfileDTO(member.getNickname(), member.getProfileImageUrl(), member.getTeam().getName());
+	    
+	    VoteRatio ratio = new VoteRatio(voteResults.getOption1VoteRatio(), voteResults.getOption2VoteRatio());
+	    VoteResultDTO resultDTO = new VoteResultDTO(voteCreator, myProfile, ratio);
+	    
+	    return resultDTO;
+	}
+	
 	//게임이 종료된 뒤 미니투표가 해당 gameId에 남아 있을경우 토큰 환불처리
-    @Transactional(readOnly = false)
+	@Transactional
 	public void saveCancelledVotesAndRefundTokens(Long gameId) {
 	    synchronized (getGameLock(gameId)) {
 	    	List<Status> statuses = Arrays.asList(Status.READY, Status.PROGRESS);

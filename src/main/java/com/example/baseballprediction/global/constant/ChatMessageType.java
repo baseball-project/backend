@@ -1,6 +1,5 @@
 package com.example.baseballprediction.global.constant;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -20,4 +19,9 @@ public enum ChatMessageType {
     public String toString() {
         return message;
     }
+    
+    public static String getEnterMessage(ChatMessageType chatMessageType, String username) {
+    	return username + chatMessageType;
+    }
+    
 }

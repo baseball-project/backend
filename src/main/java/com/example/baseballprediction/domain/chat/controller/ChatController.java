@@ -69,7 +69,7 @@ public class ChatController {
 			team.getName());
 		GameTeamType gameTeamType = chatService.findDailyGameTeamType(message.getGameId(), memberDetails.getMember().getId());
 		if (ChatType.ENTER.equals(message.getType())) {
-			message.setMessage(memberDetails.getName() + ChatMessageType.ENTER_MESSAGE);
+			message.setMessage(ChatMessageType.getEnterMessage(ChatMessageType.ENTER_MESSAGE, memberDetails.getName()));
 			message.sendProfile(chatProfileDTO);
 			message.setTeamType(gameTeamType.getTeamType());
 			messagingTemplate.convertAndSend("/sub/chat/" + message.getGameId(), message);

@@ -17,6 +17,7 @@ import lombok.RequiredArgsConstructor;
 
 @RequiredArgsConstructor
 @Service
+@Transactional(readOnly = true)
 public class ChatService {
 
 	// 채팅방 ID와 그 채팅방에 참여중인 사용자 세션 ID의 맵핑
@@ -50,7 +51,6 @@ public class ChatService {
 		sessions.remove(sessionId);
 	}
 	
-	@Transactional(readOnly = true)
 	public GameTeamType findDailyGameTeamType(Long gameId, Long memberId) {
 		GameTeamType gameTeamType = gameRepository.findTeamTypeByGameIdAndMemberId(gameId,memberId);
 		return gameTeamType;

@@ -19,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class GameVoteService {
 	private final MemberRepository memberRepository;
 	private final GameVoteRepository gameVoteRepository;
@@ -45,7 +46,7 @@ public class GameVoteService {
 			gameVoteRepository.save(gameVote);
 	}
 	
-	@Transactional(readOnly = false)
+	@Transactional
 	public void modifyGameVote(String username,Long gameId,GameVoteRequestDTO gameVoteRequestDTO) {
 		Member member = memberRepository.findByUsername(username).orElseThrow();
 		Team team = teamRepository.findById(gameVoteRequestDTO.getTeamId()).orElseThrow();
@@ -59,7 +60,7 @@ public class GameVoteService {
 	}
 	
 	
-	@Transactional(readOnly = false)
+	@Transactional
 	public void removeGameVote(Long gameId, String username) {
 		Member member = memberRepository.findByUsername(username).orElseThrow();
 		GameVote gameVote = gameVoteRepository.findByMemberIdAndGameId(member.getId(), gameId);

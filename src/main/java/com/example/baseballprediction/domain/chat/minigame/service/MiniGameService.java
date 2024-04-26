@@ -130,7 +130,7 @@ public class MiniGameService {
 	
 		        for (MiniGame vote : inProgressVotes) {
 		            if (Duration.between(vote.getStartedAt(), now).toMinutes() >= 3) {
-		            	SaveVoteEndResults(vote.getId());		                
+		            	saveVoteEndResults(vote.getId());		                
 		            }
 		        }
 	
@@ -147,7 +147,7 @@ public class MiniGameService {
 	}
 	
 	@Transactional(readOnly = false)
-	public void SaveVoteEndResults(Long miniGameId) {
+	public void saveVoteEndResults(Long miniGameId) {
 		MiniGameVoteResultDTO voteResults = miniGameVoteRepository.findVoteRatiosAndMemberId(miniGameId);
 		MiniGame miniGame = miniGameRepository.findById(miniGameId)
 		    .orElseThrow(() -> new BusinessException(ErrorCode.MINI_GAME_NOT_FOUND));
@@ -257,7 +257,7 @@ public class MiniGameService {
     
 	//게임이 종료된 뒤 미니투표가 해당 gameId에 남아 있을경우 토큰 환불처리
     @Transactional(readOnly = false)
-	public void SaveCancelledVotesAndRefundTokens(Long gameId) {
+	public void saveCancelledVotesAndRefundTokens(Long gameId) {
 	    synchronized (getGameLock(gameId)) {
 	    	List<Status> statuses = Arrays.asList(Status.READY, Status.PROGRESS);
 	        List<MiniGame> actionableMiniGames = miniGameRepository.findByGameIdAndStatusIn(gameId, statuses);

@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.example.baseballprediction.domain.member.entity.Member;
 import com.example.baseballprediction.domain.member.repository.MemberRepository;
@@ -54,7 +53,6 @@ class ReplyServiceTest {
 	}
 
 	@BeforeEach
-	@Transactional
 	void setUp() {
 		Member member1 = Member.builder()
 			.username("playdot1")

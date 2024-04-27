@@ -85,7 +85,7 @@ public class ProfileServiceTest {
 
 		assertThat(updateFavoriteTeam)
 			.extracting("id", "name", "shortName")
-			.contains(1, "한화 이글스", "한화");
+			.contains(favoriteTeam.getId(), "한화 이글스", "한화");
 	}
 
 	@DisplayName("닉네임, 한마디를 수정한다.")

@@ -1,6 +1,7 @@
 package com.example.baseballprediction.domain.game.dto;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -32,12 +33,13 @@ public class GameResponse {
 
 		private String status;
 
-		public GameDtoDaily(Game game, Team homeTeam, Team awayTeam, GameVoteRatioDTO gameVoteRatioDTO,boolean homeTeamHasVoted, boolean awayTeamHasVoted) {
+		public GameDtoDaily(Game game, Team homeTeam, Team awayTeam, GameVoteRatioDTO gameVoteRatioDTO,
+			boolean homeTeamHasVoted, boolean awayTeamHasVoted) {
 			this.gameId = game.getId();
 			this.homeTeam = new TeamDailyDTO(homeTeam, game.getHomeTeamScore(), gameVoteRatioDTO.getHomeTeamVoteRatio(),
-				homeTeam.getId(),homeTeamHasVoted);
+				homeTeam.getId(), homeTeamHasVoted);
 			this.awayTeam = new TeamDailyDTO(awayTeam, game.getAwayTeamScore(), gameVoteRatioDTO.getAwayTeamVoteRatio(),
-				awayTeam.getId(),awayTeamHasVoted);
+				awayTeam.getId(), awayTeamHasVoted);
 			this.gameTime = game.getStartedAt();
 			this.status = game.getStatus().toString();
 		}
@@ -54,7 +56,7 @@ public class GameResponse {
 		private int id;
 		private boolean hasVote;
 
-		public TeamDailyDTO(Team team, int score, int voteRatio, int id,boolean hasVote) {
+		public TeamDailyDTO(Team team, int score, int voteRatio, int id, boolean hasVote) {
 			this.teamName = team.getName();
 			this.teamShortName = team.getShortName();
 			this.score = score;
@@ -63,6 +65,22 @@ public class GameResponse {
 			this.hasVote = hasVote;
 		}
 
+		@Override
+		public boolean equals(Object o) {
+			if (this == o)
+				return true;
+			if (o == null || getClass() != o.getClass())
+				return false;
+			TeamDailyDTO that = (TeamDailyDTO)o;
+			return score == that.score && voteRatio == that.voteRatio && id == that.id && hasVote == that.hasVote
+				&& Objects.equals(teamName, that.teamName) && Objects.equals(teamShortName,
+				that.teamShortName);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(teamName, teamShortName, score, voteRatio, id, hasVote);
+		}
 	}
 
 	@Getter
@@ -91,6 +109,21 @@ public class GameResponse {
 		private int id;
 		private String teamName;
 		private int voteRatio;
+
+		@Override
+		public boolean equals(Object o) {
+			if (this == o)
+				return true;
+			if (o == null || getClass() != o.getClass())
+				return false;
+			PastGameTeamDTO that = (PastGameTeamDTO)o;
+			return id == that.id && voteRatio == that.voteRatio && Objects.equals(teamName, that.teamName);
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash(id, teamName, voteRatio);
+		}
 	}
 
 }

@@ -31,6 +31,7 @@ public class ProfileService {
 	private final S3UploadService s3UploadService;
 	private final GiftTokenRepository giftTokenRepository;
 
+	@Transactional
 	public void modifyLikeTeam(String username, int teamId) {
 		Member member = memberRepository.findByUsername(username)
 			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
@@ -40,6 +41,7 @@ public class ProfileService {
 		member.changeTeam(likeTeam);
 	}
 
+	@Transactional
 	public void modifyDetails(String username, MemberRequest.DetailsDTO detailsDTO, MultipartFile profileImage) {
 		Member member = memberRepository.findByUsername(username)
 			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
@@ -71,7 +73,6 @@ public class ProfileService {
 		return new MemberResponse.NicknameDTO(isExist);
 	}
 
-	@Transactional(readOnly = true)
 	private boolean isExistNickname(String originNickname, String nickname) {
 
 		if (originNickname.equals(nickname))
@@ -80,15 +81,13 @@ public class ProfileService {
 		return memberRepository.findByNickname(nickname).isPresent();
 	}
 
-	@Transactional(readOnly = true)
 	public ProfileProjection findProfile(String nickname) {
 		ProfileProjection profile = memberRepository.findProfile(nickname)
 			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
 
 		return profile;
 	}
-
-	@Transactional(readOnly = true)
+	
 	public MemberResponse.ProfileDTO findDetails(String username) {
 		Member member = memberRepository.findByUsername(username)
 			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));

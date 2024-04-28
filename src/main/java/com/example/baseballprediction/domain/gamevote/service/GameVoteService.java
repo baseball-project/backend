@@ -25,50 +25,49 @@ public class GameVoteService {
 	private final GameVoteRepository gameVoteRepository;
 	private final TeamRepository teamRepository;
 	private final GameRepository gameRepository;
-	
+
 	@Transactional
-	public void addGameVote(String username,Long gameId,GameVoteRequestDTO gameVoteRequestDTO) {
+	public GameVote addGameVote(String username, Long gameId, GameVoteRequestDTO gameVoteRequestDTO) {
 		Member member = memberRepository.findByUsername(username).orElseThrow();
 		Team team = teamRepository.findById(gameVoteRequestDTO.getTeamId()).orElseThrow();
 		Game game = gameRepository.findById(gameId).orElseThrow();
 		GameVote gameVoteCheck = gameVoteRepository.findByMemberIdAndGameId(member.getId(), gameId);
-		
-		if(gameVoteCheck != null) {
+
+		if (gameVoteCheck != null) {
 			throw new BusinessException(ErrorCode.VOTING_ALREADY_COMPLETED);
 		}
-		
-			GameVote gameVote = GameVote.builder()
-					.member(member)
-					.team(team)
-					.game(game)
-					.build();
-			
-			gameVoteRepository.save(gameVote);
+
+		GameVote gameVote = GameVote.builder()
+			.member(member)
+			.team(team)
+			.game(game)
+			.build();
+
+		return gameVoteRepository.save(gameVote);
 	}
-	
+
 	@Transactional
-	public void modifyGameVote(String username,Long gameId,GameVoteRequestDTO gameVoteRequestDTO) {
+	public void modifyGameVote(String username, Long gameId, GameVoteRequestDTO gameVoteRequestDTO) {
 		Member member = memberRepository.findByUsername(username).orElseThrow();
 		Team team = teamRepository.findById(gameVoteRequestDTO.getTeamId()).orElseThrow();
 		GameVote gameVote = gameVoteRepository.findByMemberIdAndGameId(member.getId(), gameId);
-		
-		if(gameVote == null) {
+
+		if (gameVote == null) {
 			throw new BusinessException(ErrorCode.VOTING_DATA_NOT_FOUND);
 		}
-		
+
 		gameVote.modifyTeam(team);
 	}
-	
-	
+
 	@Transactional
 	public void removeGameVote(Long gameId, String username) {
 		Member member = memberRepository.findByUsername(username).orElseThrow();
 		GameVote gameVote = gameVoteRepository.findByMemberIdAndGameId(member.getId(), gameId);
-		
-		if(gameVote == null) {
+
+		if (gameVote == null) {
 			throw new BusinessException(ErrorCode.VOTING_DATA_NOT_FOUND);
 		}
-		
+
 		gameVoteRepository.delete(gameVote);
 	}
 }

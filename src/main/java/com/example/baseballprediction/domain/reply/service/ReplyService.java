@@ -35,7 +35,7 @@ import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class ReplyService {
 	private final ReplyRepository replyRepository;
 	private final MemberRepository memberRepository;
@@ -44,7 +44,6 @@ public class ReplyService {
 
 	private final ReplyReportRepository replyReportRepository;
 
-	@Transactional(readOnly = true)
 	public Page<ReplyDTO> findRepliesByType(ReplyType replyType, int page, int size, String username) {
 		Pageable pageable = PageRequest.of(page, size);
 
@@ -88,6 +87,7 @@ public class ReplyService {
 			.collect(Collectors.toList());
 	}
 
+	@Transactional
 	public Reply addReply(ReplyType replyType, String username, String content) {
 		Member member = memberRepository.findByUsername(username).orElseThrow(
 			() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
@@ -101,6 +101,7 @@ public class ReplyService {
 		return replyRepository.save(reply);
 	}
 
+	@Transactional
 	public Reply addSubReply(Long replyId, ReplyType replyType, String username, String content) {
 		Reply parentReply = replyRepository.findById(replyId)
 			.orElseThrow(() -> new NotFoundException(ErrorCode.REPLY_NOT_FOUND));
@@ -118,6 +119,7 @@ public class ReplyService {
 		return replyRepository.save(reply);
 	}
 
+	@Transactional
 	public void deleteReply(Long replyId, String username) {
 		Member member = memberRepository.findByUsername(username)
 			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
@@ -132,7 +134,6 @@ public class ReplyService {
 		replyRepository.delete(reply);
 	}
 
-	@Transactional(readOnly = true)
 	public List<ReplyDTO> findSubReplies(Long parentReplyId, String username) {
 		Reply parentReply = replyRepository.findById(parentReplyId)
 			.orElseThrow(() -> new NotFoundException(ErrorCode.REPLY_NOT_FOUND));
@@ -151,6 +152,7 @@ public class ReplyService {
 		return Arrays.stream(ReportType.values()).map(m -> new ListDTO(m.name(), m.getComment())).toList();
 	}
 
+	@Transactional
 	public ReplyReport addReplyReport(Long replyId, String username, ReportType reportType) {
 		Member member = memberRepository.findByUsername(username)
 			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));

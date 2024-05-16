@@ -16,6 +16,7 @@ public class MemberRequest {
 
 	@Getter
 	@NoArgsConstructor
+	@AllArgsConstructor
 	public static class LikeTeamDTO {
 		private Integer teamId;
 	}

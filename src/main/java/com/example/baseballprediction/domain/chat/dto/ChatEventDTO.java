@@ -9,20 +9,20 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 public class ChatEventDTO {
-	
+
 	@Getter
 	public static class ChatLeaveMessage {
-		
+
 		private String nickname;
 		private String message;
-		
+
 		public ChatLeaveMessage(String nickname, ChatMessageType message) {
-		    this.nickname = nickname;
-		    this.message = message.getMessage();
+			this.nickname = nickname;
+			this.message = message.getMessage();
 		}
-		
+
 	}
-	
+
 	@Getter
 	public static class ChatMessage {
 
@@ -31,39 +31,39 @@ public class ChatEventDTO {
 		private String message;
 		private ChatProfileDTO profile;
 		private String teamType;
-		
+
 		public void setMessage(String message) {
 			this.message = message;
 		}
-		
-		public void sendProfile( ChatProfileDTO chatProfileDTO) {
+
+		public void sendProfile(ChatProfileDTO chatProfileDTO) {
 			setProfile(chatProfileDTO);
 		}
-		
+
 		private void setProfile(ChatProfileDTO chatProfileDTO) {
-			this.profile = new ChatProfileDTO(chatProfileDTO.getNickname(),chatProfileDTO.getProfileImageUrl(),chatProfileDTO.getTeamName());
+			this.profile = new ChatProfileDTO(chatProfileDTO.getNickname(), chatProfileDTO.getProfileImageUrl(),
+				chatProfileDTO.getTeamName());
 		}
-		
+
 		public void setTeamType(String teamType) {
 			this.teamType = teamType;
-			
+
 		}
 	}
-	
+
 	@Getter
 	@NoArgsConstructor
 	@AllArgsConstructor
 	public static class ChatProfileDTO {
-			private String nickname;
-			private String profileImageUrl;
-			private String TeamName;
-			
-			public ChatProfileDTO(String nickname,String profileImageUrl,Team team) {
-				this.nickname = nickname;
-				this.profileImageUrl = profileImageUrl;
-				this.TeamName = team.getName();
-			}
-			
+		private String nickname;
+		private String profileImageUrl;
+		private String teamName;
+
+		public ChatProfileDTO(String nickname, String profileImageUrl, Team team) {
+			this.nickname = nickname;
+			this.profileImageUrl = profileImageUrl;
+			this.teamName = team.getName();
+		}
 
 	}
 

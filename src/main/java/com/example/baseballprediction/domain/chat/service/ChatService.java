@@ -34,6 +34,14 @@ public class ChatService {
 		chatRooms.get(gameId).add(sessionId);
 	}
 
+	public boolean isExistChatRoom(Long gameId) {
+		return chatRooms.containsKey(gameId);
+	}
+
+	public Set<String> getUsersInChatRoom(Long gameId) {
+		return chatRooms.get(gameId);
+	}
+
 	public void removeMembeSessionChatRoom(String webSocketSessionId, Long gameId) {
 		Set<String> sessions = chatRooms.get(gameId);
 		if (sessions == null) {
@@ -50,9 +58,9 @@ public class ChatService {
 	public void removeSession(String sessionId) {
 		sessions.remove(sessionId);
 	}
-	
+
 	public GameTeamType findDailyGameTeamType(Long gameId, Long memberId) {
-		GameTeamType gameTeamType = gameRepository.findTeamTypeByGameIdAndMemberId(gameId,memberId);
+		GameTeamType gameTeamType = gameRepository.findTeamTypeByGameIdAndMemberId(gameId, memberId);
 		return gameTeamType;
 	}
 }

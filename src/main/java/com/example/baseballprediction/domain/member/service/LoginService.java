@@ -26,6 +26,8 @@ public class LoginService {
 	private final MemberRepository memberRepository;
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
+	private final JwtTokenProvider jwtTokenProvider;
+
 	public Map<String, Object> login(String username, String password) {
 		Member member = memberRepository.findByUsername(username).orElseThrow(() -> new NotFoundException(
 			ErrorCode.MEMBER_NOT_FOUND));
@@ -35,7 +37,7 @@ public class LoginService {
 		}
 
 		Map<String, Object> response = new HashMap<>();
-		response.put("token", JwtTokenProvider.createToken(member));
+		response.put("token", jwtTokenProvider.createToken(member));
 
 		MemberResponse.LoginDTO body = new MemberResponse.LoginDTO(member);
 
@@ -45,7 +47,7 @@ public class LoginService {
 	}
 
 	public void logout(String token) {
-		JwtTokenProvider.expireToken(token);
+		jwtTokenProvider.expireToken(token);
 	}
 
 	public OAuthResponse.LoginDTO oauth2Login(String username) {

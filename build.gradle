@@ -54,7 +54,7 @@ dependencies {
     runtimeOnly 'com.mysql:mysql-connector-j'
 
     //scrape
-    implementation 'org.seleniumhq.selenium:selenium-java:4.16.1'
+    implementation 'org.seleniumhq.selenium:selenium-java:4.21.0'
     implementation 'org.jsoup:jsoup:1.15.3'
 
     //S3

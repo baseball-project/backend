@@ -12,4 +12,7 @@ public class ProfileProjection {
 	private String profileImageUrl;
 	private Long winFairyCount;
 	private Long loseFairyCount;
+
+	private String teamName;
+	private String comment;
 }

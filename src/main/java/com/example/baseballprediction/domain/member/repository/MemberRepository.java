@@ -18,9 +18,12 @@ public interface MemberRepository extends JpaRepository<Member, Long> {
 	@Query(
 		"SELECT new com.example.baseballprediction.domain.member.dto.ProfileProjection(m.nickname, m.profileImageUrl, "
 			+ "sum(case when f.type = 'WIN' then 1 else 0 end) as winFairyCount, "
-			+ "sum(case when f.type = 'LOSE' then 1 else 0 end) as loseFairyCount) "
+			+ "sum(case when f.type = 'LOSE' then 1 else 0 end) as loseFairyCount, "
+			+ "t.name as teamName, m.comment"
+			+ ") "
 			+ "FROM Member m "
 			+ "LEFT JOIN MonthlyFairy f ON f.member = m "
+			+ "JOIN Team t ON m.team = t "
 			+ "WHERE m.nickname = :nickname "
 			+ "GROUP BY m.nickname, m.profileImageUrl")
 	Optional<ProfileProjection> findProfile(String nickname);

@@ -62,8 +62,10 @@ public class GameController {
 		@AuthenticationPrincipal MemberDetails memberDetails,
 		@RequestParam(required = false, defaultValue = "0") int page,
 		@RequestParam(required = false, defaultValue = "15") int item) {
-
+		if (page < 0)
+			throw new RuntimeException("페이지 번호를 확인해주세요.");
 		String username = memberDetails == null ? null : memberDetails.getUsername();
+		page = page == 0 ? page : page - 1;
 
 		Page<ReplyDTO> replyGameList = replyService.findRepliesByType(ReplyType.GAME, page, item,
 			username);

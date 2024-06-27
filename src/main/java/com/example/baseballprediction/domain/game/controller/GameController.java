@@ -162,5 +162,24 @@ public class GameController {
 		return ResponseEntity.ok(response);
 	}
 
+	//댓글 삭제 
+	@DeleteMapping("/replies/{replyId}")
+	public ResponseEntity<ApiResponse> replyRemove(@AuthenticationPrincipal MemberDetails memberDetails,
+		@PathVariable Long replyId) {
+		replyService.deleteReply(replyId, memberDetails.getUsername());
+	
+		return ResponseEntity.ok(ApiResponse.successWithNoData());
+	}
+	
+	//gameId로 게임내역 단건조회
+	@GetMapping("/{gameId}")
+	public ResponseEntity<ApiResponse<GameDtoDaily>> gameIdSingleCheck(
+			@AuthenticationPrincipal MemberDetails memberDetails,
+			@PathVariable Long gameId) {
+		
+		String username = memberDetails == null ? null : memberDetails.getUsername();
+	    GameDtoDaily gameDtoDaily = gameService.findGameIdSingleCheck(gameId,username);
+	    return ResponseEntity.ok(ApiResponse.success(gameDtoDaily));
+	}
 
 }

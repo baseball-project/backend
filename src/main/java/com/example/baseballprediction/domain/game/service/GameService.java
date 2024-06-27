@@ -121,4 +121,18 @@ public class GameService {
 		game.updateWinTeam(team);
 	}
 
+	public GameDtoDaily findGameIdSingleCheck(Long gameId, String username) {
+	    Game game = gameRepository.findById(gameId)
+	            .orElseThrow(() -> new NotFoundException(ErrorCode.GAME_NOT_FOUND));
+	
+	    Member member = null;
+		Long memberId = 0L;
+		
+		if (username != null) {
+			memberId = getMemberId(username);
+		}
+	
+	    return findGameDtoDaily(game, memberId);
+	}
+	
 }

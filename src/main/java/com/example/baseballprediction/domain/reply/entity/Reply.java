@@ -1,12 +1,16 @@
 package com.example.baseballprediction.domain.reply.entity;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import com.example.baseballprediction.domain.BaseEntity;
 import com.example.baseballprediction.domain.member.entity.Member;
+import com.example.baseballprediction.domain.replylike.entity.ReplyLike;
 import com.example.baseballprediction.global.constant.ReplyStatus;
 import com.example.baseballprediction.global.constant.ReplyType;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -17,6 +21,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -49,6 +54,9 @@ public class Reply extends BaseEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(name = "reply_status")
 	private ReplyStatus status;
+
+	@OneToMany(mappedBy = "reply", cascade = CascadeType.REMOVE)
+	private List<ReplyLike> replyLikes = new ArrayList<>();
 
 	@Builder
 	public Reply(Member member, String content, ReplyType type, Reply parentReply) {

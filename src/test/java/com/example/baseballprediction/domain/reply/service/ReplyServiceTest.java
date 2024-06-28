@@ -22,6 +22,8 @@ import com.example.baseballprediction.domain.reply.entity.Reply;
 import com.example.baseballprediction.domain.reply.entity.ReplyReport;
 import com.example.baseballprediction.domain.reply.repository.ReplyReportRepository;
 import com.example.baseballprediction.domain.reply.repository.ReplyRepository;
+import com.example.baseballprediction.domain.replylike.entity.ReplyLike;
+import com.example.baseballprediction.domain.replylike.repository.ReplyLikeRepository;
 import com.example.baseballprediction.global.constant.ErrorCode;
 import com.example.baseballprediction.global.constant.ReplyStatus;
 import com.example.baseballprediction.global.constant.ReplyType;
@@ -46,6 +48,9 @@ class ReplyServiceTest {
 
 	@Autowired
 	private ReplyReportRepository replyReportRepository;
+
+	@Autowired
+	private ReplyLikeRepository replyLikeRepository;
 
 	private Member findMember(String username) {
 		return memberRepository.findByUsername(username)
@@ -88,6 +93,7 @@ class ReplyServiceTest {
 	@AfterEach
 	void tearDown() {
 		replyReportRepository.deleteAllInBatch();
+		replyLikeRepository.deleteAllInBatch();
 		replyRepository.deleteAllInBatch();
 		memberRepository.deleteAllInBatch();
 	}
@@ -371,6 +377,37 @@ class ReplyServiceTest {
 		assertThatThrownBy(() -> replyService.addReplyReport(savedReply.getId(), reporterUsername, ReportType.ETC))
 			.isInstanceOf(BusinessException.class)
 			.hasMessage(ErrorCode.REPLY_REPORT_EXIST.getMessage());
+	}
+
+	@DisplayName("댓글을 삭제하면 좋아요도 삭제된다.")
+	@Test
+	void deleteReplyCascadeLike() {
+		//given
+		ReplyType replyType = ReplyType.FAIRY;
+		String username = "playdot1";
+		String content = "asdasd";
+
+		Member member = memberRepository.findByUsername(username).orElseThrow();
+		Reply reply = createReply(member, null, content, replyType);
+
+		Reply savedReply = replyRepository.save(reply);
+
+		ReplyLike replyLike = ReplyLike.builder()
+			.member(member)
+			.reply(reply)
+			.build();
+
+		replyLikeRepository.save(replyLike);
+
+		//when
+		replyService.deleteReply(savedReply.getId(), username);
+
+		//then
+		assertThatThrownBy(
+			() -> replyLikeRepository.findById(replyLike.getId())
+				.orElseThrow(() -> new NotFoundException(ErrorCode.REPLY_LIKE_NOT_FOUND)))
+			.isInstanceOf(NotFoundException.class)
+			.hasMessage(ErrorCode.REPLY_LIKE_NOT_FOUND.getMessage());
 	}
 
 	private Reply createReply(Member member, Reply parentReply, String content, ReplyType replyType) {

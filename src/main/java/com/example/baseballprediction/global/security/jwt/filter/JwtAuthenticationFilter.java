@@ -72,16 +72,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 		try {
 			if (!JwtTokenProvider.validateToken(accessToken)) {
-				RefreshToken refreshToken = refreshTokenRepository.findById(refreshTokenId)
-					.orElseThrow(() -> new JwtException(
-						ErrorCode.JWT_INVALID));
-
-				if (refreshToken.isInvalid()) {
-					throw new JwtException(ErrorCode.JWT_EXPIRED);
-				}
 
 				filterChain.doFilter(request, response);
 			}
+
+			RefreshToken refreshToken = refreshTokenRepository.findById(refreshTokenId)
+				.orElseThrow(() -> new JwtException(
+					ErrorCode.JWT_INVALID));
+
+			if (refreshToken.isInvalid()) {
+				throw new JwtException(ErrorCode.JWT_EXPIRED);
+			}
+
 		} catch (JwtException e) {
 			setErrorResponse(response, e);
 			return;

@@ -65,7 +65,8 @@ public class SecurityConfig {
 				new AntPathRequestMatcher("/health"),
 				new AntPathRequestMatcher("/games"),
 				new AntPathRequestMatcher("/games/daily-replies"),
-				new AntPathRequestMatcher("/chat/**")
+				new AntPathRequestMatcher("/chat/**"),
+				new AntPathRequestMatcher("/oaith2/authorization/**")
 			).permitAll()
 			.anyRequest().authenticated());
 
@@ -76,11 +77,7 @@ public class SecurityConfig {
 		// 	}
 		// );
 
-		httpSecurity.logout(logoutConfigurer -> {
-			logoutConfigurer.addLogoutHandler(jwtLogoutHandler);
-			logoutConfigurer.logoutUrl("/logout");
-			logoutConfigurer.logoutSuccessUrl("/");
-		});
+		httpSecurity.logout(httpSecurityLogoutConfigurer -> httpSecurityLogoutConfigurer.disable());
 
 		httpSecurity.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

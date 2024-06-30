@@ -55,7 +55,10 @@ public class LoginService {
 		return response;
 	}
 
+	@Transactional
 	public void logout(String token) {
-		jwtTokenProvider.expireToken(token);
+		RefreshToken refreshToken = refreshTokenRepository.findById(token)
+			.orElseThrow(() -> new NotFoundException(ErrorCode.JWT_NOT_MATCHED));
+		refreshToken.invalidToken();
 	}
 }

@@ -24,7 +24,7 @@ import io.jsonwebtoken.UnsupportedJwtException;
 @Component
 public class JwtTokenProvider {
 	public static final Long REFRESH_EXP = 1000L * 60 * 60 * 24 * 7;
-	public static final Long ACCESS_EXP = 1000L * 60 * 60 * 1;
+	public static final Long ACCESS_EXP = 1000L * 60 * 60 * 24 * 1;
 	public static final String TOKEN_PREFIX = "Bearer ";
 	public static final String HEADER = "Authorization";
 	private static String secretKey;
@@ -88,8 +88,12 @@ public class JwtTokenProvider {
 	}
 
 	public static String createRefreshToken(Member member) {
+		if (member == null) {
+			throw new NotFoundException(ErrorCode.MEMBER_NOT_FOUND);
+		}
+
 		Claims claims = Jwts.claims();
-		claims.put("username", member);
+		claims.put("username", member.getUsername());
 
 		return Jwts.builder()
 			.setClaims(claims)

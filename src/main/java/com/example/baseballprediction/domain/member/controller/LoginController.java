@@ -5,18 +5,17 @@ import java.util.Map;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.baseballprediction.domain.member.dto.MemberRequest;
 import com.example.baseballprediction.domain.member.service.LoginService;
 import com.example.baseballprediction.global.constant.SocialType;
-import com.example.baseballprediction.global.security.jwt.JwtTokenProvider;
 import com.example.baseballprediction.global.security.oauth.service.OAuth2MemberService;
 import com.example.baseballprediction.global.util.ApiResponse;
 
@@ -47,11 +46,9 @@ public class LoginController {
 			.body(apiResponse);
 	}
 
-	@GetMapping("/logout")
-	public ResponseEntity<ApiResponse> logout(@RequestHeader(JwtTokenProvider.HEADER) String authorization) {
-		String token = authorization.split(" ")[1];
-
-		loginService.logout(authorization.split(" ")[1]);
+	@PostMapping("/logout")
+	public ResponseEntity<ApiResponse> logout(@CookieValue("refreshToken") String refreshToken) {
+		loginService.logout(refreshToken);
 
 		ApiResponse response = ApiResponse.successWithNoData();
 		return ResponseEntity.ok(response);
@@ -69,7 +66,7 @@ public class LoginController {
 			.path("/")
 			.maxAge(60 * 60 * 24)
 			.sameSite("None")
-			.domain("playdot.vercel.app")
+			.domain("localhost")
 			.build();
 
 		ApiResponse<Object> apiResponse = ApiResponse.success(response.get("body"));

@@ -12,6 +12,8 @@ import com.example.baseballprediction.domain.member.entity.Member;
 import com.example.baseballprediction.domain.member.repository.MemberRepository;
 import com.example.baseballprediction.global.constant.SocialType;
 import com.example.baseballprediction.global.security.jwt.JwtTokenProvider;
+import com.example.baseballprediction.global.security.jwt.entity.RefreshToken;
+import com.example.baseballprediction.global.security.jwt.repository.RefreshTokenRepository;
 import com.example.baseballprediction.global.security.oauth.dto.OAuthResponse;
 import com.example.baseballprediction.global.security.oauth.memberinfo.OAuth2MemberInfo;
 
@@ -25,7 +27,11 @@ public class OAuth2MemberService {
 	private final NaverApiClient naverApiClient;
 	private final GoogleApiClient googleApiClient;
 
-	@Transactional(readOnly = true)
+	private final JwtTokenProvider jwtTokenProvider;
+
+	private final RefreshTokenRepository refreshTokenRepository;
+
+	@Transactional
 	public Map<String, Object> login(String code, SocialType socialType) {
 		OAuth2MemberInfo oAuth2MemberInfo = null;
 
@@ -41,9 +47,16 @@ public class OAuth2MemberService {
 			oAuth2MemberInfo.generateNickname());
 
 		Map<String, Object> response = new HashMap<>();
-		response.put("token", JwtTokenProvider.createToken(member));
 
-		OAuthResponse.LoginDTO loginDTO = new OAuthResponse.LoginDTO(member);
+		String token = jwtTokenProvider.createRefreshToken(member);
+		RefreshToken refreshToken = new RefreshToken(token);
+		refreshTokenRepository.save(refreshToken);
+
+		response.put("refreshTokenId", refreshToken.getId());
+
+		String accessToken = jwtTokenProvider.createAccessToken(member);
+
+		OAuthResponse.LoginDTO loginDTO = new OAuthResponse.LoginDTO(member, accessToken);
 		response.put("body", loginDTO);
 
 		return response;

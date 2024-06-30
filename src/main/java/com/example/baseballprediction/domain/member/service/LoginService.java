@@ -16,7 +16,6 @@ import com.example.baseballprediction.global.error.exception.NotFoundException;
 import com.example.baseballprediction.global.security.jwt.JwtTokenProvider;
 import com.example.baseballprediction.global.security.jwt.entity.RefreshToken;
 import com.example.baseballprediction.global.security.jwt.repository.RefreshTokenRepository;
-import com.example.baseballprediction.global.security.oauth.dto.OAuthResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,6 +30,7 @@ public class LoginService {
 	private final JwtTokenProvider jwtTokenProvider;
 	private final RefreshTokenRepository refreshTokenRepository;
 
+	@Transactional
 	public Map<String, Object> login(String username, String password) {
 		Member member = memberRepository.findByUsername(username).orElseThrow(() -> new NotFoundException(
 			ErrorCode.MEMBER_NOT_FOUND));
@@ -57,15 +57,5 @@ public class LoginService {
 
 	public void logout(String token) {
 		jwtTokenProvider.expireToken(token);
-	}
-
-	public OAuthResponse.LoginDTO oauth2Login(String username) {
-		Member member = memberRepository.findByUsername(username)
-			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));
-
-		String teamName = member.getTeam() == null ? null : member.getTeam().getName();
-
-		return new OAuthResponse.LoginDTO(member.isNewMember(), member.getProfileImageUrl(), member.getNickname(),
-			teamName);
 	}
 }

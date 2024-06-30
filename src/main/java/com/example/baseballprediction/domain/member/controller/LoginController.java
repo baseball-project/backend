@@ -63,7 +63,18 @@ public class LoginController {
 		Map<String, Object> response = oAuth2MemberService.login(code,
 			SocialType.valueOf(registrationId.toUpperCase()));
 
+		ResponseCookie responseCookie = ResponseCookie.from("refreshToken", response.get("refreshTokenId").toString())
+			.httpOnly(true)
+			.secure(true)
+			.path("/")
+			.maxAge(60 * 60 * 24)
+			.sameSite("None")
+			.domain("playdot.vercel.app")
+			.build();
+
 		ApiResponse<Object> apiResponse = ApiResponse.success(response.get("body"));
-		return ResponseEntity.ok().header(JwtTokenProvider.HEADER, (String)response.get("token")).body(apiResponse);
+
+		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, responseCookie.toString())
+			.body(apiResponse);
 	}
 }

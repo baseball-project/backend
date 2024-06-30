@@ -1,5 +1,7 @@
 package com.example.baseballprediction.global.security.jwt.entity;
 
+import org.hibernate.annotations.ColumnDefault;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,11 +20,18 @@ public class RefreshToken {
 	@Id
 	@GeneratedValue(strategy = GenerationType.UUID)
 	@Column(name = "refresh_token_id")
-	private Long id;
+	private String id;
 
 	private String token;
 
+	@ColumnDefault("false")
+	private boolean invalid;
+
 	public RefreshToken(String token) {
 		this.token = token;
+	}
+
+	public void invalidToken() {
+		this.invalid = true;
 	}
 }

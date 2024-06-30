@@ -14,6 +14,8 @@ import com.example.baseballprediction.global.constant.ErrorCode;
 import com.example.baseballprediction.global.error.exception.BusinessException;
 import com.example.baseballprediction.global.error.exception.NotFoundException;
 import com.example.baseballprediction.global.security.jwt.JwtTokenProvider;
+import com.example.baseballprediction.global.security.jwt.entity.RefreshToken;
+import com.example.baseballprediction.global.security.jwt.repository.RefreshTokenRepository;
 import com.example.baseballprediction.global.security.oauth.dto.OAuthResponse;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ public class LoginService {
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
 	private final JwtTokenProvider jwtTokenProvider;
+	private final RefreshTokenRepository refreshTokenRepository;
 
 	public Map<String, Object> login(String username, String password) {
 		Member member = memberRepository.findByUsername(username).orElseThrow(() -> new NotFoundException(
@@ -36,10 +39,16 @@ public class LoginService {
 			throw new BusinessException(ErrorCode.LOGIN_PASSWORD_INVALID);
 		}
 
-		Map<String, Object> response = new HashMap<>();
-		response.put("token", jwtTokenProvider.createToken(member));
+		String token = jwtTokenProvider.createRefreshToken(member);
+		RefreshToken refreshToken = new RefreshToken(token);
+		refreshTokenRepository.save(refreshToken);
 
-		MemberResponse.LoginDTO body = new MemberResponse.LoginDTO(member);
+		Map<String, Object> response = new HashMap<>();
+		response.put("refreshTokenId", refreshToken.getId());
+
+		String accessToken = jwtTokenProvider.createAccessToken(member);
+
+		MemberResponse.LoginDTO body = new MemberResponse.LoginDTO(member, accessToken);
 
 		response.put("body", body);
 

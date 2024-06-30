@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 import com.example.baseballprediction.domain.member.entity.Member;
 import com.example.baseballprediction.global.constant.ErrorCode;
 import com.example.baseballprediction.global.error.exception.JwtException;
+import com.example.baseballprediction.global.error.exception.NotFoundException;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -22,8 +23,8 @@ import io.jsonwebtoken.UnsupportedJwtException;
 
 @Component
 public class JwtTokenProvider {
-	//TODO : 개발 기간 동안 토큰 만료기한 7일로 설정
-	public static final Long EXP = 1000L * 60 * 60 * 24 * 7;
+	public static final Long REFRESH_EXP = 1000L * 60 * 60 * 24 * 7;
+	public static final Long ACCESS_EXP = 1000L * 60 * 60 * 1;
 	public static final String TOKEN_PREFIX = "Bearer ";
 	public static final String HEADER = "Authorization";
 	private static String secretKey;
@@ -67,7 +68,11 @@ public class JwtTokenProvider {
 		}
 	}
 
-	public static String createToken(Member member) {
+	public static String createAccessToken(Member member) {
+		if (member == null) {
+			throw new NotFoundException(ErrorCode.MEMBER_NOT_FOUND);
+		}
+
 		Claims claims = Jwts.claims();
 		claims.put("id", member.getId());
 		claims.put("username", member.getUsername());
@@ -75,25 +80,23 @@ public class JwtTokenProvider {
 		String jwt = Jwts.builder()
 			.setClaims(claims)
 			.setIssuedAt(new Date(System.currentTimeMillis()))
-			.setExpiration(new Date(System.currentTimeMillis() + EXP))
+			.setExpiration(new Date(System.currentTimeMillis() + ACCESS_EXP))
 			.signWith(SignatureAlgorithm.HS256, secretKey)
 			.compact();
 
 		return TOKEN_PREFIX + jwt;
 	}
 
-	public static String createToken(String username) {
+	public static String createRefreshToken(Member member) {
 		Claims claims = Jwts.claims();
-		claims.put("username", username);
+		claims.put("username", member);
 
-		String jwt = Jwts.builder()
+		return Jwts.builder()
 			.setClaims(claims)
 			.setIssuedAt(new Date(System.currentTimeMillis()))
-			.setExpiration(new Date(System.currentTimeMillis() + EXP))
+			.setExpiration(new Date(System.currentTimeMillis() + REFRESH_EXP))
 			.signWith(SignatureAlgorithm.HS256, secretKey)
 			.compact();
-
-		return TOKEN_PREFIX + jwt;
 	}
 
 	public static void expireToken(String token) {

@@ -81,11 +81,13 @@ public class MemberResponse {
 		private String profileImageUrl;
 		private String nickname;
 		private String teamName;
+		private String accessToken;
 
-		public LoginDTO(Member member) {
+		public LoginDTO(Member member, String accessToken) {
 			this.profileImageUrl = member.getProfileImageUrl();
 			this.nickname = member.getNickname();
 			this.teamName = member.getTeam().getName();
+			this.accessToken = accessToken;
 		}
 	}
 }

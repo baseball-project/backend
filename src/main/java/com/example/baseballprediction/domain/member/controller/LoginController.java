@@ -2,6 +2,8 @@ package com.example.baseballprediction.domain.member.controller;
 
 import java.util.Map;
 
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,9 +32,19 @@ public class LoginController {
 	public ResponseEntity<ApiResponse<Object>> login(@RequestBody MemberRequest.LoginDTO loginDTO) {
 		Map<String, Object> response = loginService.login(loginDTO.getUsername(), loginDTO.getPassword());
 
+		ResponseCookie responseCookie = ResponseCookie.from("refreshToken", response.get("refreshTokenId").toString())
+			.httpOnly(true)
+			.secure(true)
+			.path("/")
+			.maxAge(60 * 60 * 24)
+			.sameSite("None")
+			.domain("playdot.vercel.app")
+			.build();
+
 		ApiResponse<Object> apiResponse = ApiResponse.success(response.get("body"));
 
-		return ResponseEntity.ok().header(JwtTokenProvider.HEADER, (String)response.get("token")).body(apiResponse);
+		return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, responseCookie.toString())
+			.body(apiResponse);
 	}
 
 	@GetMapping("/logout")

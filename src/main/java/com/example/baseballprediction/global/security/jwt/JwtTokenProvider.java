@@ -8,6 +8,7 @@ import org.springframework.security.authentication.AuthenticationCredentialsNotF
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.stereotype.Component;
 
+import com.auth0.jwt.JWT;
 import com.example.baseballprediction.domain.member.entity.Member;
 import com.example.baseballprediction.global.constant.ErrorCode;
 import com.example.baseballprediction.global.error.exception.JwtException;
@@ -110,5 +111,11 @@ public class JwtTokenProvider {
 			.setClaims(claims)
 			.signWith(SignatureAlgorithm.HS256, secretKey)
 			.compact();
+	}
+
+	public static boolean extractExpiredCheck(String token) {
+		Date expiresAt = JWT.decode(token).getExpiresAt();
+
+		return expiresAt.before(new Date());
 	}
 }

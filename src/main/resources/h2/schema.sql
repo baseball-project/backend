@@ -139,3 +139,9 @@ create table reply_report(
 	foreign key(reply_id) references reply(reply_id),
 	foreign key(member_id) references member(member_id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+create table refresh_token(
+	refresh_token_id varchar(50) primary key,
+	token varchar(400) not null,
+	invalid tinyint(1) not null
+)ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

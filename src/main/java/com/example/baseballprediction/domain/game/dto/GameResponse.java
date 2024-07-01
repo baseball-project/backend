@@ -1,6 +1,7 @@
 package com.example.baseballprediction.domain.game.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 import org.springframework.data.annotation.LastModifiedDate;
@@ -81,6 +82,13 @@ public class GameResponse {
 		public int hashCode() {
 			return Objects.hash(teamName, teamShortName, score, voteRatio, id, hasVote);
 		}
+	}
+
+	@Getter
+	@NoArgsConstructor
+	@AllArgsConstructor
+	public static class PastGamesDTO {
+		private List<PastGameDTO> games;
 	}
 
 	@Getter

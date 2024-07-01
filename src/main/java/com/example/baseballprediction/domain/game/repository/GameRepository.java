@@ -17,43 +17,34 @@ import com.example.baseballprediction.global.constant.Status;
 public interface GameRepository extends JpaRepository<Game, Long> {
 	List<Game> findAllByStartedAtBetween(LocalDateTime startedAtStart, LocalDateTime startedAtEnd);
 
-	// @Query(value =
-	// 	"SELECT g.game_id, date_format(g.startedAt, '%Y.%m.%d') start_date, g.home_team_id, t.name home_team_name,"
-	// 		+ " g.away_team_id, t2.name away_team_name, v.team_id"
-	// 		+ "  FROM game g LEFT JOIN (SELECT * FROM game_vote WHERE v.member_id = :memberId) v on v.game_id = g.game_id"
-	// 		+ "  INNER JOIN team t ON g.home_team_id = t.team_id"
-	// 		+ "  INNER JOIN team t2 ON g.away_team_id = t2.team_id"
-	// 		+ " WHERE g.started_at >= :startedAtStart and g.started_at <= :startedAtEnd", nativeQuery = true)
-	// List<GameVoteProjection> findPastGameByStartedAtBetween(Long memberId, LocalDateTime staredAtStart,
-	// 	LocalDateTime startedAtEnd);
-
 	@Query(value =
-		"SELECT g.game_id gameId, date_format(g.started_at, '%Y.%m.%d') startDate, g.home_team_id homeTeamId, t.name homeTeamName,"
+		"SELECT g.game_id gameId, DATE_FORMAT(g.started_at, '%Y.%m.%d') startDate, g.home_team_id homeTeamId, t.name homeTeamName,"
 			+ " g.away_team_id awayTeamId, t2.name awayTeamName, v.team_id voteTeamId"
 			+ "  FROM game g LEFT JOIN (SELECT * FROM game_vote WHERE member_id = :memberId) v on v.game_id = g.game_id"
 			+ "  INNER JOIN team t ON g.home_team_id = t.team_id"
 			+ "  INNER JOIN team t2 ON g.away_team_id = t2.team_id"
-			+ " WHERE g.started_at >= :startedAtStart and g.started_at <= :startedAtEnd", nativeQuery = true)
+			+ " WHERE g.started_at >= :startedAtStart and g.started_at <= :startedAtEnd"
+			+ " ORDER BY g.started_at ", nativeQuery = true)
 	List<GameVoteProjection> findPastGameByStartedAtBetween(Long memberId, LocalDateTime startedAtStart,
 		LocalDateTime startedAtEnd);
 
 	Optional<Game> findByHomeTeamAndAwayTeamAndStartedAt(Team homeTeam, Team awayTeam, LocalDateTime startedAt);
-	
+
 	@Query("SELECT g.id FROM Game g WHERE DATE(g.startedAt) = CURRENT_DATE AND (g.status = 'READY' OR g.status = 'PROGRESS')")
 	List<Long> findGameIdAndStatus();
-	
+
 	@Query("SELECT g.id FROM Game g WHERE g.status = :status")
 	List<Long> findGameIdsByStatus(@Param("status") Status status);
-	
+
 	@Query(value = "SELECT " +
-	           "(CASE " +
-	           " WHEN gv.team_id = g.home_team_id THEN 'home' " +
-	           " WHEN gv.team_id = g.away_team_id THEN 'away' " +
-	           "END) as teamType " +
-	           "FROM game g " +
-	           "INNER JOIN game_vote gv ON g.game_id = gv.game_id " +
-	           "INNER JOIN team t ON gv.team_id = t.team_id " +
-	           "INNER JOIN member m ON gv.member_id = m.member_id " +
-	           "WHERE g.game_id = :gameId AND m.member_id = :memberId", nativeQuery = true)
+		"(CASE " +
+		" WHEN gv.team_id = g.home_team_id THEN 'HOME' " +
+		" WHEN gv.team_id = g.away_team_id THEN 'AWAY' " +
+		"END) as game_team_type " +
+		"FROM game g " +
+		"INNER JOIN game_vote gv ON g.game_id = gv.game_id " +
+		"INNER JOIN team t ON gv.team_id = t.team_id " +
+		"INNER JOIN member m ON gv.member_id = m.member_id " +
+		"WHERE g.game_id = :gameId AND m.member_id = :memberId", nativeQuery = true)
 	GameTeamType findTeamTypeByGameIdAndMemberId(@Param("gameId") Long gameId, @Param("memberId") Long memberId);
 }

@@ -45,13 +45,13 @@ public class GameController {
 	//오늘의 승부예측 경기 list 조회
 	@GetMapping("")
 	public ResponseEntity<ApiResponse<List<GameDtoDaily>>> gameDailyTodayList(
-			@AuthenticationPrincipal MemberDetails memberDetails) {
+		@AuthenticationPrincipal MemberDetails memberDetails) {
 
 		String username = memberDetails == null ? null : memberDetails.getUsername();
-		
+
 		List<GameDtoDaily> gameDtoDailyList = gameService.findDailyGame(username);
 		ApiResponse<List<GameDtoDaily>> response = ApiResponse.success(gameDtoDailyList);
-		
+
 		return ResponseEntity.ok(response);
 
 	}
@@ -151,13 +151,13 @@ public class GameController {
 	}
 
 	@GetMapping("/past")
-	public ResponseEntity<ApiResponse<List<GameResponse.PastGameDTO>>> gameWeekList(@RequestParam String startDate,
+	public ResponseEntity<ApiResponse<List<GameResponse.PastGamesDTO>>> gameWeekList(@RequestParam String startDate,
 		@RequestParam String endDate,
 		@AuthenticationPrincipal MemberDetails memberDetails) {
-		List<GameResponse.PastGameDTO> gameResults = gameService.findGameResult(memberDetails.getUsername(), startDate,
+		List<GameResponse.PastGamesDTO> gameResults = gameService.findGameResult(memberDetails.getUsername(), startDate,
 			endDate);
 
-		ApiResponse<List<GameResponse.PastGameDTO>> response = ApiResponse.success(gameResults);
+		ApiResponse<List<GameResponse.PastGamesDTO>> response = ApiResponse.success(gameResults);
 
 		return ResponseEntity.ok(response);
 	}
@@ -167,19 +167,19 @@ public class GameController {
 	public ResponseEntity<ApiResponse> replyRemove(@AuthenticationPrincipal MemberDetails memberDetails,
 		@PathVariable Long replyId) {
 		replyService.deleteReply(replyId, memberDetails.getUsername());
-	
+
 		return ResponseEntity.ok(ApiResponse.successWithNoData());
 	}
-	
+
 	//gameId로 게임내역 단건조회
 	@GetMapping("/{gameId}")
 	public ResponseEntity<ApiResponse<GameDtoDaily>> gameIdSingleCheck(
-			@AuthenticationPrincipal MemberDetails memberDetails,
-			@PathVariable Long gameId) {
-		
+		@AuthenticationPrincipal MemberDetails memberDetails,
+		@PathVariable Long gameId) {
+
 		String username = memberDetails == null ? null : memberDetails.getUsername();
-	    GameDtoDaily gameDtoDaily = gameService.findGameIdSingleCheck(gameId,username);
-	    return ResponseEntity.ok(ApiResponse.success(gameDtoDaily));
+		GameDtoDaily gameDtoDaily = gameService.findGameIdSingleCheck(gameId, username);
+		return ResponseEntity.ok(ApiResponse.success(gameDtoDaily));
 	}
 
 }

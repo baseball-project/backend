@@ -25,18 +25,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
 		Authentication authentication) throws IOException, ServletException {
 		// ObjectMapper objectMapper = new ObjectMapper();
 		MemberDetails memberDetails = (MemberDetails)authentication.getPrincipal();
-		String token = JwtTokenProvider.createToken(memberDetails.getMember());
-
-		// response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-		// response.setCharacterEncoding(StandardCharsets.UTF_8.name());
-		//
-		// response.addHeader(JwtTokenProvider.HEADER, token);
-
-		// boolean isNewMember = memberDetails.isNewMember();
-		// String teamName =
-		// 	memberDetails.getMember().getTeam() == null ? null : memberDetails.getMember().getTeam().getName();
-		// LoginDTO loginDTO = new LoginDTO(isNewMember, memberDetails.getProfileImageUrl(), memberDetails.getName(),
-		// 	teamName);
+		String token = JwtTokenProvider.createAccessToken(memberDetails.getMember());
 
 		String targetUrl = UriComponentsBuilder.fromUriString(request.getRequestURI())
 			.queryParam("accessToken", token)

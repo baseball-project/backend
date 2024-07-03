@@ -26,6 +26,7 @@ public class MonthlyFairyResponse {
 		private int winFairyCount;
 		private int loseFairyCount;
 		private String title;
+		private String teamName;
 
 		public FairyDTO(MonthlyFairy monthlyFairy) {
 			this.rank = monthlyFairy.getRank();
@@ -34,6 +35,7 @@ public class MonthlyFairyResponse {
 			this.loseFairyCount = monthlyFairy.getMember().getLoseFairyCount();
 			this.nickname = monthlyFairy.getMember().getNickname();
 			this.title = monthlyFairy.getMember().getComment();
+			this.teamName = monthlyFairy.getMember().getTeam().getName();
 		}
 	}
 }

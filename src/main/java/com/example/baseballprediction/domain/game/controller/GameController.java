@@ -173,7 +173,7 @@ public class GameController {
 
 	//gameId로 게임내역 단건조회
 	@GetMapping("/{gameId}")
-	public ResponseEntity<ApiResponse<GameDtoDaily>> gameIdSingleCheck(
+	public ResponseEntity<ApiResponse<GameDtoDaily>> gameIdSingleCheckDetails(
 		@AuthenticationPrincipal MemberDetails memberDetails,
 		@PathVariable Long gameId) {
 

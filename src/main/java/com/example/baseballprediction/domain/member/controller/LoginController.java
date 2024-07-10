@@ -37,7 +37,7 @@ public class LoginController {
 			.path("/")
 			.maxAge(60 * 60 * 24)
 			.sameSite("None")
-			.domain("https://playdot.vercel.app")
+			.domain("playdot.vercel.app")
 			.build();
 
 		ApiResponse<Object> apiResponse = ApiResponse.success(response.get("body"));
@@ -66,7 +66,7 @@ public class LoginController {
 			.path("/")
 			.maxAge(60 * 60 * 24)
 			.sameSite("None")
-			.domain("https:playdot.vercel.app")
+			.domain("playdot.vercel.app")
 			.build();
 
 		ApiResponse<Object> apiResponse = ApiResponse.success(response.get("body"));

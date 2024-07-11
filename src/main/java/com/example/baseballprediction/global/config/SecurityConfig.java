@@ -2,7 +2,6 @@ package com.example.baseballprediction.global.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -58,8 +57,6 @@ public class SecurityConfig {
 		httpSecurity.sessionManagement(c -> c.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 		httpSecurity.formLogin(AbstractHttpConfigurer::disable);
 
-		// httpSecurity.apply(new CustomSecurityFilterManager());
-
 		httpSecurity.authorizeHttpRequests((request) -> request
 			.requestMatchers(new AntPathRequestMatcher("/login/**"),
 				new AntPathRequestMatcher("/h2-console/**"),
@@ -71,13 +68,6 @@ public class SecurityConfig {
 			).permitAll()
 			.anyRequest().authenticated());
 
-		// httpSecurity.oauth2Login(oauth2configurer -> {
-		// 		oauth2configurer.userInfoEndpoint(user -> user.userService(oAuth2MemberService));
-		// 		oauth2configurer.successHandler(oAuth2AuthenticationSuccessHandler);
-		// 		oauth2configurer.failureHandler(oAuth2AuthenticationFailureHandler);
-		// 	}
-		// );
-
 		httpSecurity.logout(httpSecurityLogoutConfigurer -> httpSecurityLogoutConfigurer.disable());
 
 		httpSecurity.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -88,13 +78,22 @@ public class SecurityConfig {
 	@Bean
 	public CorsConfigurationSource configurationSource() {
 
+		// CorsConfiguration configuration = new CorsConfiguration();
+		// configuration.addAllowedHeader("*");
+		// configuration.addAllowedMethod("*"); // GET, POST, PUT, DELETE (Javascript 요청 허용)
+		// configuration.addAllowedOrigin("https://playdot.vercel.app"); // 모든 IP 주소 허용 (프론트 앤드 IP만 허용 react)
+		// configuration.setAllowCredentials(true); // 클라이언트에서 쿠키 요청 허용
+		// configuration.addExposedHeader("Authorization");// 옛날에는 디폴트 였다. 지금은 아닙니다.
+		// configuration.addExposedHeader(HttpHeaders.SET_COOKIE);
+		// UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+		// source.registerCorsConfiguration("/**", configuration);
+
 		CorsConfiguration configuration = new CorsConfiguration();
 		configuration.addAllowedHeader("*");
 		configuration.addAllowedMethod("*"); // GET, POST, PUT, DELETE (Javascript 요청 허용)
-		configuration.addAllowedOrigin("https://playdot.vercel.app"); // 모든 IP 주소 허용 (프론트 앤드 IP만 허용 react)
+		configuration.addAllowedOriginPattern("*"); // 모든 IP 주소 허용 (프론트 앤드 IP만 허용 react)
 		configuration.setAllowCredentials(true); // 클라이언트에서 쿠키 요청 허용
-		configuration.addExposedHeader("Authorization");// 옛날에는 디폴트 였다. 지금은 아닙니다.
-		configuration.addExposedHeader(HttpHeaders.SET_COOKIE);
+		configuration.addExposedHeader("Authorization"); // 옛날에는 디폴트 였다. 지금은 아닙니다.
 		UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", configuration);
 

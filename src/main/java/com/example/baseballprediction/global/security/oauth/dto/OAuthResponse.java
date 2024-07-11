@@ -14,14 +14,14 @@ public class OAuthResponse {
 		private String nickname;
 		private String teamName;
 
-		private String accessToken;
+		// private String accessToken;
 
 		public LoginDTO(Member member, String accessToken) {
 			this.isNewMember = member.isNewMember();
 			this.profileImageUrl = member.getProfileImageUrl();
 			this.nickname = member.getNickname();
 			this.teamName = member.getTeam() == null ? null : member.getTeam().getName();
-			this.accessToken = accessToken;
+			// this.accessToken = accessToken;
 		}
 	}
 }

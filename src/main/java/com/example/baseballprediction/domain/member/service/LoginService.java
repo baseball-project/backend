@@ -52,6 +52,8 @@ public class LoginService {
 
 		response.put("body", body);
 
+		response.put("token", accessToken);
+
 		return response;
 	}
 

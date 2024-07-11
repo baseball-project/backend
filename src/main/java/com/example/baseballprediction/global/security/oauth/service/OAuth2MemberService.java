@@ -31,6 +31,7 @@ public class OAuth2MemberService {
 
 	private final RefreshTokenRepository refreshTokenRepository;
 
+	/* 리프레시 토큰 반영 */
 	@Transactional
 	public Map<String, Object> login(String code, SocialType socialType) {
 		OAuth2MemberInfo oAuth2MemberInfo = null;
@@ -58,6 +59,8 @@ public class OAuth2MemberService {
 
 		OAuthResponse.LoginDTO loginDTO = new OAuthResponse.LoginDTO(member, accessToken);
 		response.put("body", loginDTO);
+
+		response.put("token", accessToken);
 
 		return response;
 	}

@@ -151,7 +151,6 @@ public class ProfileServiceTest {
 	void findProfileWithNoMonthlyFairy() {
 		//given
 		Member member = Member.builder()
-			.isNewMember(false)
 			.socialType(SocialType.KAKAO)
 			.username("playdot1")
 			.password("123")
@@ -174,7 +173,6 @@ public class ProfileServiceTest {
 	void findProfileWithMonthlyFairy() {
 		//given
 		Member member = Member.builder()
-			.isNewMember(false)
 			.socialType(SocialType.KAKAO)
 			.username("playdot1")
 			.password("123")
@@ -365,5 +363,35 @@ public class ProfileServiceTest {
 
 		assertThat(savedTakeMember.getId()).isEqualTo(giveMember.getId());
 		assertThat(savedGiveMember.getId()).isEqualTo(takeMember.getId());
+	}
+
+	@DisplayName("좋아하는 팀 설정 시, 최초가입 여부가 업데이트 된다.")
+	@Test
+	void updateNewMemberByModifyLikeTeam() {
+		//given
+		Member member = Member.builder()
+			.username("playdot1")
+			.password("123")
+			.nickname("테스트유저1")
+			.socialType(SocialType.KAKAO)
+			.build();
+
+		Member savedMember = memberRepository.save(member);
+
+		Team favoriteTeam = Team.builder()
+			.name("한화 이글스")
+			.shortName("한화")
+			.build();
+
+		Team savedFavoriteTeam = teamRepository.save(favoriteTeam);
+
+		//when
+		profileService.modifyLikeTeam(savedMember.getUsername(), savedFavoriteTeam.getId());
+
+		//then
+		Member updateMember = memberRepository.findByUsername("playdot1").orElseThrow();
+		boolean isNewMember = updateMember.isNewMember();
+
+		assertThat(isNewMember).isFalse();
 	}
 }

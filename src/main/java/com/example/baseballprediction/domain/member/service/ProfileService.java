@@ -39,6 +39,8 @@ public class ProfileService {
 			.orElseThrow(() -> new NotFoundException(ErrorCode.TEAM_NOT_FOUND));
 
 		member.changeTeam(likeTeam);
+
+		member.setIsNewMember(false);
 	}
 
 	@Transactional
@@ -87,7 +89,7 @@ public class ProfileService {
 
 		return profile;
 	}
-	
+
 	public MemberResponse.ProfileDTO findDetails(String username) {
 		Member member = memberRepository.findByUsername(username)
 			.orElseThrow(() -> new NotFoundException(ErrorCode.MEMBER_NOT_FOUND));

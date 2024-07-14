@@ -74,6 +74,7 @@ public class Member extends BaseEntity {
 	private int loseFairyCount;
 
 	@Column(nullable = false)
+	@ColumnDefault("1")
 	private boolean isNewMember;
 
 	@Transient
@@ -83,14 +84,13 @@ public class Member extends BaseEntity {
 	private int voteRatio;
 
 	@Builder
-	public Member(Long id, String username, String password, String nickname, SocialType socialType,
-		boolean isNewMember) {
+	public Member(Long id, String username, String password, String nickname, SocialType socialType) {
 		this.id = id;
 		this.username = username;
 		this.password = password;
 		this.nickname = nickname;
 		this.socialType = socialType;
-		this.isNewMember = isNewMember;
+		this.isNewMember = true;
 		this.token = 0;
 	}
 

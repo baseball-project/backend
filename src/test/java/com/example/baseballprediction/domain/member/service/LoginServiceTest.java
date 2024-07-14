@@ -113,6 +113,19 @@ class LoginServiceTest {
 			.hasMessage(ErrorCode.LOGIN_PASSWORD_INVALID.getMessage());
 	}
 
+	@DisplayName("최초 가입 여부를 조회한다.")
+	@Test
+	void isNewMember() {
+		//given
+		Member member = memberRepository.findByUsername("playdot1").orElseThrow();
+
+		//when
+		boolean isNewMember = member.isNewMember();
+
+		//then
+		assertThat(isNewMember).isTrue();
+	}
+
 	// 로그아웃 기능은 refresh token 작업후 진행한다.
 	// @DisplayName("로그아웃을 한다. 기존 발급받은 토큰을 만료시킨다.")
 	// @Test

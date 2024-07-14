@@ -88,7 +88,6 @@ public class OAuth2MemberService {
 			.socialType(socialType)
 			.nickname(nickname)
 			.password(password)
-			.isNewMember(true)
 			.build();
 
 		memberRepository.save(member);

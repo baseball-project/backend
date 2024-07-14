@@ -275,7 +275,7 @@ class GameServiceTest {
 		Member member = memberRepository.findAll().get(0);
 
 		//when
-		List<GameResponse.PastGameDTO> result = gameService.findGameResult(member.getUsername(), "2024-04-01",
+		List<GameResponse.PastGamesDTO> result = gameService.findGameResult(member.getUsername(), "2024-04-01",
 			"2024-04-07");
 
 		//then

@@ -117,11 +117,10 @@ public class GameService {
 		Map<String, List<GameResponse.PastGameDTO>> groupedByDate = gameResults.stream()
 			.collect(Collectors.groupingBy(GameResponse.PastGameDTO::getGameDate));
 
-		List<GameResponse.PastGamesDTO> result = new ArrayList<>();
-
-		for (List<GameResponse.PastGameDTO> games : groupedByDate.values()) {
-			result.add(new GameResponse.PastGamesDTO(games));
-		}
+		List<GameResponse.PastGamesDTO> result = groupedByDate.entrySet().stream()
+			.sorted(Map.Entry.comparingByKey()) // 날짜순으로 정렬
+			.map(entry -> new GameResponse.PastGamesDTO(entry.getValue()))
+			.collect(Collectors.toList());
 
 		return result;
 	}

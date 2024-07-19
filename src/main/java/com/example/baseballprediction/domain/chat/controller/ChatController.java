@@ -136,7 +136,7 @@ public class ChatController {
 			.getNickname();
 		VoteResultDTO voteResult = miniGameService.findPerformVoteAndGetResults(resultRatioDTO.getMiniGameId(),
 			nickname);
-		messagingTemplate.convertAndSendToUser(nickname, "/voteRatioResults/" + resultRatioDTO.getMiniGameId(),
+		messagingTemplate.convertAndSend("/sub/voteRatioResults/" + resultRatioDTO.getMiniGameId(),
 			voteResult);
 	}
 

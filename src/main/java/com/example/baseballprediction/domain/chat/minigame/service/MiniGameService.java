@@ -272,7 +272,7 @@ public class MiniGameService {
 	    }
 	}
 
-	@Transactional
+		@Transactional
     public Optional<MiniGame> findCurrentMiniGame(Long gameId) {
         return miniGameRepository.findByGameIdAndStatusWithMemberAndTeam(gameId, Status.PROGRESS).stream().findFirst();
     }

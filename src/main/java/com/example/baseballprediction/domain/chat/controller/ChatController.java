@@ -1,6 +1,9 @@
 package com.example.baseballprediction.domain.chat.controller;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
@@ -71,6 +74,25 @@ public class ChatController {
 			message.sendProfile(chatProfileDTO);
 			message.setTeamType(gameTeamType.getTeamType());
 			messagingTemplate.convertAndSend("/sub/chat/" + message.getGameId(), message);
+			// 현재 진행 중인 미니 게임 정보 전송
+			Optional<MiniGame> currentMiniGameOpt = miniGameService.findCurrentMiniGame(message.getGameId());
+		   if (currentMiniGameOpt.isPresent()) {
+		       MiniGame currentMiniGame = currentMiniGameOpt.get();
+		       boolean hasVoted = miniGameService.findHasVotedMember(currentMiniGame.getId(), memberDetails.getMember().getNickname());
+			
+		       if(hasVoted) {
+		            // 이미 투표한 경우, 투표 결과 전송
+				    VoteResultDTO voteResult = miniGameService.findPerformVoteAndGetResults(currentMiniGame.getId(), memberDetails.getMember().getNickname());
+				    messagingTemplate.convertAndSendToUser(memberDetails.getMember().getNickname(), "/chat/enter", voteResult);
+				} else {
+				    // 투표하지 않은 경우, 투표 메시지 전송
+			        ChatProfileDTO profile = currentMiniGame.toChatProfileDTO();
+			        Options options = currentMiniGame.toOptions();
+			        LocalDateTime startedAt = currentMiniGame.getStartedAt();
+			        messagingTemplate.convertAndSendToUser(memberDetails.getMember().getNickname(), "/chat/enter", 
+		                    new VoteMessage(currentMiniGame.getId(), ChatMessageType.VOTE_STARTED, profile, options, startedAt));
+			    }
+			}
 		} else if (ChatType.NORMAL.equals(message.getType()) || ChatType.BAWWLING.equals(message.getType())) {
 			message.setMessage(message.getMessage());
 			message.sendProfile(chatProfileDTO);

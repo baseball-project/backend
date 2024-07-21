@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.baseballprediction.domain.member.dto.FairyProjection;
 import com.example.baseballprediction.domain.member.dto.MemberResponse;
 import com.example.baseballprediction.domain.member.service.HistoryService;
+import com.example.baseballprediction.global.constant.ErrorCode;
+import com.example.baseballprediction.global.error.exception.BusinessException;
 import com.example.baseballprediction.global.security.MemberDetails;
 import com.example.baseballprediction.global.util.ApiResponse;
 
@@ -40,6 +42,11 @@ public class HistoryController {
 		@RequestParam(required = false, defaultValue = "0") int page,
 		@RequestParam(required = false, defaultValue = "10") int list) {
 
+		if (page < 0)
+			throw new BusinessException(ErrorCode.PAGE_NO_BAD_REQUEST);
+
+		page = page == 0 ? page : page - 1;
+
 		Page<MemberResponse.FairyHistoryDTO> fairyHistories = historyService.findFairyHistories(
 			memberDetails.getMember().getId(), page,
 			list);
@@ -53,6 +60,12 @@ public class HistoryController {
 	public ResponseEntity<ApiResponse<?>> giftHistoryList(@AuthenticationPrincipal MemberDetails memberDetails,
 		@RequestParam(required = false, defaultValue = "0") int page,
 		@RequestParam(required = false, defaultValue = "10") int list) {
+
+		if (page < 0)
+			throw new BusinessException(ErrorCode.PAGE_NO_BAD_REQUEST);
+
+		page = page == 0 ? page : page - 1;
+
 		Page<MemberResponse.GiftHistoryDTO> giftHistories = historyService.findGiftHistories(memberDetails.getMember()
 			.getId(), page, list);
 

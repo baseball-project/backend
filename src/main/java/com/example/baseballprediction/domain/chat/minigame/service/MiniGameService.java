@@ -271,4 +271,14 @@ public class MiniGameService {
 	        miniGameRepository.saveAll(actionableMiniGames);
 	    }
 	}
+
+	@Transactional
+    public Optional<MiniGame> findCurrentMiniGame(Long gameId) {
+        return miniGameRepository.findByGameIdAndStatusWithMemberAndTeam(gameId, Status.PROGRESS).stream().findFirst();
+    }
+
+    @Transactional
+    public boolean findHasVotedMember(Long miniGameId, String nickname) {
+        return miniGameVoteRepository.findByMiniGameIdAndMemberNickname(miniGameId, nickname).isPresent();
+    }	
 }
